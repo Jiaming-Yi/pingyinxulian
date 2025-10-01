@@ -299,13 +299,13 @@
             padding: 15px;
             border-radius: 10px;
             background: #f8f9fa;
-            cursor: pointer;
+            cursor: default;
             transition: all 0.3s;
         }
         
         .input-item:hover {
             border-color: #3498db;
-            transform: scale(1.05);
+            transform: translateY(-1px);
         }
         
         .input-item.correct {
@@ -327,6 +327,7 @@
             text-align: center;
             font-size: 14px;
             color: #7f8c8d;
+            margin-bottom: 8px;
         }
         
         .input-item.correct .input-status {
@@ -338,6 +339,21 @@
             color: #e74c3c;
             font-weight: bold;
         }
+        
+        .mark-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .mark-btn {
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .mark-btn.correct { background: #27ae60; color: #fff; }
+        .mark-btn.wrong { background: #e74c3c; color: #fff; }
         
         /* 历史记录 */
         .history-list {
@@ -607,6 +623,43 @@
             margin: 10px 0;
         }
         
+        /* 驾驶舱样式 */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .panel {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            padding: 16px;
+        }
+        
+        .panel h3 {
+            color: #2c3e50;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .top-list {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 8px 12px;
+            align-items: center;
+        }
+        
+        .top-list .item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .muted {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        
         /* 打印样式 */
         @media print {
             body {
@@ -756,6 +809,39 @@
         .sync-button.warning {
             background: #e67e22;
         }
+        
+        /* 逐项统计表 */
+        .table-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 10px 0 6px 0;
+        }
+        .table-controls input, .table-controls select {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .table-wrap {
+            overflow: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        table.elem-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+        .elem-table th, .elem-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f2f2f2;
+            white-space: nowrap;
+            text-align: left;
+            font-size: 14px;
+        }
+        .elem-table th { background: #fafafa; color:#2c3e50; }
     </style>
 </head>
 <body>
@@ -766,6 +852,7 @@
         <div class="nav-tab" onclick="switchScreen('ocr')">📷 拍照识别</div>
         <div class="nav-tab" onclick="switchScreen('history')">📊 历史记录</div>
         <div class="nav-tab" onclick="switchScreen('library')">📚 拼音库</div>
+        <div class="nav-tab" onclick="switchScreen('dashboard')">📈 驾驶舱</div>
         <div class="nav-tab" onclick="switchScreen('settings')">⚙️ 设置</div>
     </div>
 
@@ -1096,6 +1183,92 @@
         </div>
     </div>
 
+    <!-- 驾驶舱 -->
+    <div class="screen" id="dashboardScreen">
+        <h1 class="title">📈 学习驾驶舱</h1>
+        <p class="subtitle">实时查看训练进展、趋势与易错项</p>
+        
+        <div class="analytics-grid" id="dashboardKpis">
+            <div class="analytics-card">
+                <h3>累计训练次数</h3>
+                <div class="number" id="kpiTotalTimes">0</div>
+            </div>
+            <div class="analytics-card">
+                <h3>累计训练项数</h3>
+                <div class="number" id="kpiTotalItems">0</div>
+            </div>
+            <div class="analytics-card">
+                <h3>平均正确率</h3>
+                <div class="number" id="kpiAvgRate">0%</div>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="panel">
+                <h3>近7天训练趋势</h3>
+                <canvas id="trendChart" width="800" height="300"></canvas>
+                <div class="muted" id="trendHint">显示每日训练项数与正确率（%）</div>
+            </div>
+            <div class="panel">
+                <h3>易错Top 10</h3>
+                <div class="top-list" id="topMistakes">
+                    <!-- 动态填充：拼音 | 错误次数 | 正确率 -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel" style="margin-top: 16px;">
+            <h3>按训练类型统计</h3>
+            <canvas id="typeChart" width="1000" height="260"></canvas>
+            <div class="muted">显示各训练类型的训练项数与正确率</div>
+        </div>
+        
+        <div class="panel" style="margin-top: 16px;">
+            <h3>逐项统计（每个拼音）</h3>
+            <div class="table-controls">
+                <input type="text" id="elemSearch" placeholder="搜索拼音..." oninput="renderElementTable()">
+                <select id="elemTypeFilter" onchange="renderElementTable()">
+                    <option value="">全部类型</option>
+                    <option value="声母">声母</option>
+                    <option value="单韵母">单韵母</option>
+                    <option value="复韵母">复韵母</option>
+                    <option value="鼻韵母">鼻韵母</option>
+                    <option value="整体认读">整体认读</option>
+                </select>
+                <select id="elemSort" onchange="renderElementTable()">
+                    <option value="tries_desc">按尝试数(多→少)</option>
+                    <option value="acc_desc">按正确率(高→低)</option>
+                    <option value="wrong_desc">按错误数(多→少)</option>
+                    <option value="latest_desc">按最近训练(新→旧)</option>
+                    <option value="pinyin_asc">按拼音(A→Z)</option>
+                </select>
+                <button class="action-btn" onclick="exportElementCsv()">📤 导出CSV</button>
+            </div>
+            <div class="table-wrap">
+                <table class="elem-table">
+                    <thead>
+                        <tr>
+                            <th>拼音</th>
+                            <th>类型</th>
+                            <th>尝试</th>
+                            <th>正确</th>
+                            <th>错误</th>
+                            <th>正确率</th>
+                            <th>最近训练</th>
+                        </tr>
+                    </thead>
+                    <tbody id="elemTableBody"></tbody>
+                </table>
+            </div>
+            <div class="muted" id="elemSummary" style="margin-top:6px;"></div>
+        </div>
+        
+        <div class="action-buttons" style="margin-top: 16px;">
+            <button class="action-btn" onclick="refreshDashboard()">🔄 刷新驾驶舱</button>
+            <button class="action-btn" onclick="syncFromGitHubAndRefresh()">☁️ 从GitHub同步并刷新</button>
+        </div>
+    </div>
+
     <script>
         // 完整拼音库
         const pinyinDatabase = {
@@ -1170,6 +1343,7 @@
                 'ocr': 'ocrScreen',
                 'history': 'historyScreen',
                 'library': 'libraryScreen',
+                'dashboard': 'dashboardScreen',
                 'settings': 'settingsScreen'
             };
             
@@ -1182,6 +1356,11 @@
                 loadLibrary();
             } else if (screen === 'settings') {
                 loadGitHubConfig();
+            } else if (screen === 'dashboard') {
+                refreshDashboard();
+                startDashboardAutoRefresh();
+            } else {
+                stopDashboardAutoRefresh();
             }
         }
         
@@ -1355,9 +1534,12 @@
                 div.dataset.index = index;
                 div.innerHTML = `
                     <div class="pinyin">${item}</div>
-                    <div class="input-status">点击选择</div>
+                    <div class="input-status">未选择</div>
+                    <div class="mark-buttons">
+                        <button type="button" class="mark-btn correct" onclick="markResult(${index}, true)">✓ 正确</button>
+                        <button type="button" class="mark-btn wrong" onclick="markResult(${index}, false)">✗ 错误</button>
+                    </div>
                 `;
-                div.onclick = () => toggleInput(div, index);
                 grid.appendChild(div);
             });
             
@@ -1366,22 +1548,14 @@
             switchScreen('input');
         }
         
-        // 切换录入状态
-        function toggleInput(element, index) {
-            if (!element.classList.contains('correct') && !element.classList.contains('wrong')) {
-                element.classList.add('correct');
-                element.querySelector('.input-status').textContent = '✓ 正确';
-                inputResults[index] = true;
-            } else if (element.classList.contains('correct')) {
-                element.classList.remove('correct');
-                element.classList.add('wrong');
-                element.querySelector('.input-status').textContent = '✗ 错误';
-                inputResults[index] = false;
-            } else {
-                element.classList.remove('wrong');
-                element.querySelector('.input-status').textContent = '点击选择';
-                delete inputResults[index];
-            }
+        // 设置某项为正确/错误（显式选择）
+        function markResult(index, isCorrect) {
+            const item = document.querySelector(`.input-item[data-index="${index}"]`);
+            if (!item) return;
+            item.classList.remove('correct', 'wrong');
+            item.classList.add(isCorrect ? 'correct' : 'wrong');
+            item.querySelector('.input-status').textContent = isCorrect ? '✓ 正确' : '✗ 错误';
+            inputResults[index] = !!isCorrect;
         }
         
         // 清除录入
@@ -1389,7 +1563,8 @@
             inputResults = {};
             document.querySelectorAll('.input-item').forEach(item => {
                 item.classList.remove('correct', 'wrong');
-                item.querySelector('.input-status').textContent = '点击选择';
+                const st = item.querySelector('.input-status');
+                if (st) st.textContent = '未选择';
             });
         }
         
@@ -1413,12 +1588,12 @@
             };
             
             saveToDatabase(record);
+            if (isDashboardActive()) refreshDashboard();
             alert('✅ 保存成功！');
             
-            // 如果配置了GitHub，提示是否自动同步
             if (githubConfig.token) {
                 if (confirm('是否立即同步到GitHub？')) {
-                    syncToGitHub();
+                    syncToGitHub().then(()=>{ if (isDashboardActive()) refreshDashboard(); });
                 }
             }
             
@@ -1630,6 +1805,21 @@
             repo: localStorage.getItem('github_repo') || 'pingyinxulian'
         };
 
+        // 统一构建GitHub Headers，清洗Token避免非ASCII字符
+        function getSanitizedToken() {
+            return (githubConfig.token || '').trim().replace(/[^\x00-\x7F]/g, '');
+        }
+        function getGitHubHeaders(includeJson = false) {
+            const token = getSanitizedToken();
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28'
+            };
+            if (includeJson) headers['Content-Type'] = 'application/json';
+            return headers;
+        }
+
         // 加载配置
         function loadGitHubConfig() {
             document.getElementById('githubToken').value = githubConfig.token;
@@ -1670,46 +1860,32 @@
                 const content = JSON.stringify(database, null, 2);
                 const encodedContent = btoa(unescape(encodeURIComponent(content)));
                 
-                // 先尝试获取文件SHA（如果文件已存在）
                 let sha = null;
                 try {
                     const getResponse = await fetch(
                         `https://api.github.com/repos/${githubConfig.username}/${githubConfig.repo}/contents/data/training_records.json`,
                         {
-                            headers: {
-                                'Authorization': `token ${githubConfig.token}`,
-                                'Accept': 'application/vnd.github.v3+json'
-                            }
+                            headers: getGitHubHeaders(false)
                         }
                     );
                     if (getResponse.ok) {
                         const fileData = await getResponse.json();
                         sha = fileData.sha;
                     }
-                } catch (e) {
-                    // 文件不存在，继续
-                }
+                } catch (e) {}
                 
-                // 上传文件
                 const uploadData = {
                     message: `更新训练记录 - ${new Date().toLocaleString('zh-CN')}`,
                     content: encodedContent,
                     branch: 'main'
                 };
-                
-                if (sha) {
-                    uploadData.sha = sha;
-                }
+                if (sha) uploadData.sha = sha;
                 
                 const response = await fetch(
                     `https://api.github.com/repos/${githubConfig.username}/${githubConfig.repo}/contents/data/training_records.json`,
                     {
                         method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${githubConfig.token}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Content-Type': 'application/json'
-                        },
+                        headers: getGitHubHeaders(true),
                         body: JSON.stringify(uploadData)
                     }
                 );
@@ -1717,12 +1893,18 @@
                 if (response.ok) {
                     showSyncStatus('success', `✅ 数据已成功上传到GitHub（${database.length}条记录）`);
                     localStorage.setItem('last_sync_time', new Date().toISOString());
+                    if (isDashboardActive()) refreshDashboard();
                 } else {
-                    const error = await response.json();
+                    const error = await response.json().catch(()=>({ message: response.statusText }));
                     showSyncStatus('error', `❌ 上传失败: ${error.message}`);
                 }
             } catch (error) {
-                showSyncStatus('error', `❌ 上传出错: ${error.message}`);
+                const msg = (error && error.message) ? error.message : String(error);
+                if (/non ISO-8859-1|ISO-8859-1|headers/i.test(msg)) {
+                    showSyncStatus('error', '❌ 上传出错：Token或请求头包含非ASCII字符。请在设置中重新粘贴纯英文的Token，并去除空格或全角字符。');
+                } else {
+                    showSyncStatus('error', `❌ 上传出错: ${msg}`);
+                }
             }
         }
 
@@ -1739,10 +1921,7 @@
                 const response = await fetch(
                     `https://api.github.com/repos/${githubConfig.username}/${githubConfig.repo}/contents/data/training_records.json`,
                     {
-                        headers: {
-                            'Authorization': `token ${githubConfig.token}`,
-                            'Accept': 'application/vnd.github.v3+json'
-                        }
+                        headers: getGitHubHeaders(false)
                     }
                 );
                 
@@ -1767,11 +1946,16 @@
                 } else if (response.status === 404) {
                     showSyncStatus('info', '⚠️ GitHub上还没有数据文件，请先上传数据');
                 } else {
-                    const error = await response.json();
+                    const error = await response.json().catch(()=>({ message: response.statusText }));
                     showSyncStatus('error', `❌ 下载失败: ${error.message}`);
                 }
             } catch (error) {
-                showSyncStatus('error', `❌ 下载出错: ${error.message}`);
+                const msg = (error && error.message) ? error.message : String(error);
+                if (/non ISO-8859-1|ISO-8859-1|headers/i.test(msg)) {
+                    showSyncStatus('error', '❌ 下载出错：Token或请求头包含非ASCII字符。请在设置中重新粘贴纯英文的Token，并去除空格或全角字符。');
+                } else {
+                    showSyncStatus('error', `❌ 下载出错: ${msg}`);
+                }
             }
         }
 
@@ -1840,6 +2024,272 @@
                 updateLocalDataInfo();
                 showSyncStatus('success', '✅ 本地数据已清除');
             }
+        }
+
+        function refreshDashboard() {
+            const db = JSON.parse(localStorage.getItem('pinyinTrainingDB') || '[]');
+            // KPI统计
+            let totalTrainings = db.length;
+            let totalItems = 0;
+            let totalCorrect = 0;
+            db.forEach(r => {
+                if (r.results && Array.isArray(r.results)) {
+                    r.results.forEach(x => {
+                        if (x.result !== null) {
+                            totalItems++;
+                            if (x.result) totalCorrect++;
+                        }
+                    });
+                }
+            });
+            document.getElementById('kpiTotalTimes').textContent = totalTrainings;
+            document.getElementById('kpiTotalItems').textContent = totalItems;
+            document.getElementById('kpiAvgRate').textContent = totalItems ? Math.round(totalCorrect * 100 / totalItems) + '%' : '0%';
+            
+            // 近7天趋势（按日期）
+            const last7 = Array.from({length: 7}).map((_,i)=>{
+                const d = new Date();
+                d.setDate(d.getDate() - (6 - i));
+                const key = d.toISOString().slice(0,10);
+                return { key, items:0, correct:0 };
+            });
+            const map = new Map(last7.map(x=>[x.key,x]));
+            db.forEach(r => {
+                const key = (r.completedDate || r.date || '').slice(0,10);
+                const bucket = map.get(key);
+                if (!bucket) return;
+                if (r.results) {
+                    r.results.forEach(x=>{
+                        if (x.result !== null) {
+                            bucket.items++;
+                            if (x.result) bucket.correct++;
+                        }
+                    });
+                }
+            });
+            drawTrendChart(last7);
+            
+            // 易错Top10
+            const mistakeMap = new Map(); // pinyin -> {wrong,total}
+            db.forEach(r=>{
+                if (!r.results) return;
+                r.results.forEach(x=>{
+                    if (x.result === null) return;
+                    const rec = mistakeMap.get(x.pinyin) || {wrong:0,total:0};
+                    rec.total++;
+                    if (!x.result) rec.wrong++;
+                    mistakeMap.set(x.pinyin, rec);
+                });
+            });
+            const sorted = Array.from(mistakeMap.entries())
+                .filter(([p,{total}])=>total>=2)
+                .sort((a,b)=> b[1].wrong - a[1].wrong)
+                .slice(0,10);
+            const list = document.getElementById('topMistakes');
+            list.innerHTML = '';
+            sorted.forEach(([p,rec])=>{
+                const rate = rec.total ? Math.round((rec.total - rec.wrong)*100/rec.total) : 0;
+                const rowP = document.createElement('div'); rowP.className='item'; rowP.textContent = p; list.appendChild(rowP);
+                const rowW = document.createElement('div'); rowW.className='item'; rowW.textContent = `错${rec.wrong}`; list.appendChild(rowW);
+                const rowR = document.createElement('div'); rowR.className='item'; rowR.textContent = `${rate}%`; list.appendChild(rowR);
+            });
+            
+            // 按类型统计
+            const typeKeys = [
+                { key:'shengmu', label:'声母' },
+                { key:'danyunmu', label:'单韵母' },
+                { key:'shuangyunmu', label:'复韵母' },
+                { key:'biyunmu', label:'鼻韵母' },
+                { key:'zhengti', label:'整体认读' },
+                { key:'random', label:'随机' }
+            ];
+            const typeAgg = new Map(typeKeys.map(t=>[t.key,{ label:t.label, items:0, correct:0 }]));
+            db.forEach(r=>{
+                const k = r.mode || 'random';
+                const bucket = typeAgg.get(k) || typeAgg.get('random');
+                if (!bucket) return;
+                if (Array.isArray(r.results)) {
+                    r.results.forEach(x=>{
+                        if (x.result !== null) {
+                            bucket.items++;
+                            if (x.result) bucket.correct++;
+                        }
+                    });
+                }
+            });
+            const typePoints = typeKeys.map(t=>{
+                const b = typeAgg.get(t.key) || { items:0, correct:0, label:t.label };
+                return { label:t.label, items:b.items, rate: b.items? Math.round(b.correct*100/b.items):0 };
+            });
+            drawTypeChart(typePoints);
+            
+            // 逐项统计更新
+            buildElementStatsCache(db);
+            renderElementTable();
+        }
+        
+        function drawTrendChart(points){
+            const canvas = document.getElementById('trendChart');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            const W=canvas.width,H=canvas.height, P=40;
+            ctx.strokeStyle='#ccc'; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(P,P); ctx.lineTo(P,H-P); ctx.lineTo(W-P,H-P); ctx.stroke();
+            const labels = points.map(p=>p.key.slice(5));
+            const maxItems = Math.max(1, ...points.map(p=>p.items));
+            const itemsY = v => H-P - (v/maxItems)*(H-2*P);
+            const xStep = (W-2*P)/(points.length-1 || 1);
+            ctx.fillStyle='rgba(52,152,219,0.25)';
+            points.forEach((p,i)=>{
+                const x = P + i*xStep - 10;
+                const y = itemsY(p.items);
+                ctx.fillRect(x, y, 20, (H-P)-y);
+            });
+            ctx.strokeStyle='#e67e22'; ctx.lineWidth=2; ctx.beginPath();
+            points.forEach((p,i)=>{
+                const rate = p.items ? p.correct*100/p.items : 0;
+                const y = H-P - (rate/100)*(H-2*P);
+                const x = P + i*xStep;
+                if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            });
+            ctx.stroke();
+            ctx.fillStyle='#7f8c8d'; ctx.font='12px Arial'; ctx.textAlign='center';
+            labels.forEach((lb,i)=>{ const x=P+i*xStep; ctx.fillText(lb,x,H-P+14); });
+        }
+        
+        function drawTypeChart(points){
+            const canvas = document.getElementById('typeChart');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            const W=canvas.width,H=canvas.height,P=40;
+            ctx.strokeStyle='#ccc'; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(P,P); ctx.lineTo(P,H-P); ctx.lineTo(W-P,H-P); ctx.stroke();
+            const maxItems = Math.max(1, ...points.map(p=>p.items));
+            const barW = 28;
+            const xStep = (W-2*P)/points.length;
+            points.forEach((p,i)=>{
+                const x = P + i*xStep + (xStep-barW)/2;
+                const y = H-P - (p.items/maxItems)*(H-2*P);
+                ctx.fillStyle='rgba(46,204,113,0.35)';
+                ctx.fillRect(x, y, barW, (H-P)-y);
+                ctx.fillStyle='#e67e22'; ctx.font='12px Arial'; ctx.textAlign='center';
+                ctx.fillText(p.rate + '%', x+barW/2, y-6);
+                ctx.fillStyle='#7f8c8d';
+                ctx.fillText(p.label, x+barW/2, H-P+14);
+            });
+        }
+        
+        let dashboardTimer = null;
+        function startDashboardAutoRefresh(){
+            stopDashboardAutoRefresh();
+            dashboardTimer = setInterval(()=>{
+                if (isDashboardActive()) refreshDashboard();
+            }, 60000);
+        }
+        function stopDashboardAutoRefresh(){
+            if (dashboardTimer) { clearInterval(dashboardTimer); dashboardTimer = null; }
+        }
+        function isDashboardActive(){
+            const el = document.getElementById('dashboardScreen');
+            return el && el.classList.contains('active');
+        }
+        
+        async function syncFromGitHubAndRefresh(){
+            if (typeof syncFromGitHub === 'function') {
+                await syncFromGitHub();
+                if (isDashboardActive()) refreshDashboard();
+            } else {
+                alert('当前版本不支持GitHub同步。');
+            }
+        }
+        
+        // —— 逐项统计逻辑 ——
+        let elemStats = [];
+        function detectPinyinType(p){
+            if (pinyinDatabase && Array.isArray(pinyinDatabase.shengmu) && pinyinDatabase.shengmu.includes(p)) return '声母';
+            if (pinyinDatabase && Array.isArray(pinyinDatabase.danyunmu) && pinyinDatabase.danyunmu.includes(p)) return '单韵母';
+            if (pinyinDatabase && Array.isArray(pinyinDatabase.shuangyunmu) && pinyinDatabase.shuangyunmu.includes(p)) return '复韵母';
+            if (pinyinDatabase && Array.isArray(pinyinDatabase.biyunmu) && pinyinDatabase.biyunmu.includes(p)) return '鼻韵母';
+            if (pinyinDatabase && Array.isArray(pinyinDatabase.zhengtiWithTones) && pinyinDatabase.zhengtiWithTones.includes(p)) return '整体认读';
+            return '';
+        }
+        function buildElementStatsCache(db){
+            const map = new Map();
+            db.forEach(r=>{
+                const dt = new Date(r.completedDate || r.date || '').toISOString();
+                (r.results||[]).forEach(x=>{
+                    if (x.result === null) return;
+                    const key = x.pinyin;
+                    const rec = map.get(key) || { pinyin:key, type: detectPinyinType(key), tries:0, correct:0, wrong:0, latest:'' };
+                    rec.tries++;
+                    if (x.result) rec.correct++; else rec.wrong++;
+                    if (!rec.latest || dt > rec.latest) rec.latest = dt;
+                    map.set(key, rec);
+                });
+            });
+            elemStats = Array.from(map.values()).map(r=>({
+                ...r,
+                acc: r.tries ? Math.round(r.correct*100/r.tries) : 0
+            }));
+        }
+        function renderElementTable(){
+            const body = document.getElementById('elemTableBody');
+            const q = (document.getElementById('elemSearch')?.value || '').trim().toLowerCase();
+            const t = document.getElementById('elemTypeFilter')?.value || '';
+            const sort = document.getElementById('elemSort')?.value || 'tries_desc';
+            let rows = elemStats.slice();
+            if (q) rows = rows.filter(r=> r.pinyin.toLowerCase().includes(q));
+            if (t) rows = rows.filter(r=> r.type === t);
+            switch(sort){
+                case 'tries_desc': rows.sort((a,b)=> b.tries-a.tries || a.pinyin.localeCompare(b.pinyin)); break;
+                case 'acc_desc': rows.sort((a,b)=> b.acc-a.acc || b.tries-a.tries); break;
+                case 'wrong_desc': rows.sort((a,b)=> b.wrong-a.wrong || b.tries-a.tries); break;
+                case 'latest_desc': rows.sort((a,b)=> (b.latest||'').localeCompare(a.latest||'') || b.tries-a.tries); break;
+                case 'pinyin_asc': rows.sort((a,b)=> a.pinyin.localeCompare(b.pinyin)); break;
+            }
+            body.innerHTML = rows.map(r=>
+                `<tr>
+                    <td>${r.pinyin}</td>
+                    <td>${r.type||''}</td>
+                    <td>${r.tries}</td>
+                    <td>${r.correct}</td>
+                    <td>${r.wrong}</td>
+                    <td>${r.acc}%</td>
+                    <td>${r.latest? new Date(r.latest).toLocaleString('zh-CN'):''}</td>
+                </tr>`
+            ).join('');
+            document.getElementById('elemSummary').textContent = `共 ${rows.length} 个拼音条目`;
+        }
+        function exportElementCsv(){
+            // 基于当前筛选渲染数据导出
+            const q = (document.getElementById('elemSearch')?.value || '').trim().toLowerCase();
+            const t = document.getElementById('elemTypeFilter')?.value || '';
+            const sort = document.getElementById('elemSort')?.value || 'tries_desc';
+            let rows = elemStats.slice();
+            if (q) rows = rows.filter(r=> r.pinyin.toLowerCase().includes(q));
+            if (t) rows = rows.filter(r=> r.type === t);
+            switch(sort){
+                case 'tries_desc': rows.sort((a,b)=> b.tries-a.tries || a.pinyin.localeCompare(b.pinyin)); break;
+                case 'acc_desc': rows.sort((a,b)=> b.acc-a.acc || b.tries-a.tries); break;
+                case 'wrong_desc': rows.sort((a,b)=> b.wrong-a.wrong || b.tries-a.tries); break;
+                case 'latest_desc': rows.sort((a,b)=> (b.latest||'').localeCompare(a.latest||'') || b.tries-a.tries); break;
+                case 'pinyin_asc': rows.sort((a,b)=> a.pinyin.localeCompare(b.pinyin)); break;
+            }
+            const header = ['拼音','类型','尝试','正确','错误','正确率','最近训练'];
+            const lines = [header.join(',')].concat(rows.map(r=>[
+                r.pinyin,
+                r.type||'',
+                r.tries,
+                r.correct,
+                r.wrong,
+                r.acc+'%',
+                r.latest? new Date(r.latest).toLocaleString('zh-CN'):''
+            ].map(v=> `"${String(v).replace(/"/g,'""')}"`).join(',')));
+            const blob = new Blob(["\uFEFF"+lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `pinyin_element_stats_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click(); URL.revokeObjectURL(url);
         }
     </script>
 </body>

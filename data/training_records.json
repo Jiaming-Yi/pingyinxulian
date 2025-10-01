@@ -1,0 +1,128 @@
+[
+  {
+    "id": "T1759323622961",
+    "mode": "shengmu",
+    "typeName": "声母训练",
+    "items": [
+      "d",
+      "n",
+      "sh",
+      "h",
+      "c",
+      "l",
+      "k",
+      "p",
+      "m",
+      "r",
+      "y",
+      "j",
+      "z",
+      "b",
+      "q",
+      "w",
+      "g",
+      "s",
+      "ch",
+      "t",
+      "f",
+      "x",
+      "zh"
+    ],
+    "date": "2025-10-01T13:00:22.961Z",
+    "results": [
+      {
+        "pinyin": "d",
+        "result": true
+      },
+      {
+        "pinyin": "n",
+        "result": true
+      },
+      {
+        "pinyin": "sh",
+        "result": true
+      },
+      {
+        "pinyin": "h",
+        "result": true
+      },
+      {
+        "pinyin": "c",
+        "result": null
+      },
+      {
+        "pinyin": "l",
+        "result": true
+      },
+      {
+        "pinyin": "k",
+        "result": true
+      },
+      {
+        "pinyin": "p",
+        "result": true
+      },
+      {
+        "pinyin": "m",
+        "result": true
+      },
+      {
+        "pinyin": "r",
+        "result": true
+      },
+      {
+        "pinyin": "y",
+        "result": true
+      },
+      {
+        "pinyin": "j",
+        "result": true
+      },
+      {
+        "pinyin": "z",
+        "result": true
+      },
+      {
+        "pinyin": "b",
+        "result": true
+      },
+      {
+        "pinyin": "q",
+        "result": true
+      },
+      {
+        "pinyin": "w",
+        "result": true
+      },
+      {
+        "pinyin": "g",
+        "result": true
+      },
+      {
+        "pinyin": "s",
+        "result": true
+      },
+      {
+        "pinyin": "ch",
+        "result": true
+      },
+      {
+        "pinyin": "t",
+        "result": true
+      },
+      {
+        "pinyin": "f",
+        "result": true
+      },
+      {
+        "pinyin": "x",
+        "result": true
+      },
+      {
+        "pinyin": "zh",
+        "result": true
+      }
+    ],
+    "completedDate": "2025-10-01T13:01:01.122Z"
+  }
+]

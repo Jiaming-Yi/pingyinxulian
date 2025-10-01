@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>桐桐汉语拼音训练记录表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", "SimHei", Arial, sans-serif;
+            padding: 20px;
+            background: white;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            page-break-after: avoid;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .header .info {
+            font-size: 16px;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+        }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .training-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .training-item {
+            border: 2px solid #bdc3c7;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+        
+        .pinyin {
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            font-family: "Arial", "Microsoft YaHei", sans-serif;
+        }
+        
+        .checkboxes {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+        
+        .correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .wrong {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        /* 打印样式 */
+        @media print {
+            body {
+                padding: 10px;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+            }
+            
+            .header {
+                page-break-after: avoid;
+            }
+            
+            .training-grid {
+                gap: 10px;
+            }
+            
+            .training-item {
+                padding: 10px;
+            }
+        }
+        
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>桐桐汉语拼音训练记录表</h1>
+        <div class="info">
+            训练日期：________年____月____日　　训练者：__________
+        </div>
+    </div>
+
+    <!-- 声母训练部分 -->
+    <div class="section">
+        <h2 class="section-title">一、声母训练（23个）</h2>
+        
+        <div class="training-grid">
+            <div class="training-item">
+                <div class="pinyin">b</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">p</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">m</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">f</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">d</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">t</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">n</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">l</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">g</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">k</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">h</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">j</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">q</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">x</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">zh</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">ch</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">sh</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">r</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">z</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">c</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">s</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">y</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">w</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 韵母训练部分 -->
+    <div class="section" style="page-break-before: always;">
+        <h2 class="section-title">二、韵母训练</h2>
+        
+        <h3 style="font-size: 18px; color: #555; margin: 20px 0 15px 0;">（一）单韵母（6个）</h3>
+        <div class="training-grid">
+            <div class="training-item">
+                <div class="pinyin">a</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">o</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">e</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">i</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">u</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">ü</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <h3 style="font-size: 18px; color: #555; margin: 20px 0 15px 0;">（二）复韵母（9个）</h3>
+        <div class="training-grid">
+            <div class="training-item">
+                <div class="pinyin">ai</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">ei</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">ui</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">ao</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">ou</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">iu</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">ie</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">üe</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">er</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <h3 style="font-size: 18px; color: #555; margin: 20px 0 15px 0;">（三）前鼻韵母（5个）</h3>
+        <div class="training-grid">
+            <div class="training-item">
+                <div class="pinyin">an</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">en</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">in</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">un</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">ün</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <h3 style="font-size: 18px; color: #555; margin: 20px 0 15px 0;">（四）后鼻韵母（4个）</h3>
+        <div class="training-grid">
+            <div class="training-item">
+                <div class="pinyin">ang</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">eng</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">ing</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+            
+            <div class="training-item">
+                <div class="pinyin">ong</div>
+                <div class="checkboxes">
+                    <label class="checkbox-item correct">
+                        <input type="checkbox"> ✓ 对
+                    </label>
+                    <label class="checkbox-item wrong">
+                        <input type="checkbox"> ✗ 错
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px; padding: 20px; background: #ecf0f1; border-radius: 8px; page-break-inside: avoid;">
+        <h3 style="font-size: 18px; margin-bottom: 10px;">训练说明：</h3>
+        <ul style="line-height: 1.8; font-size: 14px; color: #555; padding-left: 20px;">
+            <li>显示拼音让桐桐读出来，家长根据读音是否正确在对应的框内打"√"</li>
+            <li>建议每天练习，记录日期和训练者姓名</li>
+            <li>对于读错的拼音，可以多次重复练习</li>
+            <li>声母共23个，韵母共24个</li>
+        </ul>
+    </div>
+
+</body>
+</html> 

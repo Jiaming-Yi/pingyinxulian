@@ -1,0 +1,2227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汉语拼音声韵调组合大全</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .poster-container {
+            width: 720px;
+            min-height: 960px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #e6f2ff 0%, #ffffff 100%);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .poster-container::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(255, 153, 51, 0.2), rgba(255, 153, 51, 0.05));
+            z-index: 0;
+        }
+        
+        .poster-container::after {
+            content: "";
+            position: absolute;
+            bottom: -70px;
+            left: -70px;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(51, 153, 255, 0.2), rgba(51, 153, 255, 0.05));
+            z-index: 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1565C0;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        
+        .section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1565C0;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 8px;
+            color: #FF9933;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        
+        th, td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        th {
+            background-color: #E3F2FD;
+            color: #1565C0;
+            font-weight: 500;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .pinyin {
+            font-weight: 500;
+            color: #1565C0;
+        }
+        
+        .example {
+            color: #FF9933;
+            font-weight: 500;
+        }
+        
+        .tone-chart {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+        }
+        
+        .tone-item {
+            text-align: center;
+            width: 18%;
+        }
+        
+        .tone-symbol {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1565C0;
+            margin-bottom: 5px;
+        }
+        
+        .tone-name {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .tone-desc {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .grid-item {
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            padding: 8px;
+            text-align: center;
+        }
+        
+        .note {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .combination-example {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        .combo-item {
+            width: 48%;
+            margin-bottom: 8px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .combo-pinyin {
+            font-weight: 700;
+            color: #1565C0;
+            margin-right: 8px;
+            font-size: 18px;
+        }
+        
+        .combo-hanzi {
+            color: #FF9933;
+        }
+        
+        .all-combinations {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        
+        .combo-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        .combo-table th {
+            background-color: #E3F2FD;
+            color: #1565C0;
+            padding: 6px;
+            position: sticky;
+            top: 0;
+        }
+        
+        .combo-table td {
+            padding: 4px;
+        }
+        
+        .combo-table tr:hover {
+            background-color: #f0f7ff;
+        }
+        
+        .combo-initial {
+            font-weight: 700;
+            color: #1565C0;
+            text-align: left;
+            padding-left: 10px !important;
+        }
+        
+        .combo-final {
+            color: #333;
+        }
+        
+        .combo-tones {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .tone {
+            width: 18%;
+            text-align: center;
+        }
+        
+        .scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #1565C0 #e0e0e0;
+        }
+        
+        .scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .scrollbar::-webkit-scrollbar-track {
+            background: #e0e0e0;
+            border-radius: 4px;
+        }
+        
+        .scrollbar::-webkit-scrollbar-thumb {
+            background-color: #1565C0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="poster-container">
+        <div class="header">
+            <h1 class="title">汉语拼音声韵调组合大全</h1>
+        </div>
+        
+        <!-- 声母表 -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-microphone"></i>声母表（23个）
+            </h2>
+            <table>
+                <tr>
+                    <th>声母</th>
+                    <th>发音示例</th>
+                    <th>声母</th>
+                    <th>发音示例</th>
+                </tr>
+                <tr>
+                    <td class="pinyin">b</td>
+                    <td class="example">玻</td>
+                    <td class="pinyin">p</td>
+                    <td class="example">坡</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">m</td>
+                    <td class="example">摸</td>
+                    <td class="pinyin">f</td>
+                    <td class="example">佛</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">d</td>
+                    <td class="example">得</td>
+                    <td class="pinyin">t</td>
+                    <td class="example">特</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">n</td>
+                    <td class="example">讷</td>
+                    <td class="pinyin">l</td>
+                    <td class="example">勒</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">g</td>
+                    <td class="example">哥</td>
+                    <td class="pinyin">k</td>
+                    <td class="example">科</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">h</td>
+                    <td class="example">喝</td>
+                    <td class="pinyin">j</td>
+                    <td class="example">基</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">q</td>
+                    <td class="example">欺</td>
+                    <td class="pinyin">x</td>
+                    <td class="example">希</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">zh</td>
+                    <td class="example">知</td>
+                    <td class="pinyin">ch</td>
+                    <td class="example">吃</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">sh</td>
+                    <td class="example">诗</td>
+                    <td class="pinyin">r</td>
+                    <td class="example">日</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">z</td>
+                    <td class="example">资</td>
+                    <td class="pinyin">c</td>
+                    <td class="example">雌</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">s</td>
+                    <td class="example">思</td>
+                    <td class="pinyin">y</td>
+                    <td class="example">衣</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">w</td>
+                    <td class="example">乌</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- 韵母表 -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-music"></i>韵母表（24个）
+            </h2>
+            <div class="grid-container">
+                <div class="grid-item">
+                    <strong>单韵母（6个）</strong>
+                    <table>
+                        <tr>
+                            <td class="pinyin">a</td>
+                            <td class="example">啊</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">o</td>
+                            <td class="example">喔</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">e</td>
+                            <td class="example">鹅</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">i</td>
+                            <td class="example">衣</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">u</td>
+                            <td class="example">乌</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">ü</td>
+                            <td class="example">迂</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="grid-item">
+                    <strong>复韵母（9个）</strong>
+                    <table>
+                        <tr>
+                            <td class="pinyin">ai</td>
+                            <td class="example">哀</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">ei</td>
+                            <td class="example">诶</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">ui</td>
+                            <td class="example">威</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">ao</td>
+                            <td class="example">熬</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">ou</td>
+                            <td class="example">欧</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">iu</td>
+                            <td class="example">优</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">ie</td>
+                            <td class="example">耶</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">üe</td>
+                            <td class="example">约</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">er</td>
+                            <td class="example">儿</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="grid-item">
+                    <strong>鼻韵母（9个）</strong>
+                    <table>
+                        <tr>
+                            <td class="pinyin">an</td>
+                            <td class="example">安</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">en</td>
+                            <td class="example">恩</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">in</td>
+                            <td class="example">因</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">un</td>
+                            <td class="example">温</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">ün</td>
+                            <td class="example">晕</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">ang</td>
+                            <td class="example">昂</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">eng</td>
+                            <td class="example">鞥</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">ing</td>
+                            <td class="example">英</td>
+                        </tr>
+                        <tr>
+                            <td class="pinyin">ong</td>
+                            <td class="example">翁</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 声调说明 -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-chart-line"></i>声调说明
+            </h2>
+            <div class="tone-chart">
+                <div class="tone-item">
+                    <div class="tone-symbol">ā</div>
+                    <div class="tone-name">第一声（阴平）</div>
+                    <div class="tone-desc">高平调</div>
+                </div>
+                <div class="tone-item">
+                    <div class="tone-symbol">á</div>
+                    <div class="tone-name">第二声（阳平）</div>
+                    <div class="tone-desc">高升调</div>
+                </div>
+                <div class="tone-item">
+                    <div class="tone-symbol">ǎ</div>
+                    <div class="tone-name">第三声（上声）</div>
+                    <div class="tone-desc">降升调</div>
+                </div>
+                <div class="tone-item">
+                    <div class="tone-symbol">à</div>
+                    <div class="tone-name">第四声（去声）</div>
+                    <div class="tone-desc">高降调</div>
+                </div>
+                <div class="tone-item">
+                    <div class="tone-symbol">a</div>
+                    <div class="tone-name">轻声</div>
+                    <div class="tone-desc">短促轻</div>
+                </div>
+            </div>
+            <p class="note">注：声调标记在韵母的主要元音上，标调顺序为a、o、e、i、u、ü</p>
+        </div>
+        
+        <!-- 整体认读音节 -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-bookmark"></i>整体认读音节（16个）
+            </h2>
+            <table>
+                <tr>
+                    <th>拼音</th>
+                    <th>汉字示例</th>
+                    <th>拼音</th>
+                    <th>汉字示例</th>
+                </tr>
+                <tr>
+                    <td class="pinyin">zhi</td>
+                    <td class="example">知</td>
+                    <td class="pinyin">chi</td>
+                    <td class="example">吃</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">shi</td>
+                    <td class="example">诗</td>
+                    <td class="pinyin">ri</td>
+                    <td class="example">日</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">zi</td>
+                    <td class="example">资</td>
+                    <td class="pinyin">ci</td>
+                    <td class="example">雌</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">si</td>
+                    <td class="example">思</td>
+                    <td class="pinyin">yi</td>
+                    <td class="example">衣</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">wu</td>
+                    <td class="example">乌</td>
+                    <td class="pinyin">yu</td>
+                    <td class="example">鱼</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">ye</td>
+                    <td class="example">耶</td>
+                    <td class="pinyin">yue</td>
+                    <td class="example">月</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">yuan</td>
+                    <td class="example">圆</td>
+                    <td class="pinyin">yin</td>
+                    <td class="example">音</td>
+                </tr>
+                <tr>
+                    <td class="pinyin">yun</td>
+                    <td class="example">云</td>
+                    <td class="pinyin">ying</td>
+                    <td class="example">英</td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- 声韵调组合示例 -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-list"></i>声韵调组合示例
+            </h2>
+            <div class="combination-example">
+                <div class="combo-item">
+                    <span class="combo-pinyin">bā</span>
+                    <span class="combo-hanzi">八</span>
+                </div>
+                <div class="combo-item">
+                    <span class="combo-pinyin">bá</span>
+                    <span class="combo-hanzi">拔</span>
+                </div>
+                <div class="combo-item">
+                    <span class="combo-pinyin">bǎ</span>
+                    <span class="combo-hanzi">把</span>
+                </div>
+                <div class="combo-item">
+                    <span class="combo-pinyin">bà</span>
+                    <span class="combo-hanzi">爸</span>
+                </div>
+                <div class="combo-item">
+                    <span class="combo-pinyin">mā</span>
+                    <span class="combo-hanzi">妈</span>
+                </div>
+                <div class="combo-item">
+                    <span class="combo-pinyin">má</span>
+                    <span class="combo-hanzi">麻</span>
+                </div>
+                <div class="combo-item">
+                    <span class="combo-pinyin">mǎ</span>
+                    <span class="combo-hanzi">马</span>
+                </div>
+                <div class="combo-item">
+                    <span class="combo-pinyin">mà</span>
+                    <span class="combo-hanzi">骂</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 所有声韵调组合 -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-th"></i>所有声韵调组合
+            </h2>
+            <div class="all-combinations scrollbar">
+                <table class="combo-table">
+                    <thead>
+                        <tr>
+                            <th>声母</th>
+                            <th>韵母</th>
+                            <th colspan="5">声调</th>
+                        </tr>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th>第一声</th>
+                            <th>第二声</th>
+                            <th>第三声</th>
+                            <th>第四声</th>
+                            <th>轻声</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- b声母组合 -->
+                        <tr>
+                            <td rowspan="18" class="combo-initial">b</td>
+                            <td class="combo-final">a</td>
+                            <td>bā</td>
+                            <td>bá</td>
+                            <td>bǎ</td>
+                            <td>bà</td>
+                            <td>ba</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ai</td>
+                            <td>bāi</td>
+                            <td>bái</td>
+                            <td>bǎi</td>
+                            <td>bài</td>
+                            <td>bai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">an</td>
+                            <td>bān</td>
+                            <td>bán</td>
+                            <td>bǎn</td>
+                            <td>bàn</td>
+                            <td>ban</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ang</td>
+                            <td>bāng</td>
+                            <td>báng</td>
+                            <td>bǎng</td>
+                            <td>bàng</td>
+                            <td>bang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ao</td>
+                            <td>bāo</td>
+                            <td>báo</td>
+                            <td>bǎo</td>
+                            <td>bào</td>
+                            <td>bao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ei</td>
+                            <td>bēi</td>
+                            <td>béi</td>
+                            <td>běi</td>
+                            <td>bèi</td>
+                            <td>bei</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">en</td>
+                            <td>bēn</td>
+                            <td>bén</td>
+                            <td>běn</td>
+                            <td>bèn</td>
+                            <td>ben</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">eng</td>
+                            <td>bēng</td>
+                            <td>béng</td>
+                            <td>běng</td>
+                            <td>bèng</td>
+                            <td>beng</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">i</td>
+                            <td>bī</td>
+                            <td>bí</td>
+                            <td>bǐ</td>
+                            <td>bì</td>
+                            <td>bi</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ia</td>
+                            <td>biā</td>
+                            <td>biá</td>
+                            <td>biǎ</td>
+                            <td>bià</td>
+                            <td>bia</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ian</td>
+                            <td>biān</td>
+                            <td>bián</td>
+                            <td>biǎn</td>
+                            <td>biàn</td>
+                            <td>bian</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iang</td>
+                            <td>biāng</td>
+                            <td>biáng</td>
+                            <td>biǎng</td>
+                            <td>biàng</td>
+                            <td>biang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iao</td>
+                            <td>biāo</td>
+                            <td>biáo</td>
+                            <td>biǎo</td>
+                            <td>biào</td>
+                            <td>biao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ie</td>
+                            <td>biē</td>
+                            <td>bié</td>
+                            <td>biě</td>
+                            <td>biè</td>
+                            <td>bie</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">in</td>
+                            <td>bīn</td>
+                            <td>bín</td>
+                            <td>bǐn</td>
+                            <td>bìn</td>
+                            <td>bin</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ing</td>
+                            <td>bīng</td>
+                            <td>bíng</td>
+                            <td>bǐng</td>
+                            <td>bìng</td>
+                            <td>bing</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">o</td>
+                            <td>bō</td>
+                            <td>bó</td>
+                            <td>bǒ</td>
+                            <td>bò</td>
+                            <td>bo</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ou</td>
+                            <td>bōu</td>
+                            <td>bóu</td>
+                            <td>bǒu</td>
+                            <td>bòu</td>
+                            <td>bou</td>
+                        </tr>
+                        
+                        <!-- p声母组合 -->
+                        <tr>
+                            <td rowspan="18" class="combo-initial">p</td>
+                            <td class="combo-final">a</td>
+                            <td>pā</td>
+                            <td>pá</td>
+                            <td>pǎ</td>
+                            <td>pà</td>
+                            <td>pa</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ai</td>
+                            <td>pāi</td>
+                            <td>pái</td>
+                            <td>pǎi</td>
+                            <td>pài</td>
+                            <td>pai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">an</td>
+                            <td>pān</td>
+                            <td>pán</td>
+                            <td>pǎn</td>
+                            <td>pàn</td>
+                            <td>pan</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ang</td>
+                            <td>pāng</td>
+                            <td>páng</td>
+                            <td>pǎng</td>
+                            <td>pàng</td>
+                            <td>pang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ao</td>
+                            <td>pāo</td>
+                            <td>páo</td>
+                            <td>pǎo</td>
+                            <td>pào</td>
+                            <td>pao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ei</td>
+                            <td>pēi</td>
+                            <td>péi</td>
+                            <td>pěi</td>
+                            <td>pèi</td>
+                            <td>pei</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">en</td>
+                            <td>pēn</td>
+                            <td>pén</td>
+                            <td>pěn</td>
+                            <td>pèn</td>
+                            <td>pen</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">eng</td>
+                            <td>pēng</td>
+                            <td>péng</td>
+                            <td>pěng</td>
+                            <td>pèng</td>
+                            <td>peng</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">i</td>
+                            <td>pī</td>
+                            <td>pí</td>
+                            <td>pǐ</td>
+                            <td>pì</td>
+                            <td>pi</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ia</td>
+                            <td>piā</td>
+                            <td>piá</td>
+                            <td>piǎ</td>
+                            <td>pià</td>
+                            <td>pia</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ian</td>
+                            <td>piān</td>
+                            <td>pián</td>
+                            <td>piǎn</td>
+                            <td>piàn</td>
+                            <td>pian</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iang</td>
+                            <td>piāng</td>
+                            <td>piáng</td>
+                            <td>piǎng</td>
+                            <td>piàng</td>
+                            <td>piang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iao</td>
+                            <td>piāo</td>
+                            <td>piáo</td>
+                            <td>piǎo</td>
+                            <td>piào</td>
+                            <td>piao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ie</td>
+                            <td>piē</td>
+                            <td>pié</td>
+                            <td>piě</td>
+                            <td>piè</td>
+                            <td>pie</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">in</td>
+                            <td>pīn</td>
+                            <td>pín</td>
+                            <td>pǐn</td>
+                            <td>pìn</td>
+                            <td>pin</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ing</td>
+                            <td>pīng</td>
+                            <td>píng</td>
+                            <td>pǐng</td>
+                            <td>pìng</td>
+                            <td>ping</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">o</td>
+                            <td>pō</td>
+                            <td>pó</td>
+                            <td>pǒ</td>
+                            <td>pò</td>
+                            <td>po</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ou</td>
+                            <td>pōu</td>
+                            <td>póu</td>
+                            <td>pǒu</td>
+                            <td>pòu</td>
+                            <td>pou</td>
+                        </tr>
+                        
+                        <!-- m声母组合 -->
+                        <tr>
+                            <td rowspan="16" class="combo-initial">m</td>
+                            <td class="combo-final">a</td>
+                            <td>mā</td>
+                            <td>má</td>
+                            <td>mǎ</td>
+                            <td>mà</td>
+                            <td>ma</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ai</td>
+                            <td>māi</td>
+                            <td>mái</td>
+                            <td>mǎi</td>
+                            <td>mài</td>
+                            <td>mai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">an</td>
+                            <td>mān</td>
+                            <td>mán</td>
+                            <td>mǎn</td>
+                            <td>màn</td>
+                            <td>man</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ang</td>
+                            <td>māng</td>
+                            <td>máng</td>
+                            <td>mǎng</td>
+                            <td>màng</td>
+                            <td>mang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ao</td>
+                            <td>māo</td>
+                            <td>máo</td>
+                            <td>mǎo</td>
+                            <td>mào</td>
+                            <td>mao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ei</td>
+                            <td>mēi</td>
+                            <td>méi</td>
+                            <td>měi</td>
+                            <td>mèi</td>
+                            <td>mei</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">en</td>
+                            <td>mēn</td>
+                            <td>mén</td>
+                            <td>měn</td>
+                            <td>mèn</td>
+                            <td>men</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">eng</td>
+                            <td>mēng</td>
+                            <td>méng</td>
+                            <td>měng</td>
+                            <td>mèng</td>
+                            <td>meng</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">i</td>
+                            <td>mī</td>
+                            <td>mí</td>
+                            <td>mǐ</td>
+                            <td>mì</td>
+                            <td>mi</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ia</td>
+                            <td>miā</td>
+                            <td>miá</td>
+                            <td>miǎ</td>
+                            <td>mià</td>
+                            <td>mia</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ian</td>
+                            <td>miān</td>
+                            <td>mián</td>
+                            <td>miǎn</td>
+                            <td>miàn</td>
+                            <td>mian</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iang</td>
+                            <td>miāng</td>
+                            <td>miáng</td>
+                            <td>miǎng</td>
+                            <td>miàng</td>
+                            <td>miang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iao</td>
+                            <td>miāo</td>
+                            <td>miáo</td>
+                            <td>miǎo</td>
+                            <td>miào</td>
+                            <td>miao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ie</td>
+                            <td>miē</td>
+                            <td>mié</td>
+                            <td>miě</td>
+                            <td>miè</td>
+                            <td>mie</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">in</td>
+                            <td>mīn</td>
+                            <td>mín</td>
+                            <td>mǐn</td>
+                            <td>mìn</td>
+                            <td>min</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ing</td>
+                            <td>mīng</td>
+                            <td>míng</td>
+                            <td>mǐng</td>
+                            <td>mìng</td>
+                            <td>ming</td>
+                        </tr>
+                        
+                        <!-- f声母组合 -->
+                        <tr>
+                            <td rowspan="12" class="combo-initial">f</td>
+                            <td class="combo-final">a</td>
+                            <td>fā</td>
+                            <td>fá</td>
+                            <td>fǎ</td>
+                            <td>fà</td>
+                            <td>fa</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">an</td>
+                            <td>fān</td>
+                            <td>fán</td>
+                            <td>fǎn</td>
+                            <td>fàn</td>
+                            <td>fan</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ang</td>
+                            <td>fāng</td>
+                            <td>fáng</td>
+                            <td>fǎng</td>
+                            <td>fàng</td>
+                            <td>fang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ei</td>
+                            <td>fēi</td>
+                            <td>féi</td>
+                            <td>fěi</td>
+                            <td>fèi</td>
+                            <td>fei</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">en</td>
+                            <td>fēn</td>
+                            <td>fén</td>
+                            <td>fěn</td>
+                            <td>fèn</td>
+                            <td>fen</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">eng</td>
+                            <td>fēng</td>
+                            <td>féng</td>
+                            <td>fěng</td>
+                            <td>fèng</td>
+                            <td>feng</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">o</td>
+                            <td>fō</td>
+                            <td>fó</td>
+                            <td>fǒ</td>
+                            <td>fò</td>
+                            <td>fo</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ou</td>
+                            <td>fōu</td>
+                            <td>fóu</td>
+                            <td>fǒu</td>
+                            <td>fòu</td>
+                            <td>fou</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">u</td>
+                            <td>fū</td>
+                            <td>fú</td>
+                            <td>fǔ</td>
+                            <td>fù</td>
+                            <td>fu</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">an</td>
+                            <td>fān</td>
+                            <td>fán</td>
+                            <td>fǎn</td>
+                            <td>fàn</td>
+                            <td>fan</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ang</td>
+                            <td>fāng</td>
+                            <td>fáng</td>
+                            <td>fǎng</td>
+                            <td>fàng</td>
+                            <td>fang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">eng</td>
+                            <td>fēng</td>
+                            <td>féng</td>
+                            <td>fěng</td>
+                            <td>fèng</td>
+                            <td>feng</td>
+                        </tr>
+                        
+                        <!-- d声母组合 -->
+                        <tr>
+                            <td rowspan="20" class="combo-initial">d</td>
+                            <td class="combo-final">a</td>
+                            <td>dā</td>
+                            <td>dá</td>
+                            <td>dǎ</td>
+                            <td>dà</td>
+                            <td>da</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ai</td>
+                            <td>dāi</td>
+                            <td>dái</td>
+                            <td>dǎi</td>
+                            <td>dài</td>
+                            <td>dai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">an</td>
+                            <td>dān</td>
+                            <td>dán</td>
+                            <td>dǎn</td>
+                            <td>dàn</td>
+                            <td>dan</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ang</td>
+                            <td>dāng</td>
+                            <td>dáng</td>
+                            <td>dǎng</td>
+                            <td>dàng</td>
+                            <td>dang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ao</td>
+                            <td>dāo</td>
+                            <td>dáo</td>
+                            <td>dǎo</td>
+                            <td>dào</td>
+                            <td>dao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">e</td>
+                            <td>dē</td>
+                            <td>dé</td>
+                            <td>dě</td>
+                            <td>dè</td>
+                            <td>de</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ei</td>
+                            <td>dēi</td>
+                            <td>déi</td>
+                            <td>děi</td>
+                            <td>dèi</td>
+                            <td>dei</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">en</td>
+                            <td>dēn</td>
+                            <td>dén</td>
+                            <td>děn</td>
+                            <td>dèn</td>
+                            <td>den</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">eng</td>
+                            <td>dēng</td>
+                            <td>déng</td>
+                            <td>děng</td>
+                            <td>dèng</td>
+                            <td>deng</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">i</td>
+                            <td>dī</td>
+                            <td>dí</td>
+                            <td>dǐ</td>
+                            <td>dì</td>
+                            <td>di</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ia</td>
+                            <td>diā</td>
+                            <td>diá</td>
+                            <td>diǎ</td>
+                            <td>dià</td>
+                            <td>dia</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ian</td>
+                            <td>diān</td>
+                            <td>dián</td>
+                            <td>diǎn</td>
+                            <td>diàn</td>
+                            <td>dian</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iang</td>
+                            <td>diāng</td>
+                            <td>diáng</td>
+                            <td>diǎng</td>
+                            <td>diàng</td>
+                            <td>diang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iao</td>
+                            <td>diāo</td>
+                            <td>diáo</td>
+                            <td>diǎo</td>
+                            <td>diào</td>
+                            <td>diao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ie</td>
+                            <td>diē</td>
+                            <td>dié</td>
+                            <td>diě</td>
+                            <td>diè</td>
+                            <td>die</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">in</td>
+                            <td>dīn</td>
+                            <td>dín</td>
+                            <td>dǐn</td>
+                            <td>dìn</td>
+                            <td>din</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ing</td>
+                            <td>dīng</td>
+                            <td>díng</td>
+                            <td>dǐng</td>
+                            <td>dìng</td>
+                            <td>ding</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iu</td>
+                            <td>diū</td>
+                            <td>diú</td>
+                            <td>diǔ</td>
+                            <td>diù</td>
+                            <td>diu</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ong</td>
+                            <td>dōng</td>
+                            <td>dóng</td>
+                            <td>dǒng</td>
+                            <td>dòng</td>
+                            <td>dong</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ou</td>
+                            <td>dōu</td>
+                            <td>dóu</td>
+                            <td>dǒu</td>
+                            <td>dòu</td>
+                            <td>dou</td>
+                        </tr>
+                        
+                        <!-- t声母组合 -->
+                        <tr>
+                            <td rowspan="19" class="combo-initial">t</td>
+                            <td class="combo-final">a</td>
+                            <td>tā</td>
+                            <td>tá</td>
+                            <td>tǎ</td>
+                            <td>tà</td>
+                            <td>ta</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ai</td>
+                            <td>tāi</td>
+                            <td>tái</td>
+                            <td>tǎi</td>
+                            <td>tài</td>
+                            <td>tai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">an</td>
+                            <td>tān</td>
+                            <td>tán</td>
+                            <td>tǎn</td>
+                            <td>tàn</td>
+                            <td>tan</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ang</td>
+                            <td>tāng</td>
+                            <td>táng</td>
+                            <td>tǎng</td>
+                            <td>tàng</td>
+                            <td>tang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ao</td>
+                            <td>tāo</td>
+                            <td>táo</td>
+                            <td>tǎo</td>
+                            <td>tào</td>
+                            <td>tao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">e</td>
+                            <td>tē</td>
+                            <td>té</td>
+                            <td>tě</td>
+                            <td>tè</td>
+                            <td>te</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">eng</td>
+                            <td>tēng</td>
+                            <td>téng</td>
+                            <td>těng</td>
+                            <td>tèng</td>
+                            <td>teng</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">i</td>
+                            <td>tī</td>
+                            <td>tí</td>
+                            <td>tǐ</td>
+                            <td>tì</td>
+                            <td>ti</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ia</td>
+                            <td>tiā</td>
+                            <td>tiá</td>
+                            <td>tiǎ</td>
+                            <td>tià</td>
+                            <td>tia</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ian</td>
+                            <td>tiān</td>
+                            <td>tián</td>
+                            <td>tiǎn</td>
+                            <td>tiàn</td>
+                            <td>tian</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iang</td>
+                            <td>tiāng</td>
+                            <td>tiáng</td>
+                            <td>tiǎng</td>
+                            <td>tiàng</td>
+                            <td>tiang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iao</td>
+                            <td>tiāo</td>
+                            <td>tiáo</td>
+                            <td>tiǎo</td>
+                            <td>tiào</td>
+                            <td>tiao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ie</td>
+                            <td>tiē</td>
+                            <td>tié</td>
+                            <td>tiě</td>
+                            <td>tiè</td>
+                            <td>tie</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">in</td>
+                            <td>tīn</td>
+                            <td>tín</td>
+                            <td>tǐn</td>
+                            <td>tìn</td>
+                            <td>tin</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ing</td>
+                            <td>tīng</td>
+                            <td>tíng</td>
+                            <td>tǐng</td>
+                            <td>tìng</td>
+                            <td>ting</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iu</td>
+                            <td>tiū</td>
+                            <td>tiú</td>
+                            <td>tiǔ</td>
+                            <td>tiù</td>
+                            <td>tiu</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ong</td>
+                            <td>tōng</td>
+                            <td>tóng</td>
+                            <td>tǒng</td>
+                            <td>tòng</td>
+                            <td>tong</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ou</td>
+                            <td>tōu</td>
+                            <td>tóu</td>
+                            <td>tǒu</td>
+                            <td>tòu</td>
+                            <td>tou</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">u</td>
+                            <td>tū</td>
+                            <td>tú</td>
+                            <td>tǔ</td>
+                            <td>tù</td>
+                            <td>tu</td>
+                        </tr>
+                        
+                        <!-- n声母组合 -->
+                        <tr>
+                            <td rowspan="18" class="combo-initial">n</td>
+                            <td class="combo-final">a</td>
+                            <td>nā</td>
+                            <td>ná</td>
+                            <td>nǎ</td>
+                            <td>nà</td>
+                            <td>na</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ai</td>
+                            <td>nāi</td>
+                            <td>nái</td>
+                            <td>nǎi</td>
+                            <td>nài</td>
+                            <td>nai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">an</td>
+                            <td>nān</td>
+                            <td>nán</td>
+                            <td>nǎn</td>
+                            <td>nàn</td>
+                            <td>nan</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ang</td>
+                            <td>nāng</td>
+                            <td>náng</td>
+                            <td>nǎng</td>
+                            <td>nàng</td>
+                            <td>nang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ao</td>
+                            <td>nāo</td>
+                            <td>náo</td>
+                            <td>nǎo</td>
+                            <td>nào</td>
+                            <td>nao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">e</td>
+                            <td>nē</td>
+                            <td>né</td>
+                            <td>ně</td>
+                            <td>nè</td>
+                            <td>ne</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ei</td>
+                            <td>nēi</td>
+                            <td>néi</td>
+                            <td>něi</td>
+                            <td>nèi</td>
+                            <td>nei</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">en</td>
+                            <td>nēn</td>
+                            <td>nén</td>
+                            <td>něn</td>
+                            <td>nèn</td>
+                            <td>nen</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">eng</td>
+                            <td>nēng</td>
+                            <td>néng</td>
+                            <td>něng</td>
+                            <td>nèng</td>
+                            <td>neng</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">i</td>
+                            <td>nī</td>
+                            <td>ní</td>
+                            <td>nǐ</td>
+                            <td>nì</td>
+                            <td>ni</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ia</td>
+                            <td>niā</td>
+                            <td>niá</td>
+                            <td>niǎ</td>
+                            <td>nià</td>
+                            <td>nia</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ian</td>
+                            <td>niān</td>
+                            <td>nián</td>
+                            <td>niǎn</td>
+                            <td>niàn</td>
+                            <td>nian</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iang</td>
+                            <td>niāng</td>
+                            <td>niáng</td>
+                            <td>niǎng</td>
+                            <td>niàng</td>
+                            <td>niang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iao</td>
+                            <td>niāo</td>
+                            <td>niáo</td>
+                            <td>niǎo</td>
+                            <td>niào</td>
+                            <td>niao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ie</td>
+                            <td>niē</td>
+                            <td>nié</td>
+                            <td>niě</td>
+                            <td>niè</td>
+                            <td>nie</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">in</td>
+                            <td>nīn</td>
+                            <td>nín</td>
+                            <td>nǐn</td>
+                            <td>nìn</td>
+                            <td>nin</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ing</td>
+                            <td>nīng</td>
+                            <td>níng</td>
+                            <td>nǐng</td>
+                            <td>nìng</td>
+                            <td>ning</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iu</td>
+                            <td>niū</td>
+                            <td>niú</td>
+                            <td>niǔ</td>
+                            <td>niù</td>
+                            <td>niu</td>
+                        </tr>
+                        
+                        <!-- l声母组合 -->
+                        <tr>
+                            <td rowspan="19" class="combo-initial">l</td>
+                            <td class="combo-final">a</td>
+                            <td>lā</td>
+                            <td>lá</td>
+                            <td>lǎ</td>
+                            <td>là</td>
+                            <td>la</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ai</td>
+                            <td>lāi</td>
+                            <td>lái</td>
+                            <td>lǎi</td>
+                            <td>lài</td>
+                            <td>lai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">an</td>
+                            <td>lān</td>
+                            <td>lán</td>
+                            <td>lǎn</td>
+                            <td>làn</td>
+                            <td>lan</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ang</td>
+                            <td>lāng</td>
+                            <td>láng</td>
+                            <td>lǎng</td>
+                            <td>làng</td>
+                            <td>lang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ao</td>
+                            <td>lāo</td>
+                            <td>láo</td>
+                            <td>lǎo</td>
+                            <td>lào</td>
+                            <td>lao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">e</td>
+                            <td>lē</td>
+                            <td>lé</td>
+                            <td>lě</td>
+                            <td>lè</td>
+                            <td>le</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ei</td>
+                            <td>lēi</td>
+                            <td>léi</td>
+                            <td>lěi</td>
+                            <td>lèi</td>
+                            <td>lei</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">en</td>
+                            <td>lēn</td>
+                            <td>lén</td>
+                            <td>lěn</td>
+                            <td>lèn</td>
+                            <td>len</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">eng</td>
+                            <td>lēng</td>
+                            <td>léng</td>
+                            <td>lěng</td>
+                            <td>lèng</td>
+                            <td>leng</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">i</td>
+                            <td>lī</td>
+                            <td>lí</td>
+                            <td>lǐ</td>
+                            <td>lì</td>
+                            <td>li</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ia</td>
+                            <td>liā</td>
+                            <td>liá</td>
+                            <td>liǎ</td>
+                            <td>lià</td>
+                            <td>lia</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ian</td>
+                            <td>liān</td>
+                            <td>lián</td>
+                            <td>liǎn</td>
+                            <td>liàn</td>
+                            <td>lian</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iang</td>
+                            <td>liāng</td>
+                            <td>liáng</td>
+                            <td>liǎng</td>
+                            <td>liàng</td>
+                            <td>liang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iao</td>
+                            <td>liāo</td>
+                            <td>liáo</td>
+                            <td>liǎo</td>
+                            <td>liào</td>
+                            <td>liao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ie</td>
+                            <td>liē</td>
+                            <td>lié</td>
+                            <td>liě</td>
+                            <td>liè</td>
+                            <td>lie</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">in</td>
+                            <td>līn</td>
+                            <td>lín</td>
+                            <td>lǐn</td>
+                            <td>lìn</td>
+                            <td>lin</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ing</td>
+                            <td>līng</td>
+                            <td>líng</td>
+                            <td>lǐng</td>
+                            <td>lìng</td>
+                            <td>ling</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">iu</td>
+                            <td>liū</td>
+                            <td>liú</td>
+                            <td>liǔ</td>
+                            <td>liù</td>
+                            <td>liu</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ou</td>
+                            <td>lōu</td>
+                            <td>lóu</td>
+                            <td>lǒu</td>
+                            <td>lòu</td>
+                            <td>lou</td>
+                        </tr>
+                        
+                        <!-- g声母组合 -->
+                        <tr>
+                            <td rowspan="16" class="combo-initial">g</td>
+                            <td class="combo-final">a</td>
+                            <td>gā</td>
+                            <td>gá</td>
+                            <td>gǎ</td>
+                            <td>gà</td>
+                            <td>ga</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ai</td>
+                            <td>gāi</td>
+                            <td>gái</td>
+                            <td>gǎi</td>
+                            <td>gài</td>
+                            <td>gai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">an</td>
+                            <td>gān</td>
+                            <td>gán</td>
+                            <td>gǎn</td>
+                            <td>gàn</td>
+                            <td>gan</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ang</td>
+                            <td>gāng</td>
+                            <td>gáng</td>
+                            <td>gǎng</td>
+                            <td>gàng</td>
+                            <td>gang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ao</td>
+                            <td>gāo</td>
+                            <td>gáo</td>
+                            <td>gǎo</td>
+                            <td>gào</td>
+                            <td>gao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">e</td>
+                            <td>gē</td>
+                            <td>gé</td>
+                            <td>gě</td>
+                            <td>gè</td>
+                            <td>ge</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ei</td>
+                            <td>gēi</td>
+                            <td>géi</td>
+                            <td>gěi</td>
+                            <td>gèi</td>
+                            <td>gei</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">en</td>
+                            <td>gēn</td>
+                            <td>gén</td>
+                            <td>gěn</td>
+                            <td>gèn</td>
+                            <td>gen</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">eng</td>
+                            <td>gēng</td>
+                            <td>géng</td>
+                            <td>gěng</td>
+                            <td>gèng</td>
+                            <td>geng</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ong</td>
+                            <td>gōng</td>
+                            <td>góng</td>
+                            <td>gǒng</td>
+                            <td>gòng</td>
+                            <td>gong</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ou</td>
+                            <td>gōu</td>
+                            <td>góu</td>
+                            <td>gǒu</td>
+                            <td>gòu</td>
+                            <td>gou</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">u</td>
+                            <td>gū</td>
+                            <td>gú</td>
+                            <td>gǔ</td>
+                            <td>gù</td>
+                            <td>gu</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ua</td>
+                            <td>guā</td>
+                            <td>guá</td>
+                            <td>guǎ</td>
+                            <td>guà</td>
+                            <td>gua</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">uai</td>
+                            <td>guāi</td>
+                            <td>guái</td>
+                            <td>guǎi</td>
+                            <td>guài</td>
+                            <td>guai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">uan</td>
+                            <td>guān</td>
+                            <td>guán</td>
+                            <td>guǎn</td>
+                            <td>guàn</td>
+                            <td>guan</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">uang</td>
+                            <td>guāng</td>
+                            <td>guáng</td>
+                            <td>guǎng</td>
+                            <td>guàng</td>
+                            <td>guang</td>
+                        </tr>
+                        
+                        <!-- k声母组合 -->
+                        <tr>
+                            <td rowspan="16" class="combo-initial">k</td>
+                            <td class="combo-final">a</td>
+                            <td>kā</td>
+                            <td>ká</td>
+                            <td>kǎ</td>
+                            <td>kà</td>
+                            <td>ka</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ai</td>
+                            <td>kāi</td>
+                            <td>kái</td>
+                            <td>kǎi</td>
+                            <td>kài</td>
+                            <td>kai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">an</td>
+                            <td>kān</td>
+                            <td>kán</td>
+                            <td>kǎn</td>
+                            <td>kàn</td>
+                            <td>kan</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ang</td>
+                            <td>kāng</td>
+                            <td>káng</td>
+                            <td>kǎng</td>
+                            <td>kàng</td>
+                            <td>kang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ao</td>
+                            <td>kāo</td>
+                            <td>káo</td>
+                            <td>kǎo</td>
+                            <td>kào</td>
+                            <td>kao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">e</td>
+                            <td>kē</td>
+                            <td>ké</td>
+                            <td>kě</td>
+                            <td>kè</td>
+                            <td>ke</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">en</td>
+                            <td>kēn</td>
+                            <td>kén</td>
+                            <td>kěn</td>
+                            <td>kèn</td>
+                            <td>ken</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">eng</td>
+                            <td>kēng</td>
+                            <td>kéng</td>
+                            <td>kěng</td>
+                            <td>kèng</td>
+                            <td>keng</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ong</td>
+                            <td>kōng</td>
+                            <td>kóng</td>
+                            <td>kǒng</td>
+                            <td>kòng</td>
+                            <td>kong</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ou</td>
+                            <td>kōu</td>
+                            <td>kóu</td>
+                            <td>kǒu</td>
+                            <td>kòu</td>
+                            <td>kou</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">u</td>
+                            <td>kū</td>
+                            <td>kú</td>
+                            <td>kǔ</td>
+                            <td>kù</td>
+                            <td>ku</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ua</td>
+                            <td>kuā</td>
+                            <td>kuá</td>
+                            <td>kuǎ</td>
+                            <td>kuà</td>
+                            <td>kua</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">uai</td>
+                            <td>kuāi</td>
+                            <td>kuái</td>
+                            <td>kuǎi</td>
+                            <td>kuài</td>
+                            <td>kuai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">uan</td>
+                            <td>kuān</td>
+                            <td>kuán</td>
+                            <td>kuǎn</td>
+                            <td>kuàn</td>
+                            <td>kuan</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">uang</td>
+                            <td>kuāng</td>
+                            <td>kuáng</td>
+                            <td>kuǎng</td>
+                            <td>kuàng</td>
+                            <td>kuang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">un</td>
+                            <td>kūn</td>
+                            <td>kún</td>
+                            <td>kǔn</td>
+                            <td>kùn</td>
+                            <td>kun</td>
+                        </tr>
+                        
+                        <!-- h声母组合 -->
+                        <tr>
+                            <td rowspan="19" class="combo-initial">h</td>
+                            <td class="combo-final">a</td>
+                            <td>hā</td>
+                            <td>há</td>
+                            <td>hǎ</td>
+                            <td>hà</td>
+                            <td>ha</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ai</td>
+                            <td>hāi</td>
+                            <td>hái</td>
+                            <td>hǎi</td>
+                            <td>hài</td>
+                            <td>hai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">an</td>
+                            <td>hān</td>
+                            <td>hán</td>
+                            <td>hǎn</td>
+                            <td>hàn</td>
+                            <td>han</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ang</td>
+                            <td>hāng</td>
+                            <td>háng</td>
+                            <td>hǎng</td>
+                            <td>hàng</td>
+                            <td>hang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ao</td>
+                            <td>hāo</td>
+                            <td>háo</td>
+                            <td>hǎo</td>
+                            <td>hào</td>
+                            <td>hao</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">e</td>
+                            <td>hē</td>
+                            <td>hé</td>
+                            <td>hě</td>
+                            <td>hè</td>
+                            <td>he</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ei</td>
+                            <td>hēi</td>
+                            <td>héi</td>
+                            <td>hěi</td>
+                            <td>hèi</td>
+                            <td>hei</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">en</td>
+                            <td>hēn</td>
+                            <td>hén</td>
+                            <td>hěn</td>
+                            <td>hèn</td>
+                            <td>hen</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">eng</td>
+                            <td>hēng</td>
+                            <td>héng</td>
+                            <td>hěng</td>
+                            <td>hèng</td>
+                            <td>heng</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ong</td>
+                            <td>hōng</td>
+                            <td>hóng</td>
+                            <td>hǒng</td>
+                            <td>hòng</td>
+                            <td>hong</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ou</td>
+                            <td>hōu</td>
+                            <td>hóu</td>
+                            <td>hǒu</td>
+                            <td>hòu</td>
+                            <td>hou</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">u</td>
+                            <td>hū</td>
+                            <td>hú</td>
+                            <td>hǔ</td>
+                            <td>hù</td>
+                            <td>hu</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">ua</td>
+                            <td>huā</td>
+                            <td>huá</td>
+                            <td>huǎ</td>
+                            <td>huà</td>
+                            <td>hua</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">uai</td>
+                            <td>huāi</td>
+                            <td>huái</td>
+                            <td>huǎi</td>
+                            <td>huài</td>
+                            <td>huai</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">uan</td>
+                            <td>huān</td>
+                            <td>huán</td>
+                            <td>huǎn</td>
+                            <td>huàn</td>
+                            <td>huan</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">uang</td>
+                            <td>huāng</td>
+                            <td>huáng</td>
+                            <td>huǎng</td>
+                            <td>huàng</td>
+                            <td>huang</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">un</td>
+                            <td>hūn</td>
+                            <td>hún</td>
+                            <td>hǔn</td>
+                            <td>hùn</td>
+                            <td>hun</td>
+                        </tr>
+                        <tr>
+                            <td class="combo-final">uo</td>
+                            <td>huō</td>
+                            <td>huó</td>
+                            <td>huǒ</td>
+                            <td>huò</td>
+                            <td>huo</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="note">注：以上表格仅展示了部分声母的声韵调组合，实际汉语拼音系统中还有更多组合。完整组合请参考汉语拼音方案。</p>
+        </div>
+        
+        <!-- 说明文字 -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-info-circle"></i>如何生成所有声韵调组合
+            </h2>
+            <p>汉语拼音的声韵调组合规则如下：</p>
+            <ol>
+                <li>基本组合：声母 + 韵母 + 声调</li>
+                <li>声母有23个，韵母有24个，声调有5个（含轻声）</li>
+                <li>理论上可生成 23 × 24 × 5 = 2760 种组合</li>
+                <li>实际使用中，并非所有声母和韵母都能组合，需遵循汉语拼音拼写规则</li>
+                <li>整体认读音节不遵循声母+韵母的组合规则，需整体记忆</li>
+                <li>特殊规则：如ü与j、q、x相拼时省略两点，y、w的使用规则等</li>
+            </ol>
+            <p class="note">注：本海报仅展示部分常见组合，完整声韵调组合请参考汉语拼音方案。</p>
+        </div>
+    </div>
+</body>
+</html>

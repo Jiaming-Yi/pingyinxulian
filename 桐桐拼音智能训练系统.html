@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>桐桐汉语拼音智能训练系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", "SimHei", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* 导航标签 */
+        .nav-tabs {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .nav-tab {
+            background: rgba(255,255,255,0.9);
+            padding: 15px 30px;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab.active {
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-tab:hover {
+            background: white;
+        }
+        
+        /* 屏幕容器 */
+        .screen {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 0 20px 20px 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        /* 选择界面 */
+        .title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 36px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        
+        .mode-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .mode-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 30px;
+            border-radius: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .mode-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .mode-btn.random {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            grid-column: span 3;
+        }
+        
+        .stats {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .stats h3 {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        
+        .stats ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .stats li {
+            padding: 5px 0;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        /* 训练表单 */
+        .training-container {
+            max-width: 100%;
+        }
+        
+        .training-header {
+            text-align: center;
+            margin-bottom: 20px;
+            page-break-after: avoid;
+        }
+        
+        .training-header h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .training-info {
+            font-size: 14px;
+            color: #666;
+            margin: 10px 0;
+        }
+        
+        .training-id {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        .training-type {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .training-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .training-item {
+            border: 2px solid #bdc3c7;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            min-height: 85px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .pinyin {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-family: "Arial", "Microsoft YaHei", sans-serif;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .checkboxes {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            font-size: 13px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .wrong {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .action-buttons {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .action-btn.success {
+            background: #27ae60;
+        }
+        
+        .action-btn.success:hover {
+            background: #229954;
+        }
+        
+        .action-btn.warning {
+            background: #e67e22;
+        }
+        
+        .action-btn.warning:hover {
+            background: #d35400;
+        }
+        
+        .action-btn.secondary {
+            background: #95a5a6;
+        }
+        
+        .action-btn.secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        /* 录入界面 */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .input-item {
+            border: 3px solid #bdc3c7;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .input-item:hover {
+            border-color: #3498db;
+            transform: scale(1.05);
+        }
+        
+        .input-item.correct {
+            border-color: #27ae60;
+            background: #d5f4e6;
+        }
+        
+        .input-item.wrong {
+            border-color: #e74c3c;
+            background: #fadbd8;
+        }
+        
+        .input-item .pinyin {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .input-status {
+            text-align: center;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .input-item.correct .input-status {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .input-item.wrong .input-status {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        /* 历史记录 */
+        .history-list {
+            margin: 20px 0;
+        }
+        
+        .history-item {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .history-item h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-meta {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .history-stats {
+            display: flex;
+            gap: 20px;
+            margin: 10px 0;
+        }
+        
+        .stat-box {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .stat-box.correct {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        
+        .stat-box.wrong {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+        
+        .stat-box.rate {
+            background: #dfe6e9;
+            color: #2c3e50;
+        }
+        
+        .history-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .history-details.show {
+            display: block;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+        }
+        
+        .detail-item {
+            padding: 5px;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .detail-item.correct {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        
+        .detail-item.wrong {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+        
+        /* 拼音库 */
+        .library-section {
+            margin-bottom: 40px;
+        }
+        
+        .library-section h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .library-section h3 {
+            color: #555;
+            font-size: 18px;
+            margin: 20px 0 10px;
+        }
+        
+        .pinyin-showcase {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .showcase-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .showcase-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .showcase-item.shengmu {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .showcase-item.danyunmu {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .showcase-item.shuangyunmu {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .showcase-item.biyunmu {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .showcase-item.zhengti {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .library-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .library-stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .library-stat-card h4 {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .library-stat-card .count {
+            font-size: 36px;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        /* OCR上传 */
+        .upload-area {
+            border: 3px dashed #bdc3c7;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: #3498db;
+            background: #ecf0f1;
+        }
+        
+        .upload-area.dragover {
+            border-color: #27ae60;
+            background: #d5f4e6;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .ocr-progress {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .ocr-progress.show {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #ecf0f1;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* 统计分析 */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .analytics-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .analytics-card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .analytics-card .number {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        /* 打印样式 */
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .nav-tabs, .action-buttons {
+                display: none !important;
+            }
+            
+            .screen {
+                box-shadow: none;
+                margin: 0;
+                padding: 10mm;
+                max-width: 100%;
+            }
+            
+            .training-grid {
+                gap: 8px;
+            }
+            
+            .training-item {
+                padding: 8px;
+                min-height: 70px;
+            }
+            
+            .pinyin {
+                font-size: 20px;
+            }
+        }
+        
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航标签 -->
+    <div class="nav-tabs">
+        <div class="nav-tab active" onclick="switchScreen('training')">🎓 开始训练</div>
+        <div class="nav-tab" onclick="switchScreen('input')">📝 录入结果</div>
+        <div class="nav-tab" onclick="switchScreen('ocr')">📷 拍照识别</div>
+        <div class="nav-tab" onclick="switchScreen('history')">📊 历史记录</div>
+        <div class="nav-tab" onclick="switchScreen('library')">📚 拼音库</div>
+    </div>
+
+    <!-- 1. 训练模式选择 -->
+    <div class="screen active" id="trainingScreen">
+        <div id="selectionView">
+            <h1 class="title">🎓 桐桐拼音训练系统</h1>
+            <p class="subtitle">选择训练模式，系统将自动生成一页训练表单（8行×4列=32个）</p>
+            
+            <div class="mode-buttons">
+                <button class="mode-btn" onclick="startTraining('shengmu')">
+                    📝 声母训练<br>
+                    <span style="font-size: 16px; opacity: 0.9;">23个声母</span>
+                </button>
+                
+                <button class="mode-btn" onclick="startTraining('danyunmu')">
+                    📝 单韵母训练<br>
+                    <span style="font-size: 16px; opacity: 0.9;">24个（6×4声调）</span>
+                </button>
+                
+                <button class="mode-btn" onclick="startTraining('shuangyunmu')">
+                    📝 复韵母训练<br>
+                    <span style="font-size: 16px; opacity: 0.9;">36个（9×4声调）</span>
+                </button>
+                
+                <button class="mode-btn" onclick="startTraining('biyunmu')">
+                    📝 鼻韵母训练<br>
+                    <span style="font-size: 16px; opacity: 0.9;">36个（9×4声调）</span>
+                </button>
+                
+                <button class="mode-btn" onclick="startTraining('zhengti')">
+                    📝 整体认读<br>
+                    <span style="font-size: 16px; opacity: 0.9;">64个（16×4声调）</span>
+                </button>
+                
+                <button class="mode-btn random" onclick="startTraining('random')">
+                    🎲 随机训练<br>
+                    <span style="font-size: 16px; opacity: 0.9;">混合所有内容</span>
+                </button>
+            </div>
+            
+            <div class="stats">
+                <h3>📊 训练库统计</h3>
+                <ul>
+                    <li>✓ 声母：23个</li>
+                    <li>✓ 单韵母（含声调）：24个（6个 × 4声调）</li>
+                    <li>✓ 复韵母（含声调）：36个（9个 × 4声调）</li>
+                    <li>✓ 鼻韵母（含声调）：36个（9个 × 4声调）</li>
+                    <li>✓ 整体认读音节（含声调）：64个（16个 × 4声调）</li>
+                    <li>✓ 总计：183个训练项</li>
+                    <li>✓ 每页显示：32个训练项（8行×4列）</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="trainingView" style="display: none;">
+            <div class="training-header">
+                <h2>桐桐拼音训练记录表</h2>
+                <div class="training-info">
+                    训练日期：________年____月____日　　训练者：__________
+                </div>
+                <div class="training-id" id="trainingId"></div>
+                <div class="training-type" id="trainingType"></div>
+            </div>
+            
+            <div class="training-grid" id="trainingGrid"></div>
+            
+            <div class="action-buttons">
+                <button class="action-btn" onclick="window.print()">🖨️ 打印表单</button>
+                <button class="action-btn success" onclick="goToInput()">✍️ 开始录入结果</button>
+                <button class="action-btn" onclick="regenerate()">🔄 重新生成</button>
+                <button class="action-btn secondary" onclick="backToSelection()">← 返回选择</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 手动录入界面 -->
+    <div class="screen" id="inputScreen">
+        <h1 class="title">📝 手动录入训练结果</h1>
+        <p class="subtitle">点击拼音框选择"对"或"错"，完成后保存到结果库</p>
+        
+        <div id="inputContent">
+            <p style="text-align: center; color: #7f8c8d; font-size: 16px; padding: 40px;">
+                请先在"开始训练"标签中生成训练表单
+            </p>
+        </div>
+        
+        <div class="action-buttons" id="inputActions" style="display: none;">
+            <button class="action-btn success" onclick="saveResults()">💾 保存结果</button>
+            <button class="action-btn secondary" onclick="clearInput()">🔄 清除选择</button>
+        </div>
+    </div>
+
+    <!-- 3. 拍照OCR识别 -->
+    <div class="screen" id="ocrScreen">
+        <h1 class="title">📷 拍照识别训练结果</h1>
+        <p class="subtitle">上传训练表单照片，系统将自动识别勾选结果</p>
+        
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">📸</div>
+            <h3>点击或拖拽上传照片</h3>
+            <p style="color: #7f8c8d; margin-top: 10px;">支持 JPG、PNG 格式</p>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+        </div>
+        
+        <img id="previewImage" class="preview-image" style="display: none;">
+        
+        <div class="ocr-progress" id="ocrProgress">
+            <h3 style="text-align: center; color: #2c3e50; margin-bottom: 10px;">正在识别...</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            <p id="ocrStatus" style="text-align: center; color: #7f8c8d; margin-top: 10px;"></p>
+        </div>
+        
+        <div id="ocrResults" style="display: none;">
+            <h3 style="color: #2c3e50; margin: 20px 0;">识别结果（请核对并修正）</h3>
+            <div id="ocrResultGrid"></div>
+            <div class="action-buttons">
+                <button class="action-btn success" onclick="saveOCRResults()">💾 确认并保存</button>
+                <button class="action-btn warning" onclick="resetOCR()">🔄 重新上传</button>
+            </div>
+        </div>
+        
+        <div class="stats" style="margin-top: 30px;">
+            <h3>💡 使用提示</h3>
+            <ul>
+                <li>1. 确保照片清晰，光线充足</li>
+                <li>2. 尽量保持表单平整，避免倾斜</li>
+                <li>3. 训练表单ID要清晰可见</li>
+                <li>4. 识别后请仔细核对结果</li>
+                <li>5. OCR识别可能不完全准确，建议人工复核</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4. 历史记录 -->
+    <div class="screen" id="historyScreen">
+        <h1 class="title">📊 训练历史记录</h1>
+        
+        <div class="analytics-grid" id="analyticsGrid">
+            <div class="analytics-card">
+                <h3>总训练次数</h3>
+                <div class="number" id="totalTrainings">0</div>
+            </div>
+            <div class="analytics-card">
+                <h3>总训练项数</h3>
+                <div class="number" id="totalItems">0</div>
+            </div>
+            <div class="analytics-card">
+                <h3>平均正确率</h3>
+                <div class="number" id="avgAccuracy">0%</div>
+            </div>
+        </div>
+        
+        <h2 style="color: #2c3e50; margin: 30px 0 20px;">训练记录列表</h2>
+        <div class="history-list" id="historyList">
+            <p style="text-align: center; color: #7f8c8d; padding: 40px;">暂无训练记录</p>
+        </div>
+    </div>
+
+    <!-- 5. 拼音库 -->
+    <div class="screen" id="libraryScreen">
+        <h1 class="title">📚 完整拼音库</h1>
+        <p class="subtitle">汉语拼音全部内容一览</p>
+        
+        <!-- 声母 -->
+        <div class="library-section">
+            <h2>📝 声母（23个）</h2>
+            <div class="pinyin-showcase" id="shengmuShowcase"></div>
+        </div>
+        
+        <!-- 单韵母 -->
+        <div class="library-section">
+            <h2>📝 单韵母（6个基础 × 4声调 = 24个）</h2>
+            <h3>ā - a的四个声调</h3>
+            <div class="pinyin-showcase">
+                <div class="showcase-item danyunmu">ā</div>
+                <div class="showcase-item danyunmu">á</div>
+                <div class="showcase-item danyunmu">ǎ</div>
+                <div class="showcase-item danyunmu">à</div>
+            </div>
+            <h3>ō - o的四个声调</h3>
+            <div class="pinyin-showcase">
+                <div class="showcase-item danyunmu">ō</div>
+                <div class="showcase-item danyunmu">ó</div>
+                <div class="showcase-item danyunmu">ǒ</div>
+                <div class="showcase-item danyunmu">ò</div>
+            </div>
+            <h3>ē - e的四个声调</h3>
+            <div class="pinyin-showcase">
+                <div class="showcase-item danyunmu">ē</div>
+                <div class="showcase-item danyunmu">é</div>
+                <div class="showcase-item danyunmu">ě</div>
+                <div class="showcase-item danyunmu">è</div>
+            </div>
+            <h3>ī - i的四个声调</h3>
+            <div class="pinyin-showcase">
+                <div class="showcase-item danyunmu">ī</div>
+                <div class="showcase-item danyunmu">í</div>
+                <div class="showcase-item danyunmu">ǐ</div>
+                <div class="showcase-item danyunmu">ì</div>
+            </div>
+            <h3>ū - u的四个声调</h3>
+            <div class="pinyin-showcase">
+                <div class="showcase-item danyunmu">ū</div>
+                <div class="showcase-item danyunmu">ú</div>
+                <div class="showcase-item danyunmu">ǔ</div>
+                <div class="showcase-item danyunmu">ù</div>
+            </div>
+            <h3>ǖ - ü的四个声调</h3>
+            <div class="pinyin-showcase">
+                <div class="showcase-item danyunmu">ǖ</div>
+                <div class="showcase-item danyunmu">ǘ</div>
+                <div class="showcase-item danyunmu">ǚ</div>
+                <div class="showcase-item danyunmu">ǜ</div>
+            </div>
+        </div>
+        
+        <!-- 复韵母 -->
+        <div class="library-section">
+            <h2>📝 复韵母（9个基础 × 4声调 = 36个）</h2>
+            <div class="pinyin-showcase" id="shuangyunmuShowcase"></div>
+        </div>
+        
+        <!-- 鼻韵母 -->
+        <div class="library-section">
+            <h2>📝 鼻韵母（9个基础 × 4声调 = 36个）</h2>
+            <h3>前鼻韵母（5个）</h3>
+            <div class="pinyin-showcase" id="qianbiyunmuShowcase"></div>
+            <h3 style="margin-top: 20px;">后鼻韵母（4个）</h3>
+            <div class="pinyin-showcase" id="houbiyunmuShowcase"></div>
+        </div>
+        
+        <!-- 整体认读音节 -->
+        <div class="library-section">
+            <h2>📝 整体认读音节（16个基础 × 4声调 = 64个）</h2>
+            <div class="pinyin-showcase" id="zhengtiShowcase"></div>
+        </div>
+        
+        <!-- 统计汇总 -->
+        <div class="library-stats">
+            <div class="library-stat-card">
+                <h4>📊 拼音库总览</h4>
+                <div class="count">183</div>
+                <p style="color: #7f8c8d; margin-top: 10px;">个训练项</p>
+            </div>
+            <div class="library-stat-card">
+                <h4>🎯 训练组合</h4>
+                <ul style="list-style: none; padding: 0; color: #555; font-size: 14px; line-height: 1.8;">
+                    <li>✓ 声母：23个</li>
+                    <li>✓ 单韵母：24个</li>
+                    <li>✓ 复韵母：36个</li>
+                    <li>✓ 鼻韵母：36个</li>
+                    <li>✓ 整体认读：64个</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 完整拼音库
+        const pinyinDatabase = {
+            shengmu: ['b', 'p', 'm', 'f', 'd', 't', 'n', 'l', 'g', 'k', 'h', 'j', 'q', 'x', 'zh', 'ch', 'sh', 'r', 'z', 'c', 's', 'y', 'w'],
+            
+            // 单韵母（6个 × 4声调 = 24个）
+            danyunmu: [
+                'ā', 'á', 'ǎ', 'à',
+                'ō', 'ó', 'ǒ', 'ò',
+                'ē', 'é', 'ě', 'è',
+                'ī', 'í', 'ǐ', 'ì',
+                'ū', 'ú', 'ǔ', 'ù',
+                'ǖ', 'ǘ', 'ǚ', 'ǜ'
+            ],
+            
+            // 复韵母（9个 × 4声调 = 36个）
+            shuangyunmu: [
+                'āi', 'ái', 'ǎi', 'ài',
+                'ēi', 'éi', 'ěi', 'èi',
+                'uī', 'uí', 'uǐ', 'uì',
+                'āo', 'áo', 'ǎo', 'ào',
+                'ōu', 'óu', 'ǒu', 'òu',
+                'iū', 'iú', 'iǔ', 'iù',
+                'iē', 'ié', 'iě', 'iè',
+                'üē', 'üé', 'üě', 'üè',
+                'ēr', 'ér', 'ěr', 'èr'
+            ],
+            
+            // 鼻韵母（9个 × 4声调 = 36个）
+            biyunmu: [
+                'ān', 'án', 'ǎn', 'àn',
+                'ēn', 'én', 'ěn', 'èn',
+                'īn', 'ín', 'ǐn', 'ìn',
+                'ūn', 'ún', 'ǔn', 'ùn',
+                'ǖn', 'ǘn', 'ǚn', 'ǜn',
+                'āng', 'áng', 'ǎng', 'àng',
+                'ēng', 'éng', 'ěng', 'èng',
+                'īng', 'íng', 'ǐng', 'ìng',
+                'ōng', 'óng', 'ǒng', 'òng'
+            ],
+            
+            // 所有韵母（向后兼容）
+            yunmuWithTones: [],
+            
+            zhengtiWithTones: [
+                'zhī', 'zhí', 'zhǐ', 'zhì', 'chī', 'chí', 'chǐ', 'chì', 'shī', 'shí', 'shǐ', 'shì', 'rī', 'rí', 'rǐ', 'rì',
+                'zī', 'zí', 'zǐ', 'zì', 'cī', 'cí', 'cǐ', 'cì', 'sī', 'sí', 'sǐ', 'sì', 'yī', 'yí', 'yǐ', 'yì',
+                'wū', 'wú', 'wǔ', 'wù', 'yū', 'yú', 'yǔ', 'yù', 'yē', 'yé', 'yě', 'yè', 'yuē', 'yué', 'yuě', 'yuè',
+                'yuān', 'yuán', 'yuǎn', 'yuàn', 'yīn', 'yín', 'yǐn', 'yìn', 'yūn', 'yún', 'yǔn', 'yùn', 'yīng', 'yíng', 'yǐng', 'yìng'
+            ]
+        };
+        
+        // 合并所有韵母（向后兼容）
+        pinyinDatabase.yunmuWithTones = [
+            ...pinyinDatabase.danyunmu,
+            ...pinyinDatabase.shuangyunmu,
+            ...pinyinDatabase.biyunmu
+        ];
+        
+        let currentTraining = null;
+        let inputResults = {};
+        const itemsPerPage = 32; // 8行×4列
+        
+        // 切换屏幕
+        function switchScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            
+            const screenMap = {
+                'training': 'trainingScreen',
+                'input': 'inputScreen',
+                'ocr': 'ocrScreen',
+                'history': 'historyScreen',
+                'library': 'libraryScreen'
+            };
+            
+            document.getElementById(screenMap[screen]).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (screen === 'history') {
+                loadHistory();
+            } else if (screen === 'library') {
+                loadLibrary();
+            }
+        }
+        
+        // 加载拼音库
+        function loadLibrary() {
+            // 显示声母
+            const shengmuContainer = document.getElementById('shengmuShowcase');
+            shengmuContainer.innerHTML = '';
+            pinyinDatabase.shengmu.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'showcase-item shengmu';
+                div.textContent = item;
+                shengmuContainer.appendChild(div);
+            });
+            
+            // 显示复韵母
+            const shuangyunmuContainer = document.getElementById('shuangyunmuShowcase');
+            shuangyunmuContainer.innerHTML = '';
+            pinyinDatabase.shuangyunmu.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'showcase-item shuangyunmu';
+                div.textContent = item;
+                shuangyunmuContainer.appendChild(div);
+            });
+            
+            // 显示前鼻韵母
+            const qianbiContainer = document.getElementById('qianbiyunmuShowcase');
+            qianbiContainer.innerHTML = '';
+            const qianbiYunmu = [
+                'ān', 'án', 'ǎn', 'àn',
+                'ēn', 'én', 'ěn', 'èn',
+                'īn', 'ín', 'ǐn', 'ìn',
+                'ūn', 'ún', 'ǔn', 'ùn',
+                'ǖn', 'ǘn', 'ǚn', 'ǜn'
+            ];
+            qianbiYunmu.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'showcase-item biyunmu';
+                div.textContent = item;
+                qianbiContainer.appendChild(div);
+            });
+            
+            // 显示后鼻韵母
+            const houbiContainer = document.getElementById('houbiyunmuShowcase');
+            houbiContainer.innerHTML = '';
+            const houbiYunmu = [
+                'āng', 'áng', 'ǎng', 'àng',
+                'ēng', 'éng', 'ěng', 'èng',
+                'īng', 'íng', 'ǐng', 'ìng',
+                'ōng', 'óng', 'ǒng', 'òng'
+            ];
+            houbiYunmu.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'showcase-item biyunmu';
+                div.textContent = item;
+                houbiContainer.appendChild(div);
+            });
+            
+            // 显示整体认读音节
+            const zhengtiContainer = document.getElementById('zhengtiShowcase');
+            zhengtiContainer.innerHTML = '';
+            pinyinDatabase.zhengtiWithTones.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'showcase-item zhengti';
+                div.textContent = item;
+                zhengtiContainer.appendChild(div);
+            });
+        }
+        
+        // 开始训练
+        function startTraining(mode) {
+            let items = [];
+            let typeName = '';
+            
+            switch(mode) {
+                case 'shengmu':
+                    items = [...pinyinDatabase.shengmu];
+                    typeName = '声母训练';
+                    break;
+                case 'danyunmu':
+                    items = [...pinyinDatabase.danyunmu];
+                    typeName = '单韵母训练（带声调）';
+                    break;
+                case 'shuangyunmu':
+                    items = [...pinyinDatabase.shuangyunmu];
+                    typeName = '复韵母训练（带声调）';
+                    break;
+                case 'biyunmu':
+                    items = [...pinyinDatabase.biyunmu];
+                    typeName = '鼻韵母训练（带声调）';
+                    break;
+                case 'yunmu':
+                    items = [...pinyinDatabase.yunmuWithTones];
+                    typeName = '韵母训练（带声调）';
+                    break;
+                case 'zhengti':
+                    items = [...pinyinDatabase.zhengtiWithTones];
+                    typeName = '整体认读音节训练';
+                    break;
+                case 'random':
+                    items = [...pinyinDatabase.shengmu, ...pinyinDatabase.yunmuWithTones, ...pinyinDatabase.zhengtiWithTones];
+                    typeName = '随机混合训练';
+                    break;
+            }
+            
+            items = shuffleArray(items).slice(0, itemsPerPage);
+            
+            currentTraining = {
+                id: 'T' + Date.now(),
+                mode: mode,
+                typeName: typeName,
+                items: items,
+                date: new Date().toISOString()
+            };
+            
+            generateTrainingSheet();
+            document.getElementById('selectionView').style.display = 'none';
+            document.getElementById('trainingView').style.display = 'block';
+        }
+        
+        // 生成训练表单
+        function generateTrainingSheet() {
+            document.getElementById('trainingId').textContent = '训练编号：' + currentTraining.id;
+            document.getElementById('trainingType').textContent = currentTraining.typeName;
+            const grid = document.getElementById('trainingGrid');
+            grid.innerHTML = '';
+            
+            currentTraining.items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'training-item';
+                div.innerHTML = `
+                    <div class="pinyin">${item}</div>
+                    <div class="checkboxes">
+                        <label class="checkbox-item correct">
+                            <input type="checkbox"> ✓
+                        </label>
+                        <label class="checkbox-item wrong">
+                            <input type="checkbox"> ✗
+                        </label>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+        
+        // 前往录入界面
+        function goToInput() {
+            if (!currentTraining) {
+                alert('请先生成训练表单');
+                return;
+            }
+            
+            inputResults = {};
+            const content = document.getElementById('inputContent');
+            content.innerHTML = '';
+            
+            const header = document.createElement('div');
+            header.style.cssText = 'text-align: center; margin-bottom: 20px;';
+            header.innerHTML = `
+                <div style="color: #3498db; font-weight: bold; font-size: 14px;">${currentTraining.id}</div>
+                <div style="color: #2c3e50; font-size: 18px; margin-top: 5px;">${currentTraining.typeName}</div>
+            `;
+            content.appendChild(header);
+            
+            const grid = document.createElement('div');
+            grid.className = 'input-grid';
+            
+            currentTraining.items.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'input-item';
+                div.dataset.index = index;
+                div.innerHTML = `
+                    <div class="pinyin">${item}</div>
+                    <div class="input-status">点击选择</div>
+                `;
+                div.onclick = () => toggleInput(div, index);
+                grid.appendChild(div);
+            });
+            
+            content.appendChild(grid);
+            document.getElementById('inputActions').style.display = 'flex';
+            switchScreen('input');
+        }
+        
+        // 切换录入状态
+        function toggleInput(element, index) {
+            if (!element.classList.contains('correct') && !element.classList.contains('wrong')) {
+                element.classList.add('correct');
+                element.querySelector('.input-status').textContent = '✓ 正确';
+                inputResults[index] = true;
+            } else if (element.classList.contains('correct')) {
+                element.classList.remove('correct');
+                element.classList.add('wrong');
+                element.querySelector('.input-status').textContent = '✗ 错误';
+                inputResults[index] = false;
+            } else {
+                element.classList.remove('wrong');
+                element.querySelector('.input-status').textContent = '点击选择';
+                delete inputResults[index];
+            }
+        }
+        
+        // 清除录入
+        function clearInput() {
+            inputResults = {};
+            document.querySelectorAll('.input-item').forEach(item => {
+                item.classList.remove('correct', 'wrong');
+                item.querySelector('.input-status').textContent = '点击选择';
+            });
+        }
+        
+        // 保存结果
+        function saveResults() {
+            if (Object.keys(inputResults).length !== currentTraining.items.length) {
+                if (!confirm('还有未录入的项目，确定要保存吗？')) {
+                    return;
+                }
+            }
+            
+            const results = currentTraining.items.map((item, index) => ({
+                pinyin: item,
+                result: inputResults[index] === undefined ? null : inputResults[index]
+            }));
+            
+            const record = {
+                ...currentTraining,
+                results: results,
+                completedDate: new Date().toISOString()
+            };
+            
+            saveToDatabase(record);
+            alert('✅ 保存成功！');
+            clearInput();
+            switchScreen('history');
+        }
+        
+        // 保存到数据库
+        function saveToDatabase(record) {
+            let database = JSON.parse(localStorage.getItem('pinyinTrainingDB') || '[]');
+            database.push(record);
+            localStorage.setItem('pinyinTrainingDB', JSON.stringify(database));
+        }
+        
+        // 加载历史记录
+        function loadHistory() {
+            const database = JSON.parse(localStorage.getItem('pinyinTrainingDB') || '[]');
+            
+            // 统计数据
+            let totalTrainings = database.length;
+            let totalItems = 0;
+            let totalCorrect = 0;
+            
+            database.forEach(record => {
+                if (record.results) {
+                    record.results.forEach(r => {
+                        if (r.result !== null) {
+                            totalItems++;
+                            if (r.result) totalCorrect++;
+                        }
+                    });
+                }
+            });
+            
+            document.getElementById('totalTrainings').textContent = totalTrainings;
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('avgAccuracy').textContent = totalItems > 0 ? Math.round(totalCorrect / totalItems * 100) + '%' : '0%';
+            
+            // 历史列表
+            const list = document.getElementById('historyList');
+            if (database.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 40px;">暂无训练记录</p>';
+                return;
+            }
+            
+            list.innerHTML = '';
+            database.reverse().forEach((record, index) => {
+                const correctCount = record.results ? record.results.filter(r => r.result === true).length : 0;
+                const wrongCount = record.results ? record.results.filter(r => r.result === false).length : 0;
+                const total = correctCount + wrongCount;
+                const rate = total > 0 ? Math.round(correctCount / total * 100) : 0;
+                
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <h3>
+                        <span>${record.typeName}</span>
+                        <button class="action-btn" style="padding: 5px 15px; font-size: 14px;" onclick="toggleDetails(${database.length - 1 - index})">查看详情</button>
+                    </h3>
+                    <div class="history-meta">
+                        训练编号：${record.id} | 日期：${new Date(record.completedDate || record.date).toLocaleString('zh-CN')}
+                    </div>
+                    <div class="history-stats">
+                        <div class="stat-box correct">✓ 正确：${correctCount}</div>
+                        <div class="stat-box wrong">✗ 错误：${wrongCount}</div>
+                        <div class="stat-box rate">正确率：${rate}%</div>
+                    </div>
+                    <div class="history-details" id="details-${database.length - 1 - index}">
+                        <div class="detail-grid">
+                            ${record.results ? record.results.map(r => `
+                                <div class="detail-item ${r.result === true ? 'correct' : (r.result === false ? 'wrong' : '')}">${r.pinyin}</div>
+                            `).join('') : ''}
+                        </div>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+        
+        // 切换详情显示
+        function toggleDetails(index) {
+            const details = document.getElementById(`details-${index}`);
+            details.classList.toggle('show');
+        }
+        
+        // 文件上传处理
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) processImage(file);
+        });
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) processImage(file);
+        }
+        
+        // 处理图像
+        function processImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.getElementById('previewImage');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                
+                document.getElementById('uploadArea').style.display = 'none';
+                performOCR(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // 执行OCR识别
+        async function performOCR(imageData) {
+            const progress = document.getElementById('ocrProgress');
+            progress.classList.add('show');
+            
+            try {
+                const worker = await Tesseract.createWorker({
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            const percent = Math.round(m.progress * 100);
+                            document.getElementById('progressFill').style.width = percent + '%';
+                            document.getElementById('progressFill').textContent = percent + '%';
+                            document.getElementById('ocrStatus').textContent = '正在识别文字...';
+                        }
+                    }
+                });
+                
+                await worker.loadLanguage('chi_sim');
+                await worker.initialize('chi_sim');
+                const { data: { text } } = await worker.recognize(imageData);
+                await worker.terminate();
+                
+                // 模拟结果（实际需要更复杂的解析逻辑）
+                setTimeout(() => {
+                    showOCRResults(text);
+                }, 500);
+                
+            } catch (error) {
+                alert('OCR识别失败：' + error.message + '\n\n建议：\n1. 确保照片清晰\n2. 尝试重新拍照\n3. 或使用手动录入功能');
+                resetOCR();
+            }
+        }
+        
+        // 显示OCR结果
+        function showOCRResults(text) {
+            document.getElementById('ocrProgress').classList.remove('show');
+            document.getElementById('ocrResults').style.display = 'block';
+            
+            // 这里需要实现复杂的解析逻辑
+            // 暂时提示用户使用手动录入
+            document.getElementById('ocrResultGrid').innerHTML = `
+                <div style="padding: 40px; text-align: center; color: #7f8c8d;">
+                    <h3 style="color: #e67e22; margin-bottom: 20px;">⚠️ OCR功能正在完善中</h3>
+                    <p>由于训练表单格式的复杂性，OCR识别准确率可能不高。</p>
+                    <p style="margin-top: 15px; color: #2c3e50; font-weight: bold;">建议使用"📝 录入结果"功能进行手动录入，准确率更高！</p>
+                    <p style="margin-top: 20px; font-size: 14px;">识别到的文本（供参考）：</p>
+                    <pre style="background: #ecf0f1; padding: 15px; border-radius: 5px; margin-top: 10px; text-align: left; max-height: 200px; overflow-y: auto;">${text}</pre>
+                </div>
+            `;
+        }
+        
+        // 保存OCR结果
+        function saveOCRResults() {
+            alert('OCR功能正在完善中，请使用手动录入功能');
+        }
+        
+        // 重置OCR
+        function resetOCR() {
+            document.getElementById('uploadArea').style.display = 'block';
+            document.getElementById('previewImage').style.display = 'none';
+            document.getElementById('ocrProgress').classList.remove('show');
+            document.getElementById('ocrResults').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+        }
+        
+        // 工具函数
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        function regenerate() {
+            startTraining(currentTraining.mode);
+        }
+        
+        function backToSelection() {
+            document.getElementById('trainingView').style.display = 'none';
+            document.getElementById('selectionView').style.display = 'block';
+        }
+    </script>
+</body>
+</html> 

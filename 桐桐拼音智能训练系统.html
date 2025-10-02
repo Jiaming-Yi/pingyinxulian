@@ -1854,6 +1854,9 @@
             <div class="login-header">
                 <h1>🎓 桐桐拼音训练系统</h1>
                 <p>请登录或注册以继续</p>
+                <p style="font-size: 12px; color: #95a5a6; margin-top: 8px;">
+                    💡 首次使用？请先注册账户
+                </p>
             </div>
             
             <div class="login-tabs">
@@ -1866,7 +1869,8 @@
                     ☁️ 从云端同步账户
                 </button>
                 <p style="color: #7f8c8d; font-size: 12px; margin-top: 8px;">
-                    在其他设备注册的账户？点击同步
+                    已在其他设备注册？点击同步<br>
+                    <span style="color: #e74c3c; font-weight: bold;">⚠️ 首次使用请先注册</span>
                 </p>
             </div>
             
@@ -2499,17 +2503,30 @@
         async function syncUsersAndReload() {
             // 先检查是否配置了GitHub
             if (!githubConfig.token) {
-                alert('⚠️ 请先配置GitHub Token\n\n操作步骤：\n1. 访问 https://github.com/settings/tokens/new\n2. 创建Token（勾选repo权限）\n3. 复制Token\n4. 在登录界面输入：\n   用户名：请输入任意临时用户名\n   密码：将Token粘贴在这里\n5. 然后再点击"从云端同步账户"');
+                const confirmConfig = confirm('📋 需要配置GitHub信息才能同步账户\n\n如果您在其他设备上注册过账户：\n\n1. 需要先获取GitHub Token\n2. 访问: github.com/settings/tokens/new\n3. 创建Token（勾选repo权限）\n\n点击"确定"继续配置\n点击"取消"先在本地注册账户');
+                
+                if (!confirmConfig) {
+                    return;
+                }
                 
                 // 显示临时输入框让用户配置
-                const token = prompt('请粘贴您的GitHub Personal Access Token：\n\n（Token需要有repo权限）');
-                if (!token) return;
+                const token = prompt('📝 步骤1/3：请粘贴您的GitHub Personal Access Token\n\n（从 github.com/settings/tokens/new 获取）\n（需要勾选 repo 权限）');
+                if (!token || token.trim() === '') {
+                    alert('❌ 未输入Token，操作取消');
+                    return;
+                }
                 
-                const username = prompt('请输入GitHub用户名：', 'Jiaming-Yi');
-                if (!username) return;
+                const username = prompt('📝 步骤2/3：请输入GitHub用户名', 'Jiaming-Yi');
+                if (!username || username.trim() === '') {
+                    alert('❌ 未输入用户名，操作取消');
+                    return;
+                }
                 
-                const repo = prompt('请输入仓库名：', 'pingyinxulian');
-                if (!repo) return;
+                const repo = prompt('📝 步骤3/3：请输入仓库名', 'pingyinxulian');
+                if (!repo || repo.trim() === '') {
+                    alert('❌ 未输入仓库名，操作取消');
+                    return;
+                }
                 
                 // 保存配置
                 githubConfig.token = token.trim();
@@ -2518,6 +2535,8 @@
                 localStorage.setItem('github_token', githubConfig.token);
                 localStorage.setItem('github_username', githubConfig.username);
                 localStorage.setItem('github_repo', githubConfig.repo);
+                
+                alert('✅ GitHub配置已保存！\n\n现在开始同步账户...');
             }
             
             // 显示加载提示
@@ -2530,14 +2549,16 @@
                 const success = await syncUsersFromGitHub();
                 
                 if (success) {
-                    alert('✅ 账户同步成功！\n\n现在可以使用在其他设备注册的账户登录了。');
+                    const userCount = Object.keys(users).length;
+                    alert(`✅ 账户同步成功！\n\n已同步 ${userCount} 个账户\n现在可以使用这些账户登录了。`);
                     // 刷新用户列表
                     users = JSON.parse(localStorage.getItem('users') || '{}');
                 } else {
-                    alert('❌ 同步失败\n\n可能的原因：\n1. GitHub上还没有用户数据\n2. Token权限不足\n3. 网络连接问题\n\n请确保至少在一台设备上注册过账户。');
+                    alert('❌ 同步失败\n\n可能的原因：\n\n1. GitHub上还没有用户数据\n   ➜ 请先在一台设备上注册账户\n   ➜ 然后在设置中点击"同步账户信息"\n\n2. Token权限不足\n   ➜ Token需要勾选 repo 权限\n\n3. 网络连接问题\n   ➜ 请检查网络连接\n\n💡 建议：如果这是第一次使用，请先注册新账户。');
                 }
             } catch (error) {
-                alert('❌ 同步出错：' + error.message);
+                console.error('同步错误详情:', error);
+                alert('❌ 同步出错\n\n错误信息：' + error.message + '\n\n请检查：\n1. GitHub Token是否正确\n2. 网络连接是否正常\n3. GitHub仓库是否存在');
             } finally {
                 syncBtn.disabled = false;
                 syncBtn.innerHTML = originalText;

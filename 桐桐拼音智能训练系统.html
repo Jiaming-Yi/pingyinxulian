@@ -1861,6 +1861,15 @@
                 <button class="login-tab" onclick="switchLoginTab('register')">注册</button>
             </div>
             
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button class="action-btn" style="padding: 8px 16px; font-size: 14px; background: #27ae60;" onclick="syncUsersAndReload()">
+                    ☁️ 从云端同步账户
+                </button>
+                <p style="color: #7f8c8d; font-size: 12px; margin-top: 8px;">
+                    在其他设备注册的账户？点击同步
+                </p>
+            </div>
+            
             <!-- 登录表单 -->
             <form class="login-form active" id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
@@ -2303,10 +2312,11 @@
                     <input type="text" id="githubRepo" placeholder="例如: pingyinxulian" value="pingyinxulian">
                 </div>
                 
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
                     <button class="sync-button" onclick="saveGitHubConfig()">💾 保存配置</button>
-                    <button class="sync-button success" onclick="syncToGitHub()">☁️ 上传数据到GitHub</button>
-                    <button class="sync-button warning" onclick="syncFromGitHub()">⬇️ 从GitHub下载数据</button>
+                    <button class="sync-button success" onclick="syncToGitHub()">☁️ 上传训练数据</button>
+                    <button class="sync-button warning" onclick="syncFromGitHub()">⬇️ 下载训练数据</button>
+                    <button class="sync-button" style="background: #9b59b6;" onclick="syncUsersManually()">👥 同步账户信息</button>
                 </div>
                 
                 <div id="syncStatus" style="display: none;" class="sync-status"></div>
@@ -2485,6 +2495,55 @@
             }
         }
         
+        // 同步账户并重新加载
+        async function syncUsersAndReload() {
+            // 先检查是否配置了GitHub
+            if (!githubConfig.token) {
+                alert('⚠️ 请先配置GitHub Token\n\n操作步骤：\n1. 访问 https://github.com/settings/tokens/new\n2. 创建Token（勾选repo权限）\n3. 复制Token\n4. 在登录界面输入：\n   用户名：请输入任意临时用户名\n   密码：将Token粘贴在这里\n5. 然后再点击"从云端同步账户"');
+                
+                // 显示临时输入框让用户配置
+                const token = prompt('请粘贴您的GitHub Personal Access Token：\n\n（Token需要有repo权限）');
+                if (!token) return;
+                
+                const username = prompt('请输入GitHub用户名：', 'Jiaming-Yi');
+                if (!username) return;
+                
+                const repo = prompt('请输入仓库名：', 'pingyinxulian');
+                if (!repo) return;
+                
+                // 保存配置
+                githubConfig.token = token.trim();
+                githubConfig.username = username.trim();
+                githubConfig.repo = repo.trim();
+                localStorage.setItem('github_token', githubConfig.token);
+                localStorage.setItem('github_username', githubConfig.username);
+                localStorage.setItem('github_repo', githubConfig.repo);
+            }
+            
+            // 显示加载提示
+            const syncBtn = event.target;
+            const originalText = syncBtn.innerHTML;
+            syncBtn.disabled = true;
+            syncBtn.innerHTML = '⏳ 同步中...';
+            
+            try {
+                const success = await syncUsersFromGitHub();
+                
+                if (success) {
+                    alert('✅ 账户同步成功！\n\n现在可以使用在其他设备注册的账户登录了。');
+                    // 刷新用户列表
+                    users = JSON.parse(localStorage.getItem('users') || '{}');
+                } else {
+                    alert('❌ 同步失败\n\n可能的原因：\n1. GitHub上还没有用户数据\n2. Token权限不足\n3. 网络连接问题\n\n请确保至少在一台设备上注册过账户。');
+                }
+            } catch (error) {
+                alert('❌ 同步出错：' + error.message);
+            } finally {
+                syncBtn.disabled = false;
+                syncBtn.innerHTML = originalText;
+            }
+        }
+        
         // 显示/隐藏登录界面
         function showLoginOverlay() {
             document.getElementById('loginOverlay').style.display = 'flex';
@@ -2544,7 +2603,14 @@
             currentUser = users[username];
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             
-            alert(`✅ 注册成功！欢迎，${displayName}！`);
+            // 尝试同步用户信息到GitHub（如果已配置）
+            syncUsersToGitHub().then(synced => {
+                if (synced) {
+                    console.log('用户信息已同步到GitHub');
+                }
+            });
+            
+            alert(`✅ 注册成功！欢迎，${displayName}！\n\n💡 提示：在"设置"中配置GitHub Token后，可以在多个设备上使用同一账户。`);
             
             hideLoginOverlay();
             updateUserDisplay();
@@ -3751,6 +3817,89 @@
             username: localStorage.getItem('github_username') || 'Jiaming-Yi',
             repo: localStorage.getItem('github_repo') || 'pingyinxulian'
         };
+        
+        // 用户信息同步到GitHub
+        async function syncUsersToGitHub() {
+            if (!githubConfig.token) {
+                console.log('未配置GitHub Token，跳过用户同步');
+                return false;
+            }
+            
+            try {
+                const usersData = localStorage.getItem('users') || '{}';
+                const content = btoa(unescape(encodeURIComponent(usersData)));
+                const fileName = 'data/users.json';
+                
+                let sha = null;
+                try {
+                    const getResponse = await fetch(
+                        `https://api.github.com/repos/${githubConfig.username}/${githubConfig.repo}/contents/${fileName}`,
+                        { headers: getGitHubHeaders(false) }
+                    );
+                    if (getResponse.ok) {
+                        const fileData = await getResponse.json();
+                        sha = fileData.sha;
+                    }
+                } catch (e) {}
+                
+                const uploadData = {
+                    message: `更新用户信息 - ${new Date().toLocaleString('zh-CN')}`,
+                    content: content,
+                    branch: 'main'
+                };
+                if (sha) uploadData.sha = sha;
+                
+                const response = await fetch(
+                    `https://api.github.com/repos/${githubConfig.username}/${githubConfig.repo}/contents/${fileName}`,
+                    {
+                        method: 'PUT',
+                        headers: getGitHubHeaders(true),
+                        body: JSON.stringify(uploadData)
+                    }
+                );
+                
+                return response.ok;
+            } catch (error) {
+                console.error('用户信息同步失败:', error);
+                return false;
+            }
+        }
+        
+        // 从GitHub下载用户信息
+        async function syncUsersFromGitHub() {
+            if (!githubConfig.token) {
+                return false;
+            }
+            
+            try {
+                const fileName = 'data/users.json';
+                const response = await fetch(
+                    `https://api.github.com/repos/${githubConfig.username}/${githubConfig.repo}/contents/${fileName}`,
+                    { headers: getGitHubHeaders(false) }
+                );
+                
+                if (response.ok) {
+                    const fileData = await response.json();
+                    const content = decodeURIComponent(escape(atob(fileData.content)));
+                    
+                    // 合并本地和云端用户
+                    const cloudUsers = JSON.parse(content);
+                    const localUsers = JSON.parse(localStorage.getItem('users') || '{}');
+                    
+                    // 合并用户（云端优先，但保留本地新用户）
+                    const mergedUsers = { ...localUsers, ...cloudUsers };
+                    
+                    localStorage.setItem('users', JSON.stringify(mergedUsers));
+                    users = mergedUsers;
+                    
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.error('用户信息下载失败:', error);
+                return false;
+            }
+        }
 
         // 统一构建GitHub Headers，清洗Token避免非ASCII字符
         function getSanitizedToken() {
@@ -3791,6 +3940,37 @@
             localStorage.setItem('github_repo', githubConfig.repo);
             
             showSyncStatus('success', '✅ GitHub配置已保存');
+        }
+        
+        // 手动同步账户信息
+        async function syncUsersManually() {
+            if (!githubConfig.token) {
+                showSyncStatus('error', '❌ 请先配置GitHub Token');
+                return;
+            }
+            
+            const action = confirm('选择同步方向：\n\n点击"确定"：上传本地账户到云端\n点击"取消"：从云端下载账户到本地');
+            
+            if (action) {
+                // 上传
+                showSyncStatus('info', '⏳ 正在上传账户信息...');
+                const success = await syncUsersToGitHub();
+                if (success) {
+                    showSyncStatus('success', '✅ 账户信息已上传到GitHub');
+                } else {
+                    showSyncStatus('error', '❌ 上传失败');
+                }
+            } else {
+                // 下载
+                showSyncStatus('info', '⏳ 正在下载账户信息...');
+                const success = await syncUsersFromGitHub();
+                if (success) {
+                    showSyncStatus('success', '✅ 账户信息已从GitHub下载');
+                    users = JSON.parse(localStorage.getItem('users') || '{}');
+                } else {
+                    showSyncStatus('error', '❌ 下载失败，可能云端还没有账户数据');
+                }
+            }
         }
 
         // 上传数据到GitHub

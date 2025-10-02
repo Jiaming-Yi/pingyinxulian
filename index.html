@@ -1,9 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>桐桐汉语拼音训练系统 - 首页</title>
+    <title>桐桐汉语拼音智能训练系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -15,234 +16,4248 @@
             font-family: "Microsoft YaHei", "SimHei", Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
         }
         
-        .container {
-            max-width: 900px;
+        /* 导航标签 */
+        .nav-tabs {
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-tab {
+            background: rgba(255,255,255,0.9);
+            padding: 15px 30px;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab.active {
             background: white;
-            border-radius: 30px;
-            padding: 60px 40px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-tab:hover {
+            background: white;
+        }
+        
+        /* 屏幕容器 */
+        .screen {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 0 20px 20px 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .screen.active {
+            display: block;
+        }
+        
+        /* 选择界面 */
+        .title {
             text-align: center;
-        }
-        
-        .logo {
-            font-size: 80px;
-            margin-bottom: 20px;
-        }
-        
-        h1 {
             color: #2c3e50;
-            font-size: 42px;
-            margin-bottom: 15px;
+            font-size: 36px;
+            margin-bottom: 20px;
             font-weight: bold;
         }
         
         .subtitle {
+            text-align: center;
             color: #7f8c8d;
-            font-size: 18px;
-            margin-bottom: 40px;
+            font-size: 16px;
+            margin-bottom: 30px;
         }
         
-        .version {
+        .mode-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .mode-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 30px;
+            border-radius: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .mode-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .mode-btn.random {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            grid-column: span 3;
+        }
+        
+        .stats {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .stats h3 {
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        
+        .stats ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .stats li {
+            padding: 5px 0;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        /* 训练表单 */
+        .training-container {
+            max-width: 100%;
+        }
+        
+        .training-header {
+            text-align: center;
+            margin-bottom: 20px;
+            page-break-after: avoid;
+        }
+        
+        .training-header h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .training-info {
+            font-size: 14px;
+            color: #666;
+            margin: 10px 0;
+        }
+        
+        .training-id {
             display: inline-block;
             background: #3498db;
             color: white;
             padding: 5px 15px;
             border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        .training-type {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .training-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .training-item {
+            border: 2px solid #bdc3c7;
+            padding: 10px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            min-height: 85px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .pinyin {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-family: "Arial", "Microsoft YaHei", sans-serif;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .checkboxes {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            font-size: 13px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        
+        .correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .wrong {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .action-buttons {
+            text-align: center;
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .action-btn.success {
+            background: #27ae60;
+        }
+        
+        .action-btn.success:hover {
+            background: #229954;
+        }
+        
+        .action-btn.warning {
+            background: #e67e22;
+        }
+        
+        .action-btn.warning:hover {
+            background: #d35400;
+        }
+        
+        .action-btn.secondary {
+            background: #95a5a6;
+        }
+        
+        .action-btn.secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        /* 录入界面 */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .input-item {
+            border: 3px solid #bdc3c7;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f8f9fa;
+            cursor: default;
+            transition: all 0.3s;
+        }
+        
+        .input-item:hover {
+            border-color: #3498db;
+            transform: translateY(-1px);
+        }
+        
+        .input-item.correct {
+            border-color: #27ae60;
+            background: #d5f4e6;
+        }
+        
+        .input-item.wrong {
+            border-color: #e74c3c;
+            background: #fadbd8;
+        }
+        
+        .input-item .pinyin {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .input-status {
+            text-align: center;
             font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+        
+        .input-item.correct .input-status {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .input-item.wrong .input-status {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .mark-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .mark-btn {
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .mark-btn.correct { background: #27ae60; color: #fff; }
+        .mark-btn.wrong { background: #e74c3c; color: #fff; }
+        
+        /* 历史记录 */
+        .history-list {
+            margin: 20px 0;
+        }
+        
+        .history-item {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .history-item h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-meta {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .history-stats {
+            display: flex;
+            gap: 20px;
+            margin: 10px 0;
+        }
+        
+        .stat-box {
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .stat-box.correct {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        
+        .stat-box.wrong {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+        
+        .stat-box.rate {
+            background: #dfe6e9;
+            color: #2c3e50;
+        }
+        
+        .history-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .history-details.show {
+            display: block;
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+        }
+        
+        .detail-item {
+            padding: 5px;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .detail-item.correct {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        
+        .detail-item.wrong {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+        
+        /* 拼音库 */
+        .library-section {
             margin-bottom: 40px;
         }
         
-        .buttons {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            margin: 40px 0;
+        .library-section h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #3498db;
         }
         
-        .btn {
-            display: block;
+        .library-section h3 {
+            color: #555;
+            font-size: 18px;
+            margin: 20px 0 10px;
+        }
+        
+        .pinyin-showcase {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .showcase-item {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            text-decoration: none;
-            padding: 25px 40px;
-            border-radius: 15px;
-            font-size: 24px;
+            padding: 15px 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 22px;
             font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: all 0.3s;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
         }
         
-        .btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        .showcase-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         
-        .btn-secondary {
+        .showcase-item.shengmu {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .showcase-item.danyunmu {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
         
-        .features {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin: 50px 0 30px;
-            text-align: left;
+        .showcase-item.shuangyunmu {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
         
-        .feature {
+        .showcase-item.biyunmu {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .showcase-item.zhengti {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .library-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .library-stat-card {
             background: #f8f9fa;
             padding: 20px;
             border-radius: 10px;
-            border-left: 4px solid #3498db;
+            border-left: 5px solid #3498db;
         }
         
-        .feature h3 {
+        .library-stat-card h4 {
             color: #2c3e50;
             font-size: 16px;
             margin-bottom: 10px;
         }
         
-        .feature p {
-            color: #7f8c8d;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin: 40px 0;
-        }
-        
-        .stat {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        
-        .stat .number {
+        .library-stat-card .count {
             font-size: 36px;
             font-weight: bold;
-            margin-bottom: 5px;
+            color: #3498db;
         }
         
-        .stat .label {
-            font-size: 14px;
+        /* OCR上传 */
+        .upload-area {
+            border: 3px dashed #bdc3c7;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: #3498db;
+            background: #ecf0f1;
+        }
+        
+        .upload-area.dragover {
+            border-color: #27ae60;
+            background: #d5f4e6;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .ocr-progress {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .ocr-progress.show {
+            display: block;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #ecf0f1;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* 统计分析 */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .analytics-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .analytics-card h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
             opacity: 0.9;
         }
         
-        .footer {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 2px solid #ecf0f1;
-            color: #95a5a6;
+        .analytics-card .number {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        /* 驾驶舱样式 */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+        
+        .panel {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            padding: 16px;
+        }
+        
+        .panel h3 {
+            color: #2c3e50;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .top-list {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 8px 12px;
+            align-items: center;
+        }
+        
+        .top-list .item {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .muted {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        
+        /* 批量打印选择器 */
+        .batch-print-selector {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .batch-print-selector h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .batch-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .batch-option {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .batch-option:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .batch-option.selected {
+            border-color: #27ae60;
+            background: #d5f4e6;
+        }
+        
+        .batch-option input[type="checkbox"] {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+        
+        .batch-option .option-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        
+        .batch-option .option-desc {
+            color: #7f8c8d;
+            font-size: 13px;
+        }
+        
+        .batch-count-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .batch-count-control label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .batch-count-control input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .batch-preview-area {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 2px dashed #ddd;
+        }
+        
+        .batch-preview-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-divider {
+            page-break-after: always;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* 拼音库打印专用样式 */
+        .library-print-mode {
+            display: none;
+        }
+        
+        /* 打印样式 */
+        @media print {
+            body {
+                background: white !important;
+                padding: 0;
+            }
+            
+            .nav-tabs, .action-buttons, .batch-print-selector {
+                display: none !important;
+            }
+            
+            .screen {
+                box-shadow: none;
+                margin: 0;
+                padding: 10mm;
+                max-width: 100%;
+                background: white !important;
+            }
+            
+            .training-grid {
+                gap: 8px;
+            }
+            
+            .training-item {
+                padding: 8px;
+                min-height: 70px;
+            }
+            
+            .pinyin {
+                font-size: 20px;
+            }
+            
+            .page-divider {
+                page-break-after: always;
+                height: 0;
+                margin: 0;
+                padding: 0;
+                border: none;
+            }
+            
+            .training-header {
+                page-break-after: avoid;
+            }
+            
+            .training-grid {
+                page-break-inside: avoid;
+            }
+            
+            /* 拼音库打印样式 */
+            .library-section {
+                page-break-inside: avoid;
+                margin-bottom: 15mm;
+            }
+            
+            .library-section h2 {
+                color: #000 !important;
+                border-bottom: 2px solid #000 !important;
+                font-size: 18pt;
+                margin-bottom: 8mm;
+                padding-bottom: 3mm;
+            }
+            
+            .library-section h3 {
+                color: #333 !important;
+                font-size: 14pt;
+                margin: 5mm 0 3mm;
+            }
+            
+            .pinyin-showcase {
+                grid-template-columns: repeat(8, 1fr);
+                gap: 3mm;
+                margin-bottom: 5mm;
+            }
+            
+            .showcase-item {
+                background: white !important;
+                color: #000 !important;
+                border: 1px solid #333 !important;
+                padding: 3mm;
+                border-radius: 2mm;
+                text-align: center;
+                font-size: 14pt;
+                font-weight: bold;
+                min-height: 12mm;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: none !important;
+                position: relative;
+            }
+            
+            .showcase-item .pinyin-text {
+                color: #000 !important;
+                font-size: 14pt;
+            }
+            
+            .showcase-item .pinyin-image {
+                display: block;
+                width: 10mm;
+                height: 10mm;
+                margin: 2mm auto;
+                border: 1px solid #ccc;
+            }
+            
+            .showcase-item .upload-icon,
+            .showcase-item .audio-icon {
+                display: none !important;
+            }
+            
+            .library-stats {
+                display: none !important;
+            }
+            
+            .subtitle {
+                display: none !important;
+            }
+            
+            .title {
+                color: #000 !important;
+                font-size: 20pt;
+                margin-bottom: 5mm;
+                text-align: center;
+            }
+            
+            /* 确保不打印图片时隐藏 */
+            body.print-no-images .showcase-item .pinyin-image {
+                display: none !important;
+            }
+            
+            body.print-no-images .showcase-item {
+                min-height: 8mm;
+            }
+        }
+        
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+        
+        /* 移动端适配 */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            /* 导航标签 */
+            .nav-tabs {
+                gap: 5px;
+                margin-bottom: 10px;
+            }
+            
+            .nav-tab {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            /* 屏幕容器 */
+            .screen {
+                padding: 20px 15px;
+                border-radius: 0 15px 15px 15px;
+            }
+            
+            /* 标题 */
+            .title {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+            
+            .subtitle {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+            
+            /* 训练模式按钮 */
+            .mode-buttons {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .mode-btn {
+                padding: 20px;
+                font-size: 18px;
+            }
+            
+            .mode-btn.random {
+                grid-column: span 1;
+            }
+            
+            /* 批量打印选择器 */
+            .batch-print-selector {
+                padding: 15px;
+            }
+            
+            .batch-print-selector h3 {
+                font-size: 18px;
+            }
+            
+            .batch-options {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .batch-count-control {
+                flex-wrap: wrap;
+            }
+            
+            .batch-count-control span {
+                width: 100%;
+                margin-top: 5px;
+            }
+            
+            /* 训练表单 */
+            .training-header h2 {
+                font-size: 20px;
+            }
+            
+            .training-info {
+                font-size: 12px;
+            }
+            
+            .training-id,
+            .training-type {
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+            
+            .training-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            
+            .training-item {
+                padding: 8px;
+                min-height: 70px;
+            }
+            
+            .pinyin {
+                font-size: 20px;
+            }
+            
+            .checkboxes {
+                gap: 8px;
+                font-size: 11px;
+            }
+            
+            .checkbox-item input[type="checkbox"] {
+                width: 14px;
+                height: 14px;
+            }
+            
+            /* 操作按钮 */
+            .action-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .action-btn {
+                width: 100%;
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            /* 输入界面 */
+            .input-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .input-item {
+                padding: 10px;
+            }
+            
+            .input-item .pinyin {
+                font-size: 24px;
+            }
+            
+            .mark-buttons {
+                gap: 5px;
+            }
+            
+            .mark-btn {
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+            
+            /* 拼音库 */
+            .library-section h2 {
+                font-size: 20px;
+            }
+            
+            .library-section h3 {
+                font-size: 16px;
+            }
+            
+            .pinyin-showcase {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+            }
+            
+            .showcase-item {
+                padding: 12px 8px;
+                font-size: 18px;
+                min-height: 70px;
+            }
+            
+            .showcase-item .pinyin-text {
+                font-size: 18px;
+            }
+            
+            .showcase-item .pinyin-image {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .showcase-item .upload-icon {
+                width: 20px;
+                height: 20px;
+                font-size: 12px;
+            }
+            
+            .showcase-item .audio-icon {
+                width: 24px;
+                height: 24px;
+                font-size: 14px;
+            }
+            
+            .library-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            /* 图片上传模态框 */
+            .image-modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            
+            .image-modal-header h3 {
+                font-size: 16px;
+            }
+            
+            .upload-area {
+                padding: 30px 15px;
+            }
+            
+            .upload-area-icon {
+                font-size: 36px;
+            }
+            
+            .upload-area h3 {
+                font-size: 16px;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .modal-btn {
+                width: 100%;
+            }
+            
+            /* 历史记录 */
+            .analytics-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .analytics-card {
+                padding: 20px;
+            }
+            
+            .analytics-card .number {
+                font-size: 36px;
+            }
+            
+            .history-stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                width: 100%;
+            }
+            
+            .detail-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            /* 驾驶舱 */
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .panel {
+                padding: 12px;
+            }
+            
+            /* 设置界面 */
+            .settings-container {
+                padding: 0;
+            }
+            
+            .setting-card {
+                padding: 20px 15px;
+            }
+            
+            .setting-card h3 {
+                font-size: 18px;
+            }
+            
+            .sync-button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+            
+            /* 统计表格 */
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .table-controls input,
+            .table-controls select {
+                width: 100%;
+            }
+            
+            .elem-table {
+                font-size: 12px;
+            }
+            
+            .elem-table th,
+            .elem-table td {
+                padding: 8px 6px;
+            }
+            
+            /* 音频控制 */
+            .audio-controls {
+                flex-direction: column;
+            }
+            
+            .audio-player {
+                width: 100%;
+            }
+            
+            .audio-upload-btn {
+                width: 100%;
+            }
+        }
+        
+        /* 小屏手机适配（320px-480px）*/
+        @media screen and (max-width: 480px) {
+            .nav-tab {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+            
+            .title {
+                font-size: 20px;
+            }
+            
+            .mode-btn {
+                font-size: 16px;
+                padding: 15px;
+            }
+            
+            .training-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .pinyin-showcase {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 5px;
+            }
+            
+            .showcase-item {
+                padding: 10px 5px;
+                font-size: 16px;
+            }
+            
+            .batch-preview-item {
+                font-size: 13px;
+                padding: 8px;
+            }
+        }
+        
+        /* 横屏模式优化 */
+        @media screen and (max-width: 768px) and (orientation: landscape) {
+            .training-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .input-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .pinyin-showcase {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        /* 用户登录界面 */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .login-header p {
+            color: #7f8c8d;
             font-size: 14px;
         }
         
-        .footer a {
-            color: #3498db;
-            text-decoration: none;
+        .login-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
         }
         
-        .footer a:hover {
-            text-decoration: underline;
+        .login-tab {
+            flex: 1;
+            padding: 12px;
+            background: #ecf0f1;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            color: #7f8c8d;
+            transition: all 0.3s;
         }
         
-        @media (max-width: 768px) {
-            .container {
-                padding: 40px 20px;
-            }
-            
-            h1 {
-                font-size: 32px;
-            }
-            
-            .features {
-                grid-template-columns: 1fr;
-            }
-            
-            .stats {
-                grid-template-columns: 1fr;
-            }
+        .login-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .login-form {
+            display: none;
+        }
+        
+        .login-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #2c3e50;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-hint {
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .login-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .current-user-info {
+            background: #d5f4e6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .current-user-info .user-name {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .logout-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        /* 设置界面 */
+        .settings-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .setting-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .setting-card h3 {
+            color: #2c3e50;
+            font-size: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .setting-item {
+            margin: 20px 0;
+        }
+        
+        .setting-item label {
+            display: block;
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .setting-item input[type="text"],
+        .setting-item input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .setting-item input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .setting-item .hint {
+            color: #7f8c8d;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+        
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .sync-status.success {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        
+        .sync-status.error {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+        
+        .sync-status.info {
+            background: #dfe6e9;
+            color: #2c3e50;
+        }
+        
+        .sync-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .sync-button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .sync-button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .sync-button.success {
+            background: #27ae60;
+        }
+        
+        .sync-button.warning {
+            background: #e67e22;
+        }
+        
+        /* 逐项统计表 */
+        .table-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 10px 0 6px 0;
+        }
+        .table-controls input, .table-controls select {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .table-wrap {
+            overflow: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+        table.elem-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+        .elem-table th, .elem-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f2f2f2;
+            white-space: nowrap;
+            text-align: left;
+            font-size: 14px;
+        }
+        .elem-table th { background: #fafafa; color:#2c3e50; }
+        
+        /* 图片上传相关样式 */
+        .showcase-item {
+            position: relative;
+            cursor: pointer;
+            min-height: 80px;
+        }
+        
+        .showcase-item .pinyin-text {
+            font-size: 22px;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .showcase-item .pinyin-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin: 5px auto;
+            border: 2px solid rgba(255,255,255,0.3);
+            display: block;
+        }
+        
+        .showcase-item .upload-icon {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        
+        .showcase-item:hover .upload-icon {
+            display: flex;
+        }
+        
+        .showcase-item .audio-icon {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: rgba(46, 204, 113, 0.9);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            font-size: 16px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            border: 2px solid white;
+            z-index: 10;
+        }
+        
+        .showcase-item .audio-icon:hover {
+            background: rgba(39, 174, 96, 1);
+            transform: scale(1.1);
+        }
+        
+        .showcase-item.has-audio .audio-icon {
+            display: flex;
+        }
+        
+        .showcase-item .audio-icon.playing {
+            background: rgba(231, 76, 60, 0.9);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* 图片上传模态框 */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .image-modal.show {
+            display: flex;
+        }
+        
+        .image-modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .image-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .image-modal-header h3 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 20px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #7f8c8d;
+            line-height: 1;
+        }
+        
+        .close-modal:hover {
+            color: #e74c3c;
+        }
+        
+        .modal-preview {
+            width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin: 15px 0;
+            border: 2px dashed #ddd;
+            display: none;
+        }
+        
+        .modal-preview.show {
+            display: block;
+        }
+        
+        .upload-area {
+            border: 3px dashed #bdc3c7;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-area:hover {
+            border-color: #3498db;
+            background: #ecf0f1;
+        }
+        
+        .upload-area.dragover {
+            border-color: #27ae60;
+            background: #d5f4e6;
+        }
+        
+        .upload-area-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            color: #7f8c8d;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .modal-btn.primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .modal-btn.primary:hover {
+            background: #2980b9;
+        }
+        
+        .modal-btn.danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .modal-btn.danger:hover {
+            background: #c0392b;
+        }
+        
+        .modal-btn.secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .modal-btn.secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        /* 音频上传区域 */
+        .audio-upload-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+        }
+        
+        .audio-upload-section h4 {
+            color: #2c3e50;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .audio-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .audio-player {
+            flex: 1;
+            height: 40px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .audio-player.show {
+            display: block;
+        }
+        
+        .audio-upload-btn {
+            padding: 10px 20px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .audio-upload-btn:hover {
+            background: #229954;
+        }
+        
+        .audio-status {
+            color: #27ae60;
+            font-size: 14px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="logo">🎓</div>
-        <h1>桐桐汉语拼音训练系统</h1>
-        <p class="subtitle">专为儿童设计的拼音学习与训练平台</p>
-        <div class="version">v1.0</div>
-        
-        <div class="stats">
-            <div class="stat">
-                <div class="number">183</div>
-                <div class="label">训练项目</div>
+    <!-- 用户登录/注册界面 -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>🎓 桐桐拼音训练系统</h1>
+                <p>请登录或注册以继续</p>
             </div>
-            <div class="stat">
-                <div class="number">6</div>
-                <div class="label">训练模式</div>
+            
+            <div class="login-tabs">
+                <button class="login-tab active" onclick="switchLoginTab('login')">登录</button>
+                <button class="login-tab" onclick="switchLoginTab('register')">注册</button>
             </div>
-            <div class="stat">
-                <div class="number">32</div>
-                <div class="label">每页项数</div>
-            </div>
-        </div>
-        
-        <div class="buttons">
-            <a href="桐桐拼音智能训练系统.html" class="btn">
-                🚀 开始训练
-            </a>
-            <a href="声母韵母训练记录表.html" class="btn btn-secondary">
-                📄 查看打印模板
-            </a>
-        </div>
-        
-        <div class="features">
-            <div class="feature">
-                <h3>🎯 多种训练模式</h3>
-                <p>声母、单韵母、复韵母、鼻韵母、整体认读音节，以及随机混合训练</p>
-            </div>
-            <div class="feature">
-                <h3>📝 智能记录</h3>
-                <p>支持手动录入和拍照识别，自动保存训练历史和统计数据</p>
-            </div>
-            <div class="feature">
-                <h3>📊 数据分析</h3>
-                <p>可视化显示学习进度、正确率、训练次数等关键指标</p>
-            </div>
-            <div class="feature">
-                <h3>🖨️ 打印优化</h3>
-                <p>专为A4纸打印优化，8×4布局，清晰易读</p>
-            </div>
-            <div class="feature">
-                <h3>📚 完整拼音库</h3>
-                <p>包含所有汉语拼音内容，分类展示，方便查询</p>
-            </div>
-            <div class="feature">
-                <h3>💾 本地存储</h3>
-                <p>数据保存在本地浏览器，无需联网，保护隐私</p>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <p>💖 为桐桐量身打造的拼音学习系统</p>
-            <p style="margin-top: 10px;">
-                <a href="https://github.com/Jiaming-Yi/pingyinxulian" target="_blank">GitHub 项目地址</a> | 
-                <a href="README.md" target="_blank">使用文档</a>
-            </p>
-            <p style="margin-top: 15px; font-size: 12px;">
-                建议使用 Chrome 或 Edge 浏览器以获得最佳体验
-            </p>
+            
+            <!-- 登录表单 -->
+            <form class="login-form active" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="loginUsername" required minlength="3" 
+                           placeholder="请输入用户名">
+                </div>
+                
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="loginPassword" required minlength="6" 
+                           placeholder="请输入密码">
+                </div>
+                
+                <button type="submit" class="login-btn">登录</button>
+            </form>
+            
+            <!-- 注册表单 -->
+            <form class="login-form" id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="registerUsername" required minlength="3" maxlength="20" 
+                           placeholder="3-20个字符">
+                    <div class="form-hint">用户名将用于识别您的数据</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>显示名称</label>
+                    <input type="text" id="registerDisplayName" required 
+                           placeholder="例如：桐桐">
+                    <div class="form-hint">用于界面显示的昵称</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="registerPassword" required minlength="6" 
+                           placeholder="至少6个字符">
+                </div>
+                
+                <div class="form-group">
+                    <label>确认密码</label>
+                    <input type="password" id="registerPasswordConfirm" required minlength="6" 
+                           placeholder="请再次输入密码">
+                </div>
+                
+                <button type="submit" class="login-btn">注册</button>
+            </form>
         </div>
     </div>
+    
+    <!-- 导航标签 -->
+    <div class="nav-tabs">
+        <div class="nav-tab active" onclick="switchScreen('training')">🎓 开始训练</div>
+        <div class="nav-tab" onclick="switchScreen('input')">📝 录入结果</div>
+        <div class="nav-tab" onclick="switchScreen('ocr')">📷 拍照识别</div>
+        <div class="nav-tab" onclick="switchScreen('history')">📊 历史记录</div>
+        <div class="nav-tab" onclick="switchScreen('library')">📚 拼音库</div>
+        <div class="nav-tab" onclick="switchScreen('dashboard')">📈 驾驶舱</div>
+        <div class="nav-tab" onclick="switchScreen('settings')">⚙️ 设置</div>
+    </div>
+
+    <!-- 1. 训练模式选择 -->
+    <div class="screen active" id="trainingScreen">
+        <div id="selectionView">
+            <h1 class="title">🎓 桐桐拼音训练系统</h1>
+            <p class="subtitle">选择训练模式，系统将自动生成一页训练表单（8行×4列=32个）</p>
+            
+            <!-- 批量打印选择器 -->
+            <div class="batch-print-selector">
+                <h3>📄 批量打印多张表单</h3>
+                <p style="color: #7f8c8d; margin-bottom: 15px;">选择需要打印的训练类型和数量，一次性生成多张不同的训练表单</p>
+                
+                <div class="batch-options">
+                    <div class="batch-option" onclick="toggleBatchOption('shengmu', this)">
+                        <input type="checkbox" id="batch-shengmu" onclick="event.stopPropagation(); toggleBatchOption('shengmu', this.parentElement)">
+                        <div class="option-title">📝 声母训练</div>
+                        <div class="option-desc">23个声母</div>
+                    </div>
+                    
+                    <div class="batch-option" onclick="toggleBatchOption('danyunmu', this)">
+                        <input type="checkbox" id="batch-danyunmu" onclick="event.stopPropagation(); toggleBatchOption('danyunmu', this.parentElement)">
+                        <div class="option-title">📝 单韵母训练</div>
+                        <div class="option-desc">24个（含声调）</div>
+                    </div>
+                    
+                    <div class="batch-option" onclick="toggleBatchOption('shuangyunmu', this)">
+                        <input type="checkbox" id="batch-shuangyunmu" onclick="event.stopPropagation(); toggleBatchOption('shuangyunmu', this.parentElement)">
+                        <div class="option-title">📝 复韵母训练</div>
+                        <div class="option-desc">36个（含声调）</div>
+                    </div>
+                    
+                    <div class="batch-option" onclick="toggleBatchOption('biyunmu', this)">
+                        <input type="checkbox" id="batch-biyunmu" onclick="event.stopPropagation(); toggleBatchOption('biyunmu', this.parentElement)">
+                        <div class="option-title">📝 鼻韵母训练</div>
+                        <div class="option-desc">36个（含声调）</div>
+                    </div>
+                    
+                    <div class="batch-option" onclick="toggleBatchOption('zhengti', this)">
+                        <input type="checkbox" id="batch-zhengti" onclick="event.stopPropagation(); toggleBatchOption('zhengti', this.parentElement)">
+                        <div class="option-title">📝 整体认读</div>
+                        <div class="option-desc">64个（含声调）</div>
+                    </div>
+                    
+                    <div class="batch-option" onclick="toggleBatchOption('random', this)">
+                        <input type="checkbox" id="batch-random" onclick="event.stopPropagation(); toggleBatchOption('random', this.parentElement)">
+                        <div class="option-title">🎲 随机混合</div>
+                        <div class="option-desc">所有内容混合</div>
+                    </div>
+                </div>
+                
+                <div class="batch-count-control">
+                    <label>每种类型打印份数：</label>
+                    <input type="number" id="batchCount" value="1" min="1" max="10">
+                    <span style="color: #7f8c8d;">（每份都是不同的随机组合）</span>
+                </div>
+                
+                <div class="batch-preview-area" id="batchPreview" style="display: none;">
+                    <h4 style="color: #2c3e50; margin-bottom: 10px;">📋 将要生成的表单：</h4>
+                    <div id="batchPreviewList"></div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn success" onclick="generateBatchPrint()" id="batchPrintBtn" disabled>
+                        🖨️ 生成并打印（<span id="totalPages">0</span> 页）
+                    </button>
+                    <button class="action-btn secondary" onclick="clearBatchSelection()">🔄 清除选择</button>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin: 20px 0; color: #7f8c8d;">
+                —— 或者选择单个训练模式 ——
+            </div>
+            
+            <div class="mode-buttons">
+                <button class="mode-btn" onclick="startTraining('shengmu')">
+                    📝 声母训练<br>
+                    <span style="font-size: 16px; opacity: 0.9;">23个声母</span>
+                </button>
+                
+                <button class="mode-btn" onclick="startTraining('danyunmu')">
+                    📝 单韵母训练<br>
+                    <span style="font-size: 16px; opacity: 0.9;">24个（6×4声调）</span>
+                </button>
+                
+                <button class="mode-btn" onclick="startTraining('shuangyunmu')">
+                    📝 复韵母训练<br>
+                    <span style="font-size: 16px; opacity: 0.9;">36个（9×4声调）</span>
+                </button>
+                
+                <button class="mode-btn" onclick="startTraining('biyunmu')">
+                    📝 鼻韵母训练<br>
+                    <span style="font-size: 16px; opacity: 0.9;">36个（9×4声调）</span>
+                </button>
+                
+                <button class="mode-btn" onclick="startTraining('zhengti')">
+                    📝 整体认读<br>
+                    <span style="font-size: 16px; opacity: 0.9;">64个（16×4声调）</span>
+                </button>
+                
+                <button class="mode-btn random" onclick="startTraining('random')">
+                    🎲 随机训练<br>
+                    <span style="font-size: 16px; opacity: 0.9;">混合所有内容</span>
+                </button>
+            </div>
+            
+            <div class="stats">
+                <h3>📊 训练库统计</h3>
+                <ul>
+                    <li>✓ 声母：23个</li>
+                    <li>✓ 单韵母（含声调）：24个（6个 × 4声调）</li>
+                    <li>✓ 复韵母（含声调）：36个（9个 × 4声调）</li>
+                    <li>✓ 鼻韵母（含声调）：36个（9个 × 4声调）</li>
+                    <li>✓ 整体认读音节（含声调）：64个（16个 × 4声调）</li>
+                    <li>✓ 总计：183个训练项</li>
+                    <li>✓ 每页显示：32个训练项（8行×4列）</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="trainingView" style="display: none;">
+            <!-- 单张表单容器 -->
+            <div id="singleSheetContainer">
+                <div class="training-header">
+                    <h2>桐桐拼音训练记录表</h2>
+                    <div class="training-info">
+                        训练日期：________年____月____日　　训练者：__________
+                    </div>
+                    <div class="training-id" id="trainingId"></div>
+                    <div class="training-type" id="trainingType"></div>
+                </div>
+                
+                <div class="training-grid" id="trainingGrid"></div>
+                
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="window.print()">🖨️ 打印表单</button>
+                    <button class="action-btn success" onclick="goToInput()">✍️ 开始录入结果</button>
+                    <button class="action-btn" onclick="regenerate()">🔄 重新生成</button>
+                    <button class="action-btn secondary" onclick="backToSelection()">← 返回选择</button>
+                </div>
+            </div>
+            
+            <!-- 批量打印容器 -->
+            <div id="batchSheetsContainer" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- 2. 手动录入界面 -->
+    <div class="screen" id="inputScreen">
+        <h1 class="title">📝 手动录入训练结果</h1>
+        <p class="subtitle">点击拼音框选择"对"或"错"，完成后保存到结果库</p>
+        
+        <div id="inputContent">
+            <p style="text-align: center; color: #7f8c8d; font-size: 16px; padding: 40px;">
+                请先在"开始训练"标签中生成训练表单
+            </p>
+        </div>
+        
+        <div class="action-buttons" id="inputActions" style="display: none;">
+            <button class="action-btn success" onclick="saveResults()">💾 保存结果</button>
+            <button class="action-btn secondary" onclick="clearInput()">🔄 清除选择</button>
+        </div>
+    </div>
+
+    <!-- 3. 拍照OCR识别 -->
+    <div class="screen" id="ocrScreen">
+        <h1 class="title">📷 拍照识别训练结果</h1>
+        <p class="subtitle">上传训练表单照片，系统将自动识别勾选结果</p>
+        
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            <div class="upload-icon">📸</div>
+            <h3>点击或拖拽上传照片</h3>
+            <p style="color: #7f8c8d; margin-top: 10px;">支持 JPG、PNG 格式</p>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+        </div>
+        
+        <img id="previewImage" class="preview-image" style="display: none;">
+        
+        <div class="ocr-progress" id="ocrProgress">
+            <h3 style="text-align: center; color: #2c3e50; margin-bottom: 10px;">正在识别...</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            <p id="ocrStatus" style="text-align: center; color: #7f8c8d; margin-top: 10px;"></p>
+        </div>
+        
+        <div id="ocrResults" style="display: none;">
+            <h3 style="color: #2c3e50; margin: 20px 0;">识别结果（请核对并修正）</h3>
+            <div id="ocrResultGrid"></div>
+            <div class="action-buttons">
+                <button class="action-btn success" onclick="saveOCRResults()">💾 确认并保存</button>
+                <button class="action-btn warning" onclick="resetOCR()">🔄 重新上传</button>
+            </div>
+        </div>
+        
+        <div class="stats" style="margin-top: 30px;">
+            <h3>💡 使用提示</h3>
+            <ul>
+                <li>1. 确保照片清晰，光线充足</li>
+                <li>2. 尽量保持表单平整，避免倾斜</li>
+                <li>3. 训练表单ID要清晰可见</li>
+                <li>4. 识别后请仔细核对结果</li>
+                <li>5. OCR识别可能不完全准确，建议人工复核</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 4. 历史记录 -->
+    <div class="screen" id="historyScreen">
+        <h1 class="title">📊 训练历史记录</h1>
+        
+        <div class="analytics-grid" id="analyticsGrid">
+            <div class="analytics-card">
+                <h3>总训练次数</h3>
+                <div class="number" id="totalTrainings">0</div>
+            </div>
+            <div class="analytics-card">
+                <h3>总训练项数</h3>
+                <div class="number" id="totalItems">0</div>
+            </div>
+            <div class="analytics-card">
+                <h3>平均正确率</h3>
+                <div class="number" id="avgAccuracy">0%</div>
+            </div>
+        </div>
+        
+        <h2 style="color: #2c3e50; margin: 30px 0 20px;">训练记录列表</h2>
+        <div class="history-list" id="historyList">
+            <p style="text-align: center; color: #7f8c8d; padding: 40px;">暂无训练记录</p>
+        </div>
+    </div>
+
+    <!-- 5. 拼音库 -->
+    <div class="screen" id="libraryScreen">
+        <h1 class="title">📚 完整拼音库</h1>
+        <p class="subtitle">汉语拼音全部内容一览</p>
+        
+        <div class="action-buttons" style="margin-bottom: 20px;">
+            <button class="action-btn success" onclick="printLibrary()">🖨️ 打印拼音库（A4）</button>
+            <button class="action-btn" onclick="printLibraryWithImages()">🖨️ 打印拼音库（含图片）</button>
+        </div>
+        
+        <!-- 声母 -->
+        <div class="library-section">
+            <h2>📝 声母（23个）</h2>
+            <div class="pinyin-showcase" id="shengmuShowcase"></div>
+        </div>
+        
+        <!-- 单韵母 -->
+        <div class="library-section">
+            <h2>📝 单韵母（6个基础 × 4声调 = 24个）</h2>
+            <h3>ā - a的四个声调</h3>
+            <div class="pinyin-showcase">
+                <div class="showcase-item danyunmu">ā</div>
+                <div class="showcase-item danyunmu">á</div>
+                <div class="showcase-item danyunmu">ǎ</div>
+                <div class="showcase-item danyunmu">à</div>
+            </div>
+            <h3>ō - o的四个声调</h3>
+            <div class="pinyin-showcase">
+                <div class="showcase-item danyunmu">ō</div>
+                <div class="showcase-item danyunmu">ó</div>
+                <div class="showcase-item danyunmu">ǒ</div>
+                <div class="showcase-item danyunmu">ò</div>
+            </div>
+            <h3>ē - e的四个声调</h3>
+            <div class="pinyin-showcase">
+                <div class="showcase-item danyunmu">ē</div>
+                <div class="showcase-item danyunmu">é</div>
+                <div class="showcase-item danyunmu">ě</div>
+                <div class="showcase-item danyunmu">è</div>
+            </div>
+            <h3>ī - i的四个声调</h3>
+            <div class="pinyin-showcase">
+                <div class="showcase-item danyunmu">ī</div>
+                <div class="showcase-item danyunmu">í</div>
+                <div class="showcase-item danyunmu">ǐ</div>
+                <div class="showcase-item danyunmu">ì</div>
+            </div>
+            <h3>ū - u的四个声调</h3>
+            <div class="pinyin-showcase">
+                <div class="showcase-item danyunmu">ū</div>
+                <div class="showcase-item danyunmu">ú</div>
+                <div class="showcase-item danyunmu">ǔ</div>
+                <div class="showcase-item danyunmu">ù</div>
+            </div>
+            <h3>ǖ - ü的四个声调</h3>
+            <div class="pinyin-showcase">
+                <div class="showcase-item danyunmu">ǖ</div>
+                <div class="showcase-item danyunmu">ǘ</div>
+                <div class="showcase-item danyunmu">ǚ</div>
+                <div class="showcase-item danyunmu">ǜ</div>
+            </div>
+        </div>
+        
+        <!-- 复韵母 -->
+        <div class="library-section">
+            <h2>📝 复韵母（9个基础 × 4声调 = 36个）</h2>
+            <div class="pinyin-showcase" id="shuangyunmuShowcase"></div>
+        </div>
+        
+        <!-- 鼻韵母 -->
+        <div class="library-section">
+            <h2>📝 鼻韵母（9个基础 × 4声调 = 36个）</h2>
+            <h3>前鼻韵母（5个）</h3>
+            <div class="pinyin-showcase" id="qianbiyunmuShowcase"></div>
+            <h3 style="margin-top: 20px;">后鼻韵母（4个）</h3>
+            <div class="pinyin-showcase" id="houbiyunmuShowcase"></div>
+        </div>
+        
+        <!-- 整体认读音节 -->
+        <div class="library-section">
+            <h2>📝 整体认读音节（16个基础 × 4声调 = 64个）</h2>
+            <div class="pinyin-showcase" id="zhengtiShowcase"></div>
+        </div>
+        
+        <!-- 统计汇总 -->
+        <div class="library-stats">
+            <div class="library-stat-card">
+                <h4>📊 拼音库总览</h4>
+                <div class="count">183</div>
+                <p style="color: #7f8c8d; margin-top: 10px;">个训练项</p>
+            </div>
+            <div class="library-stat-card">
+                <h4>🎯 训练组合</h4>
+                <ul style="list-style: none; padding: 0; color: #555; font-size: 14px; line-height: 1.8;">
+                    <li>✓ 声母：23个</li>
+                    <li>✓ 单韵母：24个</li>
+                    <li>✓ 复韵母：36个</li>
+                    <li>✓ 鼻韵母：36个</li>
+                    <li>✓ 整体认读：64个</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. 设置界面 -->
+    <div class="screen" id="settingsScreen">
+        <h1 class="title">⚙️ 系统设置</h1>
+        <p class="subtitle">配置GitHub同步，实现多设备数据共享</p>
+        
+        <div class="settings-container">
+            <!-- 当前用户信息 -->
+            <div class="setting-card">
+                <h3>👤 当前用户</h3>
+                <div class="current-user-info">
+                    <div>
+                        <div class="user-name" id="currentUserDisplay">未登录</div>
+                        <div style="color: #7f8c8d; font-size: 13px; margin-top: 5px;">用户名：<span id="currentUsernameDisplay">-</span></div>
+                    </div>
+                    <button class="logout-btn" onclick="handleLogout()">退出登录</button>
+                </div>
+                <p style="color: #7f8c8d; font-size: 13px; line-height: 1.6;">
+                    您的所有训练数据和设置都与当前账户关联。切换账户后，将看到该账户的独立数据。
+                </p>
+            </div>
+            <!-- GitHub同步设置 -->
+            <div class="setting-card">
+                <h3>🔗 GitHub数据同步</h3>
+                <p style="color: #7f8c8d; margin-bottom: 20px; line-height: 1.6;">
+                    配置GitHub Personal Access Token后，您的训练数据将自动同步到GitHub仓库，
+                    在任何设备上都能访问相同的训练记录。
+                </p>
+                
+                <div class="setting-item">
+                    <label>GitHub Personal Access Token</label>
+                    <input type="password" id="githubToken" placeholder="输入您的GitHub Token">
+                    <div class="hint">
+                        <a href="https://github.com/settings/tokens/new" target="_blank" style="color: #3498db;">点击这里创建Token</a>
+                        （需要勾选 repo 权限）
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <label>GitHub用户名</label>
+                    <input type="text" id="githubUsername" placeholder="例如: Jiaming-Yi" value="Jiaming-Yi">
+                </div>
+                
+                <div class="setting-item">
+                    <label>仓库名称</label>
+                    <input type="text" id="githubRepo" placeholder="例如: pingyinxulian" value="pingyinxulian">
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="sync-button" onclick="saveGitHubConfig()">💾 保存配置</button>
+                    <button class="sync-button success" onclick="syncToGitHub()">☁️ 上传数据到GitHub</button>
+                    <button class="sync-button warning" onclick="syncFromGitHub()">⬇️ 从GitHub下载数据</button>
+                </div>
+                
+                <div id="syncStatus" style="display: none;" class="sync-status"></div>
+            </div>
+            
+            <!-- 数据管理 -->
+            <div class="setting-card">
+                <h3>📦 数据管理</h3>
+                
+                <div class="setting-item">
+                    <label>本地数据</label>
+                    <div id="localDataInfo" style="color: #7f8c8d; margin: 10px 0;"></div>
+                    <button class="sync-button" onclick="exportLocalData()">📥 导出本地数据</button>
+                    <button class="sync-button warning" onclick="clearLocalData()">🗑️ 清除本地数据</button>
+                </div>
+            </div>
+            
+            <!-- 使用说明 -->
+            <div class="setting-card">
+                <h3>💡 使用说明</h3>
+                <ol style="color: #555; line-height: 2; padding-left: 20px;">
+                    <li>访问 <a href="https://github.com/settings/tokens/new" target="_blank" style="color: #3498db;">GitHub Token页面</a> 创建新Token</li>
+                    <li>Token名称随意，有效期建议选择90天或更长</li>
+                    <li>勾选 <strong>repo</strong> 权限（完整的仓库访问权限）</li>
+                    <li>点击生成Token，复制Token（注意：只显示一次！）</li>
+                    <li>回到本页面，粘贴Token并保存配置</li>
+                    <li>首次使用点击"上传数据到GitHub"</li>
+                    <li>在其他设备使用时，点击"从GitHub下载数据"即可同步</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片上传模态框 -->
+    <div class="image-modal" id="imageModal">
+        <div class="image-modal-content">
+            <div class="image-modal-header">
+                <h3>为 "<span id="modalPinyin"></span>" 上传图片</h3>
+                <button class="close-modal" onclick="closeImageModal()">&times;</button>
+            </div>
+            
+            <img id="modalPreview" class="modal-preview" alt="预览">
+            
+            <div class="upload-area" id="modalUploadArea" onclick="document.getElementById('modalFileInput').click()">
+                <div class="upload-area-icon">📷</div>
+                <h3 style="color: #2c3e50; margin: 10px 0;">点击或拖拽上传图片</h3>
+                <p style="color: #7f8c8d; font-size: 14px;">支持 JPG、PNG、GIF 格式</p>
+                <input type="file" id="modalFileInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+            </div>
+            
+            <!-- 音频上传区域 -->
+            <div class="audio-upload-section">
+                <h4>🔊 发音音频</h4>
+                <div class="audio-controls">
+                    <audio id="modalAudioPlayer" class="audio-player" controls></audio>
+                    <button class="audio-upload-btn" onclick="document.getElementById('modalAudioInput').click()">
+                        📁 选择音频
+                    </button>
+                    <input type="file" id="modalAudioInput" accept="audio/*" style="display: none;" onchange="handleAudioSelect(event)">
+                    <span id="audioStatus" class="audio-status"></span>
+                </div>
+                <p style="color: #7f8c8d; font-size: 13px; margin-top: 5px;">支持 MP3、WAV、OGG 格式，文件不超过10MB</p>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="modal-btn secondary" onclick="closeImageModal()">取消</button>
+                <button class="modal-btn danger" onclick="deletePinyinImage()" id="deleteImageBtn" style="display: none;">删除图片</button>
+                <button class="modal-btn danger" onclick="deletePinyinAudio()" id="deleteAudioBtn" style="display: none;">删除音频</button>
+                <button class="modal-btn primary" onclick="savePinyinData()" id="saveDataBtn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 驾驶舱 -->
+    <div class="screen" id="dashboardScreen">
+        <h1 class="title">📈 学习驾驶舱</h1>
+        <p class="subtitle">实时查看训练进展、趋势与易错项</p>
+        
+        <div class="analytics-grid" id="dashboardKpis">
+            <div class="analytics-card">
+                <h3>累计训练次数</h3>
+                <div class="number" id="kpiTotalTimes">0</div>
+            </div>
+            <div class="analytics-card">
+                <h3>累计训练项数</h3>
+                <div class="number" id="kpiTotalItems">0</div>
+            </div>
+            <div class="analytics-card">
+                <h3>平均正确率</h3>
+                <div class="number" id="kpiAvgRate">0%</div>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="panel">
+                <h3>近7天训练趋势</h3>
+                <canvas id="trendChart" width="800" height="300"></canvas>
+                <div class="muted" id="trendHint">显示每日训练项数与正确率（%）</div>
+            </div>
+            <div class="panel">
+                <h3>易错Top 10</h3>
+                <div class="top-list" id="topMistakes">
+                    <!-- 动态填充：拼音 | 错误次数 | 正确率 -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel" style="margin-top: 16px;">
+            <h3>按训练类型统计</h3>
+            <canvas id="typeChart" width="1000" height="260"></canvas>
+            <div class="muted">显示各训练类型的训练项数与正确率</div>
+        </div>
+        
+        <div class="panel" style="margin-top: 16px;">
+            <h3>逐项统计（每个拼音）</h3>
+            <div class="table-controls">
+                <input type="text" id="elemSearch" placeholder="搜索拼音..." oninput="renderElementTable()">
+                <select id="elemTypeFilter" onchange="renderElementTable()">
+                    <option value="">全部类型</option>
+                    <option value="声母">声母</option>
+                    <option value="单韵母">单韵母</option>
+                    <option value="复韵母">复韵母</option>
+                    <option value="鼻韵母">鼻韵母</option>
+                    <option value="整体认读">整体认读</option>
+                </select>
+                <select id="elemSort" onchange="renderElementTable()">
+                    <option value="tries_desc">按尝试数(多→少)</option>
+                    <option value="acc_desc">按正确率(高→低)</option>
+                    <option value="wrong_desc">按错误数(多→少)</option>
+                    <option value="latest_desc">按最近训练(新→旧)</option>
+                    <option value="pinyin_asc">按拼音(A→Z)</option>
+                </select>
+                <button class="action-btn" onclick="exportElementCsv()">📤 导出CSV</button>
+            </div>
+            <div class="table-wrap">
+                <table class="elem-table">
+                    <thead>
+                        <tr>
+                            <th>拼音</th>
+                            <th>类型</th>
+                            <th>尝试</th>
+                            <th>正确</th>
+                            <th>错误</th>
+                            <th>正确率</th>
+                            <th>最近训练</th>
+                        </tr>
+                    </thead>
+                    <tbody id="elemTableBody"></tbody>
+                </table>
+            </div>
+            <div class="muted" id="elemSummary" style="margin-top:6px;"></div>
+        </div>
+        
+        <div class="action-buttons" style="margin-top: 16px;">
+            <button class="action-btn" onclick="refreshDashboard()">🔄 刷新驾驶舱</button>
+            <button class="action-btn" onclick="syncFromGitHubAndRefresh()">☁️ 从GitHub同步并刷新</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== 用户认证系统 ==========
+        
+        // 用户数据结构
+        let users = JSON.parse(localStorage.getItem('users') || '{}');
+        let currentUser = null;
+        
+        // 初始化：检查是否有登录用户
+        function initUserSystem() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                hideLoginOverlay();
+                updateUserDisplay();
+            } else {
+                showLoginOverlay();
+            }
+        }
+        
+        // 显示/隐藏登录界面
+        function showLoginOverlay() {
+            document.getElementById('loginOverlay').style.display = 'flex';
+        }
+        
+        function hideLoginOverlay() {
+            document.getElementById('loginOverlay').style.display = 'none';
+        }
+        
+        // 切换登录/注册标签
+        function switchLoginTab(tab) {
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'login') {
+                document.querySelectorAll('.login-tab')[0].classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                document.querySelectorAll('.login-tab')[1].classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+        
+        // 处理注册
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('registerUsername').value.trim();
+            const displayName = document.getElementById('registerDisplayName').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+            
+            // 验证
+            if (password !== passwordConfirm) {
+                alert('两次输入的密码不一致！');
+                return;
+            }
+            
+            if (users[username]) {
+                alert('该用户名已被注册，请选择其他用户名！');
+                return;
+            }
+            
+            // 创建新用户
+            users[username] = {
+                username: username,
+                displayName: displayName,
+                password: password, // 实际应用中应该加密
+                createdAt: new Date().toISOString(),
+                lastLoginAt: new Date().toISOString()
+            };
+            
+            // 保存用户数据
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // 自动登录
+            currentUser = users[username];
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            alert(`✅ 注册成功！欢迎，${displayName}！`);
+            
+            hideLoginOverlay();
+            updateUserDisplay();
+            loadUserData();
+        }
+        
+        // 处理登录
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            // 验证
+            if (!users[username]) {
+                alert('用户名不存在！');
+                return;
+            }
+            
+            if (users[username].password !== password) {
+                alert('密码错误！');
+                return;
+            }
+            
+            // 登录成功
+            users[username].lastLoginAt = new Date().toISOString();
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            currentUser = users[username];
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            alert(`✅ 登录成功！欢迎回来，${currentUser.displayName}！`);
+            
+            hideLoginOverlay();
+            updateUserDisplay();
+            loadUserData();
+        }
+        
+        // 处理登出
+        function handleLogout() {
+            if (confirm('确定要退出登录吗？\n\n您的数据已保存，下次登录可继续使用。')) {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                showLoginOverlay();
+                
+                // 清空当前显示的数据
+                document.getElementById('loginUsername').value = '';
+                document.getElementById('loginPassword').value = '';
+            }
+        }
+        
+        // 更新用户显示
+        function updateUserDisplay() {
+            if (currentUser) {
+                document.getElementById('currentUserDisplay').textContent = currentUser.displayName;
+                document.getElementById('currentUsernameDisplay').textContent = currentUser.username;
+            }
+        }
+        
+        // 获取用户专属的数据键名
+        function getUserDataKey(key) {
+            return currentUser ? `${currentUser.username}_${key}` : key;
+        }
+        
+        // 加载用户数据
+        function loadUserData() {
+            if (!currentUser) return;
+            
+            // 重新加载用户的训练记录
+            const userTrainingKey = getUserDataKey('pinyinTrainingDB');
+            const userImagesKey = getUserDataKey('pinyinImages');
+            const userAudiosKey = getUserDataKey('pinyinAudios');
+            
+            // 加载数据到全局变量
+            pinyinImages = JSON.parse(localStorage.getItem(userImagesKey) || '{}');
+            pinyinAudios = JSON.parse(localStorage.getItem(userAudiosKey) || '{}');
+            
+            // 刷新界面
+            if (document.getElementById('libraryScreen').classList.contains('active')) {
+                loadLibrary();
+            }
+        }
+        
+        // 保存用户数据（重写原有的保存函数）
+        function saveToDatabase(record) {
+            const userKey = getUserDataKey('pinyinTrainingDB');
+            let database = JSON.parse(localStorage.getItem(userKey) || '[]');
+            database.push(record);
+            localStorage.setItem(userKey, JSON.stringify(database));
+        }
+        
+        // 页面加载时初始化用户系统
+        window.addEventListener('DOMContentLoaded', function() {
+            initUserSystem();
+        });
+        
+        // ========== 原有代码开始 ==========
+        
+        // 完整拼音库
+        const pinyinDatabase = {
+            shengmu: ['b', 'p', 'm', 'f', 'd', 't', 'n', 'l', 'g', 'k', 'h', 'j', 'q', 'x', 'zh', 'ch', 'sh', 'r', 'z', 'c', 's', 'y', 'w'],
+            
+            // 单韵母（6个 × 4声调 = 24个）
+            danyunmu: [
+                'ā', 'á', 'ǎ', 'à',
+                'ō', 'ó', 'ǒ', 'ò',
+                'ē', 'é', 'ě', 'è',
+                'ī', 'í', 'ǐ', 'ì',
+                'ū', 'ú', 'ǔ', 'ù',
+                'ǖ', 'ǘ', 'ǚ', 'ǜ'
+            ],
+            
+            // 复韵母（9个 × 4声调 = 36个）
+            shuangyunmu: [
+                'āi', 'ái', 'ǎi', 'ài',
+                'ēi', 'éi', 'ěi', 'èi',
+                'uī', 'uí', 'uǐ', 'uì',
+                'āo', 'áo', 'ǎo', 'ào',
+                'ōu', 'óu', 'ǒu', 'òu',
+                'iū', 'iú', 'iǔ', 'iù',
+                'iē', 'ié', 'iě', 'iè',
+                'üē', 'üé', 'üě', 'üè',
+                'ēr', 'ér', 'ěr', 'èr'
+            ],
+            
+            // 鼻韵母（9个 × 4声调 = 36个）
+            biyunmu: [
+                'ān', 'án', 'ǎn', 'àn',
+                'ēn', 'én', 'ěn', 'èn',
+                'īn', 'ín', 'ǐn', 'ìn',
+                'ūn', 'ún', 'ǔn', 'ùn',
+                'ǖn', 'ǘn', 'ǚn', 'ǜn',
+                'āng', 'áng', 'ǎng', 'àng',
+                'ēng', 'éng', 'ěng', 'èng',
+                'īng', 'íng', 'ǐng', 'ìng',
+                'ōng', 'óng', 'ǒng', 'òng'
+            ],
+            
+            // 所有韵母（向后兼容）
+            yunmuWithTones: [],
+            
+            zhengtiWithTones: [
+                'zhī', 'zhí', 'zhǐ', 'zhì', 'chī', 'chí', 'chǐ', 'chì', 'shī', 'shí', 'shǐ', 'shì', 'rī', 'rí', 'rǐ', 'rì',
+                'zī', 'zí', 'zǐ', 'zì', 'cī', 'cí', 'cǐ', 'cì', 'sī', 'sí', 'sǐ', 'sì', 'yī', 'yí', 'yǐ', 'yì',
+                'wū', 'wú', 'wǔ', 'wù', 'yū', 'yú', 'yǔ', 'yù', 'yē', 'yé', 'yě', 'yè', 'yuē', 'yué', 'yuě', 'yuè',
+                'yuān', 'yuán', 'yuǎn', 'yuàn', 'yīn', 'yín', 'yǐn', 'yìn', 'yūn', 'yún', 'yǔn', 'yùn', 'yīng', 'yíng', 'yǐng', 'yìng'
+            ]
+        };
+        
+        // 合并所有韵母（向后兼容）
+        pinyinDatabase.yunmuWithTones = [
+            ...pinyinDatabase.danyunmu,
+            ...pinyinDatabase.shuangyunmu,
+            ...pinyinDatabase.biyunmu
+        ];
+        
+        let currentTraining = null;
+        let inputResults = {};
+        const itemsPerPage = 32; // 8行×4列
+        
+        // 切换屏幕
+        function switchScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            
+            const screenMap = {
+                'training': 'trainingScreen',
+                'input': 'inputScreen',
+                'ocr': 'ocrScreen',
+                'history': 'historyScreen',
+                'library': 'libraryScreen',
+                'dashboard': 'dashboardScreen',
+                'settings': 'settingsScreen'
+            };
+            
+            document.getElementById(screenMap[screen]).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (screen === 'history') {
+                loadHistory();
+            } else if (screen === 'library') {
+                loadLibrary();
+            } else if (screen === 'settings') {
+                loadGitHubConfig();
+            } else if (screen === 'dashboard') {
+                refreshDashboard();
+                startDashboardAutoRefresh();
+            } else {
+                stopDashboardAutoRefresh();
+            }
+        }
+        
+        // 图片和音频存储对象（使用localStorage，按用户隔离）
+        let pinyinImages = {};
+        let pinyinAudios = {};
+        let currentEditingPinyin = null;
+        let currentImageData = null;
+        let currentAudioData = null;
+        
+        // 初始化用户数据
+        function initUserImages() {
+            const userImagesKey = getUserDataKey('pinyinImages');
+            const userAudiosKey = getUserDataKey('pinyinAudios');
+            pinyinImages = JSON.parse(localStorage.getItem(userImagesKey) || '{}');
+            pinyinAudios = JSON.parse(localStorage.getItem(userAudiosKey) || '{}');
+        }
+        
+        // 加载拼音库
+        function loadLibrary() {
+            // 初始化用户的图片和音频数据
+            initUserImages();
+            
+            // 显示声母
+            const shengmuContainer = document.getElementById('shengmuShowcase');
+            shengmuContainer.innerHTML = '';
+            pinyinDatabase.shengmu.forEach(item => {
+                const div = createPinyinItem(item, 'shengmu');
+                shengmuContainer.appendChild(div);
+            });
+            
+            // 显示复韵母
+            const shuangyunmuContainer = document.getElementById('shuangyunmuShowcase');
+            shuangyunmuContainer.innerHTML = '';
+            pinyinDatabase.shuangyunmu.forEach(item => {
+                const div = createPinyinItem(item, 'shuangyunmu');
+                shuangyunmuContainer.appendChild(div);
+            });
+            
+            // 显示前鼻韵母
+            const qianbiContainer = document.getElementById('qianbiyunmuShowcase');
+            qianbiContainer.innerHTML = '';
+            const qianbiYunmu = [
+                'ān', 'án', 'ǎn', 'àn',
+                'ēn', 'én', 'ěn', 'èn',
+                'īn', 'ín', 'ǐn', 'ìn',
+                'ūn', 'ún', 'ǔn', 'ùn',
+                'ǖn', 'ǘn', 'ǚn', 'ǜn'
+            ];
+            qianbiYunmu.forEach(item => {
+                const div = createPinyinItem(item, 'biyunmu');
+                qianbiContainer.appendChild(div);
+            });
+            
+            // 显示后鼻韵母
+            const houbiContainer = document.getElementById('houbiyunmuShowcase');
+            houbiContainer.innerHTML = '';
+            const houbiYunmu = [
+                'āng', 'áng', 'ǎng', 'àng',
+                'ēng', 'éng', 'ěng', 'èng',
+                'īng', 'íng', 'ǐng', 'ìng',
+                'ōng', 'óng', 'ǒng', 'òng'
+            ];
+            houbiYunmu.forEach(item => {
+                const div = createPinyinItem(item, 'biyunmu');
+                houbiContainer.appendChild(div);
+            });
+            
+            // 显示整体认读音节
+            const zhengtiContainer = document.getElementById('zhengtiShowcase');
+            zhengtiContainer.innerHTML = '';
+            pinyinDatabase.zhengtiWithTones.forEach(item => {
+                const div = createPinyinItem(item, 'zhengti');
+                zhengtiContainer.appendChild(div);
+            });
+        }
+        
+        // 创建拼音项（带图片和音频上传功能）
+        function createPinyinItem(pinyin, type) {
+            const div = document.createElement('div');
+            div.className = `showcase-item ${type}`;
+            div.onclick = () => openImageModal(pinyin);
+            
+            // 如果有音频，添加has-audio类
+            if (pinyinAudios[pinyin]) {
+                div.classList.add('has-audio');
+            }
+            
+            // 如果有图片，显示图片
+            if (pinyinImages[pinyin]) {
+                const img = document.createElement('img');
+                img.src = pinyinImages[pinyin];
+                img.className = 'pinyin-image';
+                img.alt = pinyin;
+                div.appendChild(img);
+            }
+            
+            // 显示拼音文字
+            const text = document.createElement('span');
+            text.className = 'pinyin-text';
+            text.textContent = pinyin;
+            div.appendChild(text);
+            
+            // 添加上传图标
+            const uploadIcon = document.createElement('div');
+            uploadIcon.className = 'upload-icon';
+            uploadIcon.innerHTML = '📷';
+            div.appendChild(uploadIcon);
+            
+            // 如果有音频，添加播放按钮
+            if (pinyinAudios[pinyin]) {
+                const audioIcon = document.createElement('div');
+                audioIcon.className = 'audio-icon';
+                audioIcon.innerHTML = '🔊';
+                audioIcon.onclick = (e) => {
+                    e.stopPropagation(); // 阻止触发打开模态框
+                    playPinyinAudio(pinyin, audioIcon);
+                };
+                div.appendChild(audioIcon);
+            }
+            
+            return div;
+        }
+        
+        // 打开图片和音频上传模态框
+        function openImageModal(pinyin) {
+            currentEditingPinyin = pinyin;
+            currentImageData = null;
+            currentAudioData = null;
+            
+            document.getElementById('modalPinyin').textContent = pinyin;
+            document.getElementById('imageModal').classList.add('show');
+            
+            const preview = document.getElementById('modalPreview');
+            const deleteImageBtn = document.getElementById('deleteImageBtn');
+            const deleteAudioBtn = document.getElementById('deleteAudioBtn');
+            const audioPlayer = document.getElementById('modalAudioPlayer');
+            const audioStatus = document.getElementById('audioStatus');
+            
+            // 如果已有图片，显示预览和删除按钮
+            if (pinyinImages[pinyin]) {
+                preview.src = pinyinImages[pinyin];
+                preview.classList.add('show');
+                deleteImageBtn.style.display = 'inline-block';
+            } else {
+                preview.classList.remove('show');
+                deleteImageBtn.style.display = 'none';
+            }
+            
+            // 如果已有音频，显示播放器和删除按钮
+            if (pinyinAudios[pinyin]) {
+                audioPlayer.src = pinyinAudios[pinyin];
+                audioPlayer.classList.add('show');
+                deleteAudioBtn.style.display = 'inline-block';
+                audioStatus.textContent = '✓ 已有音频';
+            } else {
+                audioPlayer.classList.remove('show');
+                audioPlayer.src = '';
+                deleteAudioBtn.style.display = 'none';
+                audioStatus.textContent = '';
+            }
+        }
+        
+        // 关闭模态框
+        function closeImageModal() {
+            document.getElementById('imageModal').classList.remove('show');
+            document.getElementById('modalFileInput').value = '';
+            document.getElementById('modalAudioInput').value = '';
+            document.getElementById('modalPreview').classList.remove('show');
+            document.getElementById('modalAudioPlayer').classList.remove('show');
+            document.getElementById('modalAudioPlayer').pause();
+            currentEditingPinyin = null;
+            currentImageData = null;
+            currentAudioData = null;
+        }
+        
+        // 处理图片选择
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // 检查文件类型
+            if (!file.type.startsWith('image/')) {
+                alert('请选择图片文件！');
+                return;
+            }
+            
+            // 检查文件大小（限制5MB）
+            if (file.size > 5 * 1024 * 1024) {
+                alert('图片文件不能超过5MB！');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentImageData = e.target.result;
+                const preview = document.getElementById('modalPreview');
+                preview.src = currentImageData;
+                preview.classList.add('show');
+                document.getElementById('saveImageBtn').style.display = 'inline-block';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // 处理音频选择
+        function handleAudioSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // 检查文件类型
+            if (!file.type.startsWith('audio/')) {
+                alert('请选择音频文件！');
+                return;
+            }
+            
+            // 检查文件大小（限制10MB）
+            if (file.size > 10 * 1024 * 1024) {
+                alert('音频文件不能超过10MB！');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentAudioData = e.target.result;
+                const audioPlayer = document.getElementById('modalAudioPlayer');
+                const audioStatus = document.getElementById('audioStatus');
+                audioPlayer.src = currentAudioData;
+                audioPlayer.classList.add('show');
+                audioStatus.textContent = '✓ 音频已选择';
+                audioStatus.style.color = '#27ae60';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // 保存拼音图片和音频
+        function savePinyinData() {
+            if (!currentEditingPinyin) {
+                alert('错误：未选择拼音项！');
+                return;
+            }
+            
+            let saved = false;
+            
+            // 保存图片（如果有新选择）
+            if (currentImageData) {
+                pinyinImages[currentEditingPinyin] = currentImageData;
+                const userImagesKey = getUserDataKey('pinyinImages');
+                localStorage.setItem(userImagesKey, JSON.stringify(pinyinImages));
+                saved = true;
+            }
+            
+            // 保存音频（如果有新选择）
+            if (currentAudioData) {
+                pinyinAudios[currentEditingPinyin] = currentAudioData;
+                const userAudiosKey = getUserDataKey('pinyinAudios');
+                localStorage.setItem(userAudiosKey, JSON.stringify(pinyinAudios));
+                saved = true;
+            }
+            
+            if (saved) {
+                // 刷新拼音库显示
+                loadLibrary();
+                closeImageModal();
+                alert('✅ 保存成功！');
+            } else {
+                alert('没有需要保存的内容。请先选择图片或音频。');
+            }
+        }
+        
+        // 保存拼音图片（保留向后兼容）
+        function savePinyinImage() {
+            savePinyinData();
+        }
+        
+        // 删除拼音图片
+        function deletePinyinImage() {
+            if (!currentEditingPinyin) return;
+            
+            if (confirm(`确定要删除"${currentEditingPinyin}"的图片吗？`)) {
+                delete pinyinImages[currentEditingPinyin];
+                const userImagesKey = getUserDataKey('pinyinImages');
+                localStorage.setItem(userImagesKey, JSON.stringify(pinyinImages));
+                
+                // 刷新拼音库显示
+                loadLibrary();
+                closeImageModal();
+                alert('✅ 图片已删除！');
+            }
+        }
+        
+        // 删除拼音音频
+        function deletePinyinAudio() {
+            if (!currentEditingPinyin) return;
+            
+            if (confirm(`确定要删除"${currentEditingPinyin}"的音频吗？`)) {
+                delete pinyinAudios[currentEditingPinyin];
+                const userAudiosKey = getUserDataKey('pinyinAudios');
+                localStorage.setItem(userAudiosKey, JSON.stringify(pinyinAudios));
+                
+                // 刷新拼音库显示
+                loadLibrary();
+                closeImageModal();
+                alert('✅ 音频已删除！');
+            }
+        }
+        
+        // 播放拼音音频
+        let currentPlayingAudio = null;
+        let currentPlayingIcon = null;
+        
+        function playPinyinAudio(pinyin, iconElement) {
+            const audioData = pinyinAudios[pinyin];
+            if (!audioData) {
+                alert('该拼音还没有音频，请先上传！');
+                return;
+            }
+            
+            // 如果已经有音频在播放，先停止
+            if (currentPlayingAudio) {
+                currentPlayingAudio.pause();
+                currentPlayingAudio.currentTime = 0;
+                if (currentPlayingIcon) {
+                    currentPlayingIcon.classList.remove('playing');
+                }
+            }
+            
+            // 创建并播放新音频
+            const audio = new Audio(audioData);
+            currentPlayingAudio = audio;
+            currentPlayingIcon = iconElement;
+            
+            iconElement.classList.add('playing');
+            
+            audio.onended = () => {
+                iconElement.classList.remove('playing');
+                currentPlayingAudio = null;
+                currentPlayingIcon = null;
+            };
+            
+            audio.onerror = () => {
+                alert('音频播放失败！');
+                iconElement.classList.remove('playing');
+                currentPlayingAudio = null;
+                currentPlayingIcon = null;
+            };
+            
+            audio.play().catch(error => {
+                console.error('播放错误:', error);
+                alert('音频播放失败：' + error.message);
+                iconElement.classList.remove('playing');
+            });
+        }
+        
+        // 拖拽上传功能
+        const modalUploadArea = document.getElementById('modalUploadArea');
+        if (modalUploadArea) {
+            modalUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                modalUploadArea.classList.add('dragover');
+            });
+            
+            modalUploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                modalUploadArea.classList.remove('dragover');
+            });
+            
+            modalUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                modalUploadArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.type.startsWith('image/')) {
+                        // 模拟文件输入
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(file);
+                        document.getElementById('modalFileInput').files = dataTransfer.files;
+                        handleImageSelect({ target: { files: [file] } });
+                    } else {
+                        alert('请拖拽图片文件！');
+                    }
+                }
+            });
+        }
+        
+        // 点击模态框背景关闭
+        document.getElementById('imageModal').addEventListener('click', (e) => {
+            if (e.target.id === 'imageModal') {
+                closeImageModal();
+            }
+        });
+        
+        // 开始训练
+        function startTraining(mode) {
+            let items = [];
+            let typeName = '';
+            
+            switch(mode) {
+                case 'shengmu':
+                    items = [...pinyinDatabase.shengmu];
+                    typeName = '声母训练';
+                    break;
+                case 'danyunmu':
+                    items = [...pinyinDatabase.danyunmu];
+                    typeName = '单韵母训练（带声调）';
+                    break;
+                case 'shuangyunmu':
+                    items = [...pinyinDatabase.shuangyunmu];
+                    typeName = '复韵母训练（带声调）';
+                    break;
+                case 'biyunmu':
+                    items = [...pinyinDatabase.biyunmu];
+                    typeName = '鼻韵母训练（带声调）';
+                    break;
+                case 'yunmu':
+                    items = [...pinyinDatabase.yunmuWithTones];
+                    typeName = '韵母训练（带声调）';
+                    break;
+                case 'zhengti':
+                    items = [...pinyinDatabase.zhengtiWithTones];
+                    typeName = '整体认读音节训练';
+                    break;
+                case 'random':
+                    items = [...pinyinDatabase.shengmu, ...pinyinDatabase.yunmuWithTones, ...pinyinDatabase.zhengtiWithTones];
+                    typeName = '随机混合训练';
+                    break;
+            }
+            
+            items = shuffleArray(items).slice(0, itemsPerPage);
+            
+            currentTraining = {
+                id: 'T' + Date.now(),
+                mode: mode,
+                typeName: typeName,
+                items: items,
+                date: new Date().toISOString()
+            };
+            
+            generateTrainingSheet();
+            document.getElementById('selectionView').style.display = 'none';
+            document.getElementById('trainingView').style.display = 'block';
+        }
+        
+        // 生成训练表单
+        function generateTrainingSheet() {
+            document.getElementById('trainingId').textContent = '训练编号：' + currentTraining.id;
+            document.getElementById('trainingType').textContent = currentTraining.typeName;
+            const grid = document.getElementById('trainingGrid');
+            grid.innerHTML = '';
+            
+            currentTraining.items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'training-item';
+                div.innerHTML = `
+                    <div class="pinyin">${item}</div>
+                    <div class="checkboxes">
+                        <label class="checkbox-item correct">
+                            <input type="checkbox"> ✓
+                        </label>
+                        <label class="checkbox-item wrong">
+                            <input type="checkbox"> ✗
+                        </label>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+        
+        // 前往录入界面
+        function goToInput() {
+            if (!currentTraining) {
+                alert('请先生成训练表单');
+                return;
+            }
+            
+            inputResults = {};
+            const content = document.getElementById('inputContent');
+            content.innerHTML = '';
+            
+            const header = document.createElement('div');
+            header.style.cssText = 'text-align: center; margin-bottom: 20px;';
+            header.innerHTML = `
+                <div style="color: #3498db; font-weight: bold; font-size: 14px;">${currentTraining.id}</div>
+                <div style="color: #2c3e50; font-size: 18px; margin-top: 5px;">${currentTraining.typeName}</div>
+            `;
+            content.appendChild(header);
+            
+            const grid = document.createElement('div');
+            grid.className = 'input-grid';
+            
+            currentTraining.items.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'input-item';
+                div.dataset.index = index;
+                div.innerHTML = `
+                    <div class="pinyin">${item}</div>
+                    <div class="input-status">未选择</div>
+                    <div class="mark-buttons">
+                        <button type="button" class="mark-btn correct" onclick="markResult(${index}, true)">✓ 正确</button>
+                        <button type="button" class="mark-btn wrong" onclick="markResult(${index}, false)">✗ 错误</button>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+            
+            content.appendChild(grid);
+            document.getElementById('inputActions').style.display = 'flex';
+            switchScreen('input');
+        }
+        
+        // 设置某项为正确/错误（显式选择）
+        function markResult(index, isCorrect) {
+            const item = document.querySelector(`.input-item[data-index="${index}"]`);
+            if (!item) return;
+            item.classList.remove('correct', 'wrong');
+            item.classList.add(isCorrect ? 'correct' : 'wrong');
+            item.querySelector('.input-status').textContent = isCorrect ? '✓ 正确' : '✗ 错误';
+            inputResults[index] = !!isCorrect;
+        }
+        
+        // 清除录入
+        function clearInput() {
+            inputResults = {};
+            document.querySelectorAll('.input-item').forEach(item => {
+                item.classList.remove('correct', 'wrong');
+                const st = item.querySelector('.input-status');
+                if (st) st.textContent = '未选择';
+            });
+        }
+        
+        // 保存结果
+        function saveResults() {
+            if (Object.keys(inputResults).length !== currentTraining.items.length) {
+                if (!confirm('还有未录入的项目，确定要保存吗？')) {
+                    return;
+                }
+            }
+            
+            const results = currentTraining.items.map((item, index) => ({
+                pinyin: item,
+                result: inputResults[index] === undefined ? null : inputResults[index]
+            }));
+            
+            const record = {
+                ...currentTraining,
+                results: results,
+                completedDate: new Date().toISOString()
+            };
+            
+            saveToDatabase(record);
+            if (isDashboardActive()) refreshDashboard();
+            alert('✅ 保存成功！');
+            
+            if (githubConfig.token) {
+                if (confirm('是否立即同步到GitHub？')) {
+                    syncToGitHub().then(()=>{ if (isDashboardActive()) refreshDashboard(); });
+                }
+            }
+            
+            clearInput();
+            switchScreen('history');
+        }
+        
+        // 保存到数据库
+        function saveToDatabase(record) {
+            let database = JSON.parse(localStorage.getItem('pinyinTrainingDB') || '[]');
+            database.push(record);
+            localStorage.setItem('pinyinTrainingDB', JSON.stringify(database));
+        }
+        
+        // 加载历史记录
+        function loadHistory() {
+            const userKey = getUserDataKey('pinyinTrainingDB');
+            const database = JSON.parse(localStorage.getItem(userKey) || '[]');
+            
+            // 统计数据
+            let totalTrainings = database.length;
+            let totalItems = 0;
+            let totalCorrect = 0;
+            
+            database.forEach(record => {
+                if (record.results) {
+                    record.results.forEach(r => {
+                        if (r.result !== null) {
+                            totalItems++;
+                            if (r.result) totalCorrect++;
+                        }
+                    });
+                }
+            });
+            
+            document.getElementById('totalTrainings').textContent = totalTrainings;
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('avgAccuracy').textContent = totalItems > 0 ? Math.round(totalCorrect / totalItems * 100) + '%' : '0%';
+            
+            // 历史列表
+            const list = document.getElementById('historyList');
+            if (database.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 40px;">暂无训练记录</p>';
+                return;
+            }
+            
+            list.innerHTML = '';
+            database.reverse().forEach((record, index) => {
+                const correctCount = record.results ? record.results.filter(r => r.result === true).length : 0;
+                const wrongCount = record.results ? record.results.filter(r => r.result === false).length : 0;
+                const total = correctCount + wrongCount;
+                const rate = total > 0 ? Math.round(correctCount / total * 100) : 0;
+                
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <h3>
+                        <span>${record.typeName}</span>
+                        <button class="action-btn" style="padding: 5px 15px; font-size: 14px;" onclick="toggleDetails(${database.length - 1 - index})">查看详情</button>
+                    </h3>
+                    <div class="history-meta">
+                        训练编号：${record.id} | 日期：${new Date(record.completedDate || record.date).toLocaleString('zh-CN')}
+                    </div>
+                    <div class="history-stats">
+                        <div class="stat-box correct">✓ 正确：${correctCount}</div>
+                        <div class="stat-box wrong">✗ 错误：${wrongCount}</div>
+                        <div class="stat-box rate">正确率：${rate}%</div>
+                    </div>
+                    <div class="history-details" id="details-${database.length - 1 - index}">
+                        <div class="detail-grid">
+                            ${record.results ? record.results.map(r => `
+                                <div class="detail-item ${r.result === true ? 'correct' : (r.result === false ? 'wrong' : '')}">${r.pinyin}</div>
+                            `).join('') : ''}
+                        </div>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+        
+        // 切换详情显示
+        function toggleDetails(index) {
+            const details = document.getElementById(`details-${index}`);
+            details.classList.toggle('show');
+        }
+        
+        // 文件上传处理
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) processImage(file);
+        });
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) processImage(file);
+        }
+        
+        // 处理图像
+        function processImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.getElementById('previewImage');
+                img.src = e.target.result;
+                img.style.display = 'block';
+                
+                document.getElementById('uploadArea').style.display = 'none';
+                performOCR(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // 执行OCR识别
+        async function performOCR(imageData) {
+            const progress = document.getElementById('ocrProgress');
+            progress.classList.add('show');
+            
+            try {
+                const worker = await Tesseract.createWorker({
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            const percent = Math.round(m.progress * 100);
+                            document.getElementById('progressFill').style.width = percent + '%';
+                            document.getElementById('progressFill').textContent = percent + '%';
+                            document.getElementById('ocrStatus').textContent = '正在识别文字...';
+                        }
+                    }
+                });
+                
+                await worker.loadLanguage('chi_sim');
+                await worker.initialize('chi_sim');
+                const { data: { text } } = await worker.recognize(imageData);
+                await worker.terminate();
+                
+                // 模拟结果（实际需要更复杂的解析逻辑）
+                setTimeout(() => {
+                    showOCRResults(text);
+                }, 500);
+                
+            } catch (error) {
+                alert('OCR识别失败：' + error.message + '\n\n建议：\n1. 确保照片清晰\n2. 尝试重新拍照\n3. 或使用手动录入功能');
+                resetOCR();
+            }
+        }
+        
+        // 显示OCR结果
+        function showOCRResults(text) {
+            document.getElementById('ocrProgress').classList.remove('show');
+            document.getElementById('ocrResults').style.display = 'block';
+            
+            // 这里需要实现复杂的解析逻辑
+            // 暂时提示用户使用手动录入
+            document.getElementById('ocrResultGrid').innerHTML = `
+                <div style="padding: 40px; text-align: center; color: #7f8c8d;">
+                    <h3 style="color: #e67e22; margin-bottom: 20px;">⚠️ OCR功能正在完善中</h3>
+                    <p>由于训练表单格式的复杂性，OCR识别准确率可能不高。</p>
+                    <p style="margin-top: 15px; color: #2c3e50; font-weight: bold;">建议使用"📝 录入结果"功能进行手动录入，准确率更高！</p>
+                    <p style="margin-top: 20px; font-size: 14px;">识别到的文本（供参考）：</p>
+                    <pre style="background: #ecf0f1; padding: 15px; border-radius: 5px; margin-top: 10px; text-align: left; max-height: 200px; overflow-y: auto;">${text}</pre>
+                </div>
+            `;
+        }
+        
+        // 保存OCR结果
+        function saveOCRResults() {
+            alert('OCR功能正在完善中，请使用手动录入功能');
+        }
+        
+        // 重置OCR
+        function resetOCR() {
+            document.getElementById('uploadArea').style.display = 'block';
+            document.getElementById('previewImage').style.display = 'none';
+            document.getElementById('ocrProgress').classList.remove('show');
+            document.getElementById('ocrResults').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+        }
+        
+        // 工具函数
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        function regenerate() {
+            startTraining(currentTraining.mode);
+        }
+        
+        function backToSelection() {
+            document.getElementById('trainingView').style.display = 'none';
+            document.getElementById('selectionView').style.display = 'block';
+            document.getElementById('singleSheetContainer').style.display = 'block';
+            document.getElementById('batchSheetsContainer').style.display = 'none';
+            document.getElementById('batchSheetsContainer').innerHTML = '';
+        }
+        
+        // 批量打印功能
+        let batchSelection = new Set();
+        
+        // 切换批量选项
+        function toggleBatchOption(mode, element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            if (checkbox.checked) {
+                checkbox.checked = false;
+                element.classList.remove('selected');
+                batchSelection.delete(mode);
+            } else {
+                checkbox.checked = true;
+                element.classList.add('selected');
+                batchSelection.add(mode);
+            }
+            updateBatchPreview();
+        }
+        
+        // 更新批量打印预览
+        function updateBatchPreview() {
+            const count = parseInt(document.getElementById('batchCount').value) || 1;
+            const preview = document.getElementById('batchPreview');
+            const previewList = document.getElementById('batchPreviewList');
+            const totalPages = document.getElementById('totalPages');
+            const printBtn = document.getElementById('batchPrintBtn');
+            
+            if (batchSelection.size === 0) {
+                preview.style.display = 'none';
+                printBtn.disabled = true;
+                totalPages.textContent = '0';
+                return;
+            }
+            
+            preview.style.display = 'block';
+            printBtn.disabled = false;
+            
+            const typeNames = {
+                'shengmu': '声母训练',
+                'danyunmu': '单韵母训练',
+                'shuangyunmu': '复韵母训练',
+                'biyunmu': '鼻韵母训练',
+                'zhengti': '整体认读训练',
+                'random': '随机混合训练'
+            };
+            
+            let html = '';
+            let total = 0;
+            batchSelection.forEach(mode => {
+                html += `<div class="batch-preview-item">
+                    <span>${typeNames[mode]}</span>
+                    <span style="color: #3498db; font-weight: bold;">${count} 份</span>
+                </div>`;
+                total += count;
+            });
+            
+            previewList.innerHTML = html;
+            totalPages.textContent = total;
+        }
+        
+        // 清除批量选择
+        function clearBatchSelection() {
+            batchSelection.clear();
+            document.querySelectorAll('.batch-option').forEach(opt => {
+                opt.classList.remove('selected');
+                opt.querySelector('input[type="checkbox"]').checked = false;
+            });
+            updateBatchPreview();
+        }
+        
+        // 生成批量打印表单
+        function generateBatchPrint() {
+            if (batchSelection.size === 0) {
+                alert('请至少选择一种训练类型！');
+                return;
+            }
+            
+            const count = parseInt(document.getElementById('batchCount').value) || 1;
+            const container = document.getElementById('batchSheetsContainer');
+            container.innerHTML = '';
+            
+            const typeNames = {
+                'shengmu': '声母训练',
+                'danyunmu': '单韵母训练（带声调）',
+                'shuangyunmu': '复韵母训练（带声调）',
+                'biyunmu': '鼻韵母训练（带声调）',
+                'zhengti': '整体认读音节训练',
+                'random': '随机混合训练'
+            };
+            
+            let sheetIndex = 0;
+            const totalSheets = batchSelection.size * count;
+            
+            batchSelection.forEach(mode => {
+                for (let i = 0; i < count; i++) {
+                    sheetIndex++;
+                    
+                    // 获取训练项
+                    let items = [];
+                    switch(mode) {
+                        case 'shengmu':
+                            items = [...pinyinDatabase.shengmu];
+                            break;
+                        case 'danyunmu':
+                            items = [...pinyinDatabase.danyunmu];
+                            break;
+                        case 'shuangyunmu':
+                            items = [...pinyinDatabase.shuangyunmu];
+                            break;
+                        case 'biyunmu':
+                            items = [...pinyinDatabase.biyunmu];
+                            break;
+                        case 'zhengti':
+                            items = [...pinyinDatabase.zhengtiWithTones];
+                            break;
+                        case 'random':
+                            items = [...pinyinDatabase.shengmu, ...pinyinDatabase.yunmuWithTones, ...pinyinDatabase.zhengtiWithTones];
+                            break;
+                    }
+                    
+                    // 随机打乱并取32个
+                    items = shuffleArray(items).slice(0, itemsPerPage);
+                    
+                    // 创建表单
+                    const trainingId = 'T' + Date.now() + '-' + sheetIndex;
+                    const sheetDiv = document.createElement('div');
+                    sheetDiv.className = 'training-sheet';
+                    
+                    sheetDiv.innerHTML = `
+                        <div class="training-header">
+                            <h2>桐桐拼音训练记录表</h2>
+                            <div class="training-info">
+                                训练日期：________年____月____日　　训练者：__________
+                            </div>
+                            <div class="training-id">训练编号：${trainingId}</div>
+                            <div class="training-type">${typeNames[mode]}</div>
+                        </div>
+                        
+                        <div class="training-grid">
+                            ${items.map(item => `
+                                <div class="training-item">
+                                    <div class="pinyin">${item}</div>
+                                    <div class="checkboxes">
+                                        <label class="checkbox-item correct">
+                                            <input type="checkbox"> ✓
+                                        </label>
+                                        <label class="checkbox-item wrong">
+                                            <input type="checkbox"> ✗
+                                        </label>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                    container.appendChild(sheetDiv);
+                    
+                    // 添加分页符（除了最后一页）
+                    if (sheetIndex < totalSheets) {
+                        const divider = document.createElement('div');
+                        divider.className = 'page-divider';
+                        container.appendChild(divider);
+                    }
+                }
+            });
+            
+            // 显示批量打印视图
+            document.getElementById('selectionView').style.display = 'none';
+            document.getElementById('trainingView').style.display = 'block';
+            document.getElementById('singleSheetContainer').style.display = 'none';
+            container.style.display = 'block';
+            
+            // 添加批量打印专用按钮
+            const actionDiv = document.createElement('div');
+            actionDiv.className = 'action-buttons';
+            actionDiv.innerHTML = `
+                <button class="action-btn success" onclick="window.print()">🖨️ 打印全部 ${totalSheets} 页</button>
+                <button class="action-btn secondary" onclick="backToSelection()">← 返回选择</button>
+            `;
+            container.appendChild(actionDiv);
+            
+            alert(`✅ 已生成 ${totalSheets} 张训练表单！\n点击"打印全部"按钮开始打印。`);
+        }
+        
+        // 监听批量数量变化
+        document.addEventListener('DOMContentLoaded', function() {
+            const batchCountInput = document.getElementById('batchCount');
+            if (batchCountInput) {
+                batchCountInput.addEventListener('input', updateBatchPreview);
+            }
+        });
+        
+        // 打印拼音库（不含图片）
+        function printLibrary() {
+            // 添加打印专用类，隐藏图片
+            document.body.classList.add('print-no-images');
+            
+            // 提示用户
+            alert('💡 打印提示：\n\n' +
+                  '1. 建议选择"纵向"方向\n' +
+                  '2. 纸张大小：A4\n' +
+                  '3. 页边距：默认或窄边距\n' +
+                  '4. 不包含图片，仅打印拼音文字\n' +
+                  '5. 黑白打印效果更好\n\n' +
+                  '点击确定后进入打印预览。');
+            
+            // 延迟以确保样式生效
+            setTimeout(() => {
+                window.print();
+                // 打印完成后移除类
+                setTimeout(() => {
+                    document.body.classList.remove('print-no-images');
+                }, 1000);
+            }, 100);
+        }
+        
+        // 打印拼音库（含图片）
+        function printLibraryWithImages() {
+            // 检查是否有上传的图片
+            const hasImages = Object.keys(pinyinImages).length > 0;
+            
+            if (!hasImages) {
+                if (confirm('当前还没有上传任何图片。\n\n是否继续打印纯文字版本？')) {
+                    printLibrary();
+                }
+                return;
+            }
+            
+            // 提示用户
+            alert('💡 打印提示：\n\n' +
+                  '1. 建议选择"纵向"方向\n' +
+                  '2. 纸张大小：A4\n' +
+                  '3. 页边距：默认或窄边距\n' +
+                  '4. 包含已上传的图片\n' +
+                  '5. 建议彩色打印以显示图片\n' +
+                  `6. 当前有 ${Object.keys(pinyinImages).length} 个拼音有图片\n\n` +
+                  '点击确定后进入打印预览。');
+            
+            // 延迟以确保样式生效
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        }
+
+        // GitHub配置
+        let githubConfig = {
+            token: localStorage.getItem('github_token') || '',
+            username: localStorage.getItem('github_username') || 'Jiaming-Yi',
+            repo: localStorage.getItem('github_repo') || 'pingyinxulian'
+        };
+
+        // 统一构建GitHub Headers，清洗Token避免非ASCII字符
+        function getSanitizedToken() {
+            return (githubConfig.token || '').trim().replace(/[^\x00-\x7F]/g, '');
+        }
+        function getGitHubHeaders(includeJson = false) {
+            const token = getSanitizedToken();
+            const headers = {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28'
+            };
+            if (includeJson) headers['Content-Type'] = 'application/json';
+            return headers;
+        }
+
+        // 加载配置
+        function loadGitHubConfig() {
+            document.getElementById('githubToken').value = githubConfig.token;
+            document.getElementById('githubUsername').value = githubConfig.username;
+            document.getElementById('githubRepo').value = githubConfig.repo;
+            updateLocalDataInfo();
+        }
+
+        // 保存GitHub配置
+        function saveGitHubConfig() {
+            githubConfig.token = document.getElementById('githubToken').value.trim();
+            githubConfig.username = document.getElementById('githubUsername').value.trim();
+            githubConfig.repo = document.getElementById('githubRepo').value.trim();
+            
+            if (!githubConfig.token || !githubConfig.username || !githubConfig.repo) {
+                showSyncStatus('error', '❌ 请填写完整的GitHub配置信息');
+                return;
+            }
+            
+            localStorage.setItem('github_token', githubConfig.token);
+            localStorage.setItem('github_username', githubConfig.username);
+            localStorage.setItem('github_repo', githubConfig.repo);
+            
+            showSyncStatus('success', '✅ GitHub配置已保存');
+        }
+
+        // 上传数据到GitHub
+        async function syncToGitHub() {
+            if (!githubConfig.token) {
+                showSyncStatus('error', '❌ 请先配置GitHub Token');
+                return;
+            }
+            
+            if (!currentUser) {
+                showSyncStatus('error', '❌ 请先登录');
+                return;
+            }
+            
+            showSyncStatus('info', '⏳ 正在上传数据到GitHub...');
+            
+            try {
+                const userKey = getUserDataKey('pinyinTrainingDB');
+                const database = JSON.parse(localStorage.getItem(userKey) || '[]');
+                const content = JSON.stringify(database, null, 2);
+                const encodedContent = btoa(unescape(encodeURIComponent(content)));
+                
+                // 使用用户名创建独立的文件
+                const fileName = `data/${currentUser.username}_training_records.json`;
+                
+                let sha = null;
+                try {
+                    const getResponse = await fetch(
+                        `https://api.github.com/repos/${githubConfig.username}/${githubConfig.repo}/contents/${fileName}`,
+                        {
+                            headers: getGitHubHeaders(false)
+                        }
+                    );
+                    if (getResponse.ok) {
+                        const fileData = await getResponse.json();
+                        sha = fileData.sha;
+                    }
+                } catch (e) {}
+                
+                const uploadData = {
+                    message: `更新训练记录 - ${currentUser.displayName} - ${new Date().toLocaleString('zh-CN')}`,
+                    content: encodedContent,
+                    branch: 'main'
+                };
+                if (sha) uploadData.sha = sha;
+                
+                const response = await fetch(
+                    `https://api.github.com/repos/${githubConfig.username}/${githubConfig.repo}/contents/${fileName}`,
+                    {
+                        method: 'PUT',
+                        headers: getGitHubHeaders(true),
+                        body: JSON.stringify(uploadData)
+                    }
+                );
+                
+                if (response.ok) {
+                    showSyncStatus('success', `✅ 数据已成功上传到GitHub（${database.length}条记录）`);
+                    localStorage.setItem('last_sync_time', new Date().toISOString());
+                    if (isDashboardActive()) refreshDashboard();
+                } else {
+                    const error = await response.json().catch(()=>({ message: response.statusText }));
+                    showSyncStatus('error', `❌ 上传失败: ${error.message}`);
+                }
+            } catch (error) {
+                const msg = (error && error.message) ? error.message : String(error);
+                if (/non ISO-8859-1|ISO-8859-1|headers/i.test(msg)) {
+                    showSyncStatus('error', '❌ 上传出错：Token或请求头包含非ASCII字符。请在设置中重新粘贴纯英文的Token，并去除空格或全角字符。');
+                } else {
+                    showSyncStatus('error', `❌ 上传出错: ${msg}`);
+                }
+            }
+        }
+
+        // 从GitHub下载数据
+        async function syncFromGitHub() {
+            if (!githubConfig.token) {
+                showSyncStatus('error', '❌ 请先配置GitHub Token');
+                return;
+            }
+            
+            if (!currentUser) {
+                showSyncStatus('error', '❌ 请先登录');
+                return;
+            }
+            
+            showSyncStatus('info', '⏳ 正在从GitHub下载数据...');
+            
+            try {
+                const fileName = `data/${currentUser.username}_training_records.json`;
+                const response = await fetch(
+                    `https://api.github.com/repos/${githubConfig.username}/${githubConfig.repo}/contents/${fileName}`,
+                    {
+                        headers: getGitHubHeaders(false)
+                    }
+                );
+                
+                if (response.ok) {
+                    const fileData = await response.json();
+                    const content = decodeURIComponent(escape(atob(fileData.content)));
+                    const database = JSON.parse(content);
+                    
+                    // 合并本地和云端数据（去重）
+                    const userKey = getUserDataKey('pinyinTrainingDB');
+                    const localDB = JSON.parse(localStorage.getItem(userKey) || '[]');
+                    const mergedDB = mergeTrainingData(localDB, database);
+                    
+                    localStorage.setItem(userKey, JSON.stringify(mergedDB));
+                    localStorage.setItem('last_sync_time', new Date().toISOString());
+                    
+                    showSyncStatus('success', `✅ 数据已成功从GitHub下载（${database.length}条记录，合并后${mergedDB.length}条）`);
+                    updateLocalDataInfo();
+                    
+                    if (document.getElementById('historyScreen').classList.contains('active')) {
+                        loadHistory();
+                    }
+                } else if (response.status === 404) {
+                    showSyncStatus('info', '⚠️ GitHub上还没有数据文件，请先上传数据');
+                } else {
+                    const error = await response.json().catch(()=>({ message: response.statusText }));
+                    showSyncStatus('error', `❌ 下载失败: ${error.message}`);
+                }
+            } catch (error) {
+                const msg = (error && error.message) ? error.message : String(error);
+                if (/non ISO-8859-1|ISO-8859-1|headers/i.test(msg)) {
+                    showSyncStatus('error', '❌ 下载出错：Token或请求头包含非ASCII字符。请在设置中重新粘贴纯英文的Token，并去除空格或全角字符。');
+                } else {
+                    showSyncStatus('error', `❌ 下载出错: ${msg}`);
+                }
+            }
+        }
+
+        // 合并训练数据（去重）
+        function mergeTrainingData(local, remote) {
+            const merged = [...local];
+            const existingIds = new Set(local.map(r => r.id));
+            
+            remote.forEach(record => {
+                if (!existingIds.has(record.id)) {
+                    merged.push(record);
+                    existingIds.add(record.id);
+                }
+            });
+            
+            // 按日期排序
+            merged.sort((a, b) => new Date(a.date) - new Date(b.date));
+            return merged;
+        }
+
+        // 显示同步状态
+        function showSyncStatus(type, message) {
+            const statusDiv = document.getElementById('syncStatus');
+            statusDiv.className = `sync-status ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'flex';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // 更新本地数据信息
+        function updateLocalDataInfo() {
+            const userKey = getUserDataKey('pinyinTrainingDB');
+            const database = JSON.parse(localStorage.getItem(userKey) || '[]');
+            const lastSync = localStorage.getItem('last_sync_time');
+            
+            let info = `本地共有 ${database.length} 条训练记录`;
+            if (lastSync) {
+                info += `<br>上次同步: ${new Date(lastSync).toLocaleString('zh-CN')}`;
+            }
+            
+            document.getElementById('localDataInfo').innerHTML = info;
+        }
+
+        // 导出本地数据
+        function exportLocalData() {
+            const userKey = getUserDataKey('pinyinTrainingDB');
+            const database = JSON.parse(localStorage.getItem(userKey) || '[]');
+            const dataStr = JSON.stringify(database, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pinyin_training_data_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showSyncStatus('success', '✅ 数据已导出');
+        }
+
+        // 清除本地数据
+        function clearLocalData() {
+            if (confirm('确定要清除所有本地训练数据吗？\n\n建议先上传到GitHub或导出备份！')) {
+                const userKey = getUserDataKey('pinyinTrainingDB');
+                localStorage.removeItem(userKey);
+                updateLocalDataInfo();
+                showSyncStatus('success', '✅ 本地数据已清除');
+            }
+        }
+
+        function refreshDashboard() {
+            const userKey = getUserDataKey('pinyinTrainingDB');
+            const db = JSON.parse(localStorage.getItem(userKey) || '[]');
+            // KPI统计
+            let totalTrainings = db.length;
+            let totalItems = 0;
+            let totalCorrect = 0;
+            db.forEach(r => {
+                if (r.results && Array.isArray(r.results)) {
+                    r.results.forEach(x => {
+                        if (x.result !== null) {
+                            totalItems++;
+                            if (x.result) totalCorrect++;
+                        }
+                    });
+                }
+            });
+            document.getElementById('kpiTotalTimes').textContent = totalTrainings;
+            document.getElementById('kpiTotalItems').textContent = totalItems;
+            document.getElementById('kpiAvgRate').textContent = totalItems ? Math.round(totalCorrect * 100 / totalItems) + '%' : '0%';
+            
+            // 近7天趋势（按日期）
+            const last7 = Array.from({length: 7}).map((_,i)=>{
+                const d = new Date();
+                d.setDate(d.getDate() - (6 - i));
+                const key = d.toISOString().slice(0,10);
+                return { key, items:0, correct:0 };
+            });
+            const map = new Map(last7.map(x=>[x.key,x]));
+            db.forEach(r => {
+                const key = (r.completedDate || r.date || '').slice(0,10);
+                const bucket = map.get(key);
+                if (!bucket) return;
+                if (r.results) {
+                    r.results.forEach(x=>{
+                        if (x.result !== null) {
+                            bucket.items++;
+                            if (x.result) bucket.correct++;
+                        }
+                    });
+                }
+            });
+            drawTrendChart(last7);
+            
+            // 易错Top10
+            const mistakeMap = new Map(); // pinyin -> {wrong,total}
+            db.forEach(r=>{
+                if (!r.results) return;
+                r.results.forEach(x=>{
+                    if (x.result === null) return;
+                    const rec = mistakeMap.get(x.pinyin) || {wrong:0,total:0};
+                    rec.total++;
+                    if (!x.result) rec.wrong++;
+                    mistakeMap.set(x.pinyin, rec);
+                });
+            });
+            const sorted = Array.from(mistakeMap.entries())
+                .filter(([p,{total}])=>total>=2)
+                .sort((a,b)=> b[1].wrong - a[1].wrong)
+                .slice(0,10);
+            const list = document.getElementById('topMistakes');
+            list.innerHTML = '';
+            sorted.forEach(([p,rec])=>{
+                const rate = rec.total ? Math.round((rec.total - rec.wrong)*100/rec.total) : 0;
+                const rowP = document.createElement('div'); rowP.className='item'; rowP.textContent = p; list.appendChild(rowP);
+                const rowW = document.createElement('div'); rowW.className='item'; rowW.textContent = `错${rec.wrong}`; list.appendChild(rowW);
+                const rowR = document.createElement('div'); rowR.className='item'; rowR.textContent = `${rate}%`; list.appendChild(rowR);
+            });
+            
+            // 按类型统计
+            const typeKeys = [
+                { key:'shengmu', label:'声母' },
+                { key:'danyunmu', label:'单韵母' },
+                { key:'shuangyunmu', label:'复韵母' },
+                { key:'biyunmu', label:'鼻韵母' },
+                { key:'zhengti', label:'整体认读' },
+                { key:'random', label:'随机' }
+            ];
+            const typeAgg = new Map(typeKeys.map(t=>[t.key,{ label:t.label, items:0, correct:0 }]));
+            db.forEach(r=>{
+                const k = r.mode || 'random';
+                const bucket = typeAgg.get(k) || typeAgg.get('random');
+                if (!bucket) return;
+                if (Array.isArray(r.results)) {
+                    r.results.forEach(x=>{
+                        if (x.result !== null) {
+                            bucket.items++;
+                            if (x.result) bucket.correct++;
+                        }
+                    });
+                }
+            });
+            const typePoints = typeKeys.map(t=>{
+                const b = typeAgg.get(t.key) || { items:0, correct:0, label:t.label };
+                return { label:t.label, items:b.items, rate: b.items? Math.round(b.correct*100/b.items):0 };
+            });
+            drawTypeChart(typePoints);
+            
+            // 逐项统计更新
+            buildElementStatsCache(db);
+            renderElementTable();
+        }
+        
+        function drawTrendChart(points){
+            const canvas = document.getElementById('trendChart');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            const W=canvas.width,H=canvas.height, P=40;
+            ctx.strokeStyle='#ccc'; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(P,P); ctx.lineTo(P,H-P); ctx.lineTo(W-P,H-P); ctx.stroke();
+            const labels = points.map(p=>p.key.slice(5));
+            const maxItems = Math.max(1, ...points.map(p=>p.items));
+            const itemsY = v => H-P - (v/maxItems)*(H-2*P);
+            const xStep = (W-2*P)/(points.length-1 || 1);
+            ctx.fillStyle='rgba(52,152,219,0.25)';
+            points.forEach((p,i)=>{
+                const x = P + i*xStep - 10;
+                const y = itemsY(p.items);
+                ctx.fillRect(x, y, 20, (H-P)-y);
+            });
+            ctx.strokeStyle='#e67e22'; ctx.lineWidth=2; ctx.beginPath();
+            points.forEach((p,i)=>{
+                const rate = p.items ? p.correct*100/p.items : 0;
+                const y = H-P - (rate/100)*(H-2*P);
+                const x = P + i*xStep;
+                if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+            });
+            ctx.stroke();
+            ctx.fillStyle='#7f8c8d'; ctx.font='12px Arial'; ctx.textAlign='center';
+            labels.forEach((lb,i)=>{ const x=P+i*xStep; ctx.fillText(lb,x,H-P+14); });
+        }
+        
+        function drawTypeChart(points){
+            const canvas = document.getElementById('typeChart');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            const W=canvas.width,H=canvas.height,P=40;
+            ctx.strokeStyle='#ccc'; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(P,P); ctx.lineTo(P,H-P); ctx.lineTo(W-P,H-P); ctx.stroke();
+            const maxItems = Math.max(1, ...points.map(p=>p.items));
+            const barW = 28;
+            const xStep = (W-2*P)/points.length;
+            points.forEach((p,i)=>{
+                const x = P + i*xStep + (xStep-barW)/2;
+                const y = H-P - (p.items/maxItems)*(H-2*P);
+                ctx.fillStyle='rgba(46,204,113,0.35)';
+                ctx.fillRect(x, y, barW, (H-P)-y);
+                ctx.fillStyle='#e67e22'; ctx.font='12px Arial'; ctx.textAlign='center';
+                ctx.fillText(p.rate + '%', x+barW/2, y-6);
+                ctx.fillStyle='#7f8c8d';
+                ctx.fillText(p.label, x+barW/2, H-P+14);
+            });
+        }
+        
+        let dashboardTimer = null;
+        function startDashboardAutoRefresh(){
+            stopDashboardAutoRefresh();
+            dashboardTimer = setInterval(()=>{
+                if (isDashboardActive()) refreshDashboard();
+            }, 60000);
+        }
+        function stopDashboardAutoRefresh(){
+            if (dashboardTimer) { clearInterval(dashboardTimer); dashboardTimer = null; }
+        }
+        function isDashboardActive(){
+            const el = document.getElementById('dashboardScreen');
+            return el && el.classList.contains('active');
+        }
+        
+        async function syncFromGitHubAndRefresh(){
+            if (typeof syncFromGitHub === 'function') {
+                await syncFromGitHub();
+                if (isDashboardActive()) refreshDashboard();
+            } else {
+                alert('当前版本不支持GitHub同步。');
+            }
+        }
+        
+        // —— 逐项统计逻辑 ——
+        let elemStats = [];
+        function detectPinyinType(p){
+            if (pinyinDatabase && Array.isArray(pinyinDatabase.shengmu) && pinyinDatabase.shengmu.includes(p)) return '声母';
+            if (pinyinDatabase && Array.isArray(pinyinDatabase.danyunmu) && pinyinDatabase.danyunmu.includes(p)) return '单韵母';
+            if (pinyinDatabase && Array.isArray(pinyinDatabase.shuangyunmu) && pinyinDatabase.shuangyunmu.includes(p)) return '复韵母';
+            if (pinyinDatabase && Array.isArray(pinyinDatabase.biyunmu) && pinyinDatabase.biyunmu.includes(p)) return '鼻韵母';
+            if (pinyinDatabase && Array.isArray(pinyinDatabase.zhengtiWithTones) && pinyinDatabase.zhengtiWithTones.includes(p)) return '整体认读';
+            return '';
+        }
+        function buildElementStatsCache(db){
+            const map = new Map();
+            db.forEach(r=>{
+                const dt = new Date(r.completedDate || r.date || '').toISOString();
+                (r.results||[]).forEach(x=>{
+                    if (x.result === null) return;
+                    const key = x.pinyin;
+                    const rec = map.get(key) || { pinyin:key, type: detectPinyinType(key), tries:0, correct:0, wrong:0, latest:'' };
+                    rec.tries++;
+                    if (x.result) rec.correct++; else rec.wrong++;
+                    if (!rec.latest || dt > rec.latest) rec.latest = dt;
+                    map.set(key, rec);
+                });
+            });
+            elemStats = Array.from(map.values()).map(r=>({
+                ...r,
+                acc: r.tries ? Math.round(r.correct*100/r.tries) : 0
+            }));
+        }
+        function renderElementTable(){
+            const body = document.getElementById('elemTableBody');
+            const q = (document.getElementById('elemSearch')?.value || '').trim().toLowerCase();
+            const t = document.getElementById('elemTypeFilter')?.value || '';
+            const sort = document.getElementById('elemSort')?.value || 'tries_desc';
+            let rows = elemStats.slice();
+            if (q) rows = rows.filter(r=> r.pinyin.toLowerCase().includes(q));
+            if (t) rows = rows.filter(r=> r.type === t);
+            switch(sort){
+                case 'tries_desc': rows.sort((a,b)=> b.tries-a.tries || a.pinyin.localeCompare(b.pinyin)); break;
+                case 'acc_desc': rows.sort((a,b)=> b.acc-a.acc || b.tries-a.tries); break;
+                case 'wrong_desc': rows.sort((a,b)=> b.wrong-a.wrong || b.tries-a.tries); break;
+                case 'latest_desc': rows.sort((a,b)=> (b.latest||'').localeCompare(a.latest||'') || b.tries-a.tries); break;
+                case 'pinyin_asc': rows.sort((a,b)=> a.pinyin.localeCompare(b.pinyin)); break;
+            }
+            body.innerHTML = rows.map(r=>
+                `<tr>
+                    <td>${r.pinyin}</td>
+                    <td>${r.type||''}</td>
+                    <td>${r.tries}</td>
+                    <td>${r.correct}</td>
+                    <td>${r.wrong}</td>
+                    <td>${r.acc}%</td>
+                    <td>${r.latest? new Date(r.latest).toLocaleString('zh-CN'):''}</td>
+                </tr>`
+            ).join('');
+            document.getElementById('elemSummary').textContent = `共 ${rows.length} 个拼音条目`;
+        }
+        function exportElementCsv(){
+            // 基于当前筛选渲染数据导出
+            const q = (document.getElementById('elemSearch')?.value || '').trim().toLowerCase();
+            const t = document.getElementById('elemTypeFilter')?.value || '';
+            const sort = document.getElementById('elemSort')?.value || 'tries_desc';
+            let rows = elemStats.slice();
+            if (q) rows = rows.filter(r=> r.pinyin.toLowerCase().includes(q));
+            if (t) rows = rows.filter(r=> r.type === t);
+            switch(sort){
+                case 'tries_desc': rows.sort((a,b)=> b.tries-a.tries || a.pinyin.localeCompare(b.pinyin)); break;
+                case 'acc_desc': rows.sort((a,b)=> b.acc-a.acc || b.tries-a.tries); break;
+                case 'wrong_desc': rows.sort((a,b)=> b.wrong-a.wrong || b.tries-a.tries); break;
+                case 'latest_desc': rows.sort((a,b)=> (b.latest||'').localeCompare(a.latest||'') || b.tries-a.tries); break;
+                case 'pinyin_asc': rows.sort((a,b)=> a.pinyin.localeCompare(b.pinyin)); break;
+            }
+            const header = ['拼音','类型','尝试','正确','错误','正确率','最近训练'];
+            const lines = [header.join(',')].concat(rows.map(r=>[
+                r.pinyin,
+                r.type||'',
+                r.tries,
+                r.correct,
+                r.wrong,
+                r.acc+'%',
+                r.latest? new Date(r.latest).toLocaleString('zh-CN'):''
+            ].map(v=> `"${String(v).replace(/"/g,'""')}"`).join(',')));
+            const blob = new Blob(["\uFEFF"+lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `pinyin_element_stats_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click(); URL.revokeObjectURL(url);
+        }
+    </script>
 </body>
 </html> 

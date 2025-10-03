@@ -1935,8 +1935,12 @@
             </div>
             
             <div style="text-align: center; margin-bottom: 20px;">
+                <button class="action-btn" style="padding: 8px 16px; font-size: 14px; background: #27ae60;" onclick="syncUsersAndReload()">
+                    ☁️ 从云端同步账户
+                </button>
                 <p style="color: #7f8c8d; font-size: 12px; margin-top: 8px;">
-                    💡 系统会自动同步云端账户，无需手动配置
+                    已在其他设备注册？点击同步<br>
+                    <span style="color: #e74c3c; font-weight: bold;">⚠️ 首次使用请先注册</span>
                 </p>
             </div>
             
@@ -2388,26 +2392,13 @@
                 <div class="current-user-info">
                     <div>
                         <div class="user-name" id="currentUserDisplay">未登录</div>
-                        <div style="color: #7f8c8d; font-size: 13px; margin-top: 5px;">
-                            用户名：<span id="currentUsernameDisplay">-</span>
-                            <span id="userRoleDisplay" style="margin-left: 10px; padding: 2px 8px; background: #f39c12; color: white; border-radius: 12px; font-size: 11px; display: none;"></span>
-                        </div>
+                        <div style="color: #7f8c8d; font-size: 13px; margin-top: 5px;">用户名：<span id="currentUsernameDisplay">-</span></div>
                     </div>
                     <button class="logout-btn" onclick="handleLogout()">退出登录</button>
                 </div>
                 <p style="color: #7f8c8d; font-size: 13px; line-height: 1.6;">
                     您的所有训练数据和设置都与当前账户关联。切换账户后，将看到该账户的独立数据。
                 </p>
-                <div id="adminInfo" style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-top: 10px; border-left: 4px solid #ffc107; display: none;">
-                    <p style="color: #856404; margin: 0; font-size: 12px;">
-                        🔧 <strong>管理员权限：</strong>可以配置GitHub同步功能，管理全局设置。
-                    </p>
-                </div>
-                <div id="userInfo" style="background: #d1ecf1; padding: 10px; border-radius: 6px; margin-top: 10px; border-left: 4px solid #17a2b8; display: none;">
-                    <p style="color: #0c5460; margin: 0; font-size: 12px;">
-                        👤 <strong>普通用户：</strong>专注于训练功能，无需配置复杂的同步设置。
-                    </p>
-                </div>
             </div>
             <!-- GitHub同步设置 -->
             <div class="setting-card">
@@ -2416,12 +2407,6 @@
                     配置GitHub Personal Access Token后，您的训练数据将自动同步到GitHub仓库，
                     在任何设备上都能访问相同的训练记录。
                 </p>
-                <div style="background: #e8f5e8; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #27ae60;">
-                    <p style="color: #155724; margin: 0; font-weight: bold;">💡 全局配置功能</p>
-                    <p style="color: #155724; margin: 5px 0 0 0; font-size: 14px;">
-                        首次配置后，Token会自动保存到云端，其他用户无需重复输入即可使用同步功能。
-                    </p>
-                </div>
                 
                 <div class="setting-item">
                     <label>GitHub Personal Access Token</label>
@@ -2447,7 +2432,6 @@
                     <button class="sync-button success" onclick="syncToGitHub()">☁️ 上传训练数据</button>
                     <button class="sync-button warning" onclick="syncFromGitHub()">⬇️ 下载训练数据</button>
                     <button class="sync-button" style="background: #9b59b6;" onclick="syncUsersManually()">👥 同步账户信息</button>
-                    <button class="sync-button" style="background: #17a2b8;" onclick="reloadGlobalConfig()">🔄 重新加载配置</button>
                 </div>
                 
                 <div id="syncStatus" style="display: none;" class="sync-status"></div>
@@ -2627,41 +2611,69 @@
             }
         }
         
-        // 自动同步账户（后台静默进行）
-        async function autoSyncUsers() {
-            try {
-                console.log('🔄 开始自动同步账户...');
-                console.log('GitHub配置状态:', {
-                    token: githubConfig.token ? '已配置' : '未配置',
-                    username: githubConfig.username,
-                    repo: githubConfig.repo
-                });
+        // 同步账户并重新加载
+        async function syncUsersAndReload() {
+            // 先检查是否配置了GitHub
+            if (!githubConfig.token) {
+                const confirmConfig = confirm('📋 需要配置GitHub信息才能同步账户\n\n如果您在其他设备上注册过账户：\n\n1. 需要先获取GitHub Token\n2. 访问: github.com/settings/tokens/new\n3. 创建Token（勾选repo权限）\n\n点击"确定"继续配置\n点击"取消"先在本地注册账户');
                 
-                // 如果没有token，尝试从本地存储加载
-                if (!githubConfig.token) {
-                    const localToken = localStorage.getItem('github_token');
-                    if (localToken) {
-                        githubConfig.token = localToken;
-                        githubConfig.username = localStorage.getItem('github_username') || 'Jiaming-Yi';
-                        githubConfig.repo = localStorage.getItem('github_repo') || 'pingyinxulian';
-                        console.log('✅ 已从本地存储加载GitHub配置');
-                    } else {
-                        console.log('⚠️ 未找到GitHub Token，跳过自动同步');
-                        return;
-                    }
+                if (!confirmConfig) {
+                    return;
                 }
                 
-                // 尝试从GitHub同步用户数据
+                // 显示临时输入框让用户配置
+                const token = prompt('📝 步骤1/3：请粘贴您的GitHub Personal Access Token\n\n（从 github.com/settings/tokens/new 获取）\n（需要勾选 repo 权限）');
+                if (!token || token.trim() === '') {
+                    alert('❌ 未输入Token，操作取消');
+                    return;
+                }
+                
+                const username = prompt('📝 步骤2/3：请输入GitHub用户名', 'Jiaming-Yi');
+                if (!username || username.trim() === '') {
+                    alert('❌ 未输入用户名，操作取消');
+                    return;
+                }
+                
+                const repo = prompt('📝 步骤3/3：请输入仓库名', 'pingyinxulian');
+                if (!repo || repo.trim() === '') {
+                    alert('❌ 未输入仓库名，操作取消');
+                    return;
+                }
+                
+                // 保存配置
+                githubConfig.token = token.trim();
+                githubConfig.username = username.trim();
+                githubConfig.repo = repo.trim();
+                localStorage.setItem('github_token', githubConfig.token);
+                localStorage.setItem('github_username', githubConfig.username);
+                localStorage.setItem('github_repo', githubConfig.repo);
+                
+                alert('✅ GitHub配置已保存！\n\n现在开始同步账户...');
+            }
+            
+            // 显示加载提示
+            const syncBtn = event.target;
+            const originalText = syncBtn.innerHTML;
+            syncBtn.disabled = true;
+            syncBtn.innerHTML = '⏳ 同步中...';
+            
+            try {
                 const success = await syncUsersFromGitHub();
+                
                 if (success) {
-                    console.log('✅ 账户自动同步成功');
+                    const userCount = Object.keys(users).length;
+                    alert(`✅ 账户同步成功！\n\n已同步 ${userCount} 个账户\n现在可以使用这些账户登录了。`);
                     // 刷新用户列表
                     users = JSON.parse(localStorage.getItem('users') || '{}');
                 } else {
-                    console.log('ℹ️ 未找到云端账户数据，使用本地数据');
+                    alert('❌ 同步失败\n\n可能的原因：\n\n1. GitHub上还没有用户数据\n   ➜ 请先在一台设备上注册账户\n   ➜ 然后在设置中点击"同步账户信息"\n\n2. Token权限不足\n   ➜ Token需要勾选 repo 权限\n\n3. 网络连接问题\n   ➜ 请检查网络连接\n\n💡 建议：如果这是第一次使用，请先注册新账户。');
                 }
             } catch (error) {
-                console.log('⚠️ 账户自动同步失败:', error.message);
+                console.error('同步错误详情:', error);
+                alert('❌ 同步出错\n\n错误信息：' + error.message + '\n\n请检查：\n1. GitHub Token是否正确\n2. 网络连接是否正常\n3. GitHub仓库是否存在');
+            } finally {
+                syncBtn.disabled = false;
+                syncBtn.innerHTML = originalText;
             }
         }
         
@@ -2713,7 +2725,6 @@
                 username: username,
                 displayName: displayName,
                 password: password, // 实际应用中应该加密
-                role: 'user', // 默认角色为普通用户
                 createdAt: new Date().toISOString(),
                 lastLoginAt: new Date().toISOString()
             };
@@ -2732,8 +2743,7 @@
                 }
             });
             
-            const roleText = users[username].role === 'admin' ? '（管理员）' : '（普通用户）';
-            alert(`✅ 注册成功！欢迎，${displayName}！${roleText}\n\n💡 提示：系统会自动同步您的数据到云端。`);
+            alert(`✅ 注册成功！欢迎，${displayName}！\n\n💡 提示：在"设置"中配置GitHub Token后，可以在多个设备上使用同一账户。`);
             
             hideLoginOverlay();
             updateUserDisplay();
@@ -2765,8 +2775,7 @@
             currentUser = users[username];
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             
-            const roleText = currentUser.role === 'admin' ? '（管理员）' : '（普通用户）';
-            alert(`✅ 登录成功！欢迎回来，${currentUser.displayName}！${roleText}\n\n💡 提示：系统会自动同步您的数据。`);
+            alert(`✅ 登录成功！欢迎回来，${currentUser.displayName}！`);
             
             hideLoginOverlay();
             updateUserDisplay();
@@ -2791,48 +2800,7 @@
             if (currentUser) {
                 document.getElementById('currentUserDisplay').textContent = currentUser.displayName;
                 document.getElementById('currentUsernameDisplay').textContent = currentUser.username;
-                
-                // 显示用户角色
-                const roleDisplay = document.getElementById('userRoleDisplay');
-                const adminInfo = document.getElementById('adminInfo');
-                const userInfo = document.getElementById('userInfo');
-                
-                if (currentUser.role === 'admin') {
-                    roleDisplay.textContent = '管理员';
-                    roleDisplay.style.background = '#e74c3c';
-                    roleDisplay.style.display = 'inline-block';
-                    adminInfo.style.display = 'block';
-                    userInfo.style.display = 'none';
-                } else {
-                    roleDisplay.textContent = '普通用户';
-                    roleDisplay.style.background = '#3498db';
-                    roleDisplay.style.display = 'inline-block';
-                    adminInfo.style.display = 'none';
-                    userInfo.style.display = 'block';
-                }
-                
-                // 根据用户角色显示/隐藏GitHub配置界面
-                updateGitHubConfigVisibility();
-            } else {
-                document.getElementById('userRoleDisplay').style.display = 'none';
-                document.getElementById('adminInfo').style.display = 'none';
-                document.getElementById('userInfo').style.display = 'none';
             }
-        }
-        
-        // 根据用户角色更新GitHub配置界面可见性
-        function updateGitHubConfigVisibility() {
-            const githubConfigCards = document.querySelectorAll('.setting-card');
-            githubConfigCards.forEach(card => {
-                const title = card.querySelector('h3');
-                if (title && title.textContent.includes('GitHub数据同步')) {
-                    if (currentUser && currentUser.role === 'admin') {
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                }
-            });
         }
         
         // 获取用户专属的数据键名
@@ -2878,37 +2846,10 @@
             pinyinDatabase.zhengtiWithTones = pinyinDatabase.zhengtiWithTones.map(p => p.toLowerCase());
         }
         
-        // 创建默认管理员用户
-        function createDefaultAdmin() {
-            const adminUsername = 'admin';
-            if (!users[adminUsername]) {
-                users[adminUsername] = {
-                    username: adminUsername,
-                    displayName: '系统管理员',
-                    password: 'admin123', // 实际应用中应该使用更安全的密码
-                    role: 'admin',
-                    createdAt: new Date().toISOString(),
-                    lastLoginAt: new Date().toISOString()
-                };
-                localStorage.setItem('users', JSON.stringify(users));
-                console.log('✅ 已创建默认管理员账户: admin/admin123');
-            }
-        }
-        
         // 页面加载时初始化用户系统
         window.addEventListener('DOMContentLoaded', function() {
-            createDefaultAdmin(); // 创建默认管理员
             initUserSystem();
             convertPinyinToLowercase();
-            // 异步加载全局GitHub配置，不阻塞页面初始化
-            loadGlobalGitHubConfig().then(() => {
-                // 配置加载完成后自动同步账户
-                autoSyncUsers();
-            }).catch(error => {
-                console.log('加载GitHub配置时出错:', error);
-                // 即使配置加载失败，也尝试同步（可能使用本地配置）
-                autoSyncUsers();
-            });
         });
         
         // ========== 原有代码开始 ==========
@@ -4759,125 +4700,12 @@
             }, 100);
         }
 
-        // GitHub配置 - 全局共享配置
+        // GitHub配置
         let githubConfig = {
-            token: '',
-            username: 'Jiaming-Yi',
-            repo: 'pingyinxulian'
+            token: localStorage.getItem('github_token') || '',
+            username: localStorage.getItem('github_username') || 'Jiaming-Yi',
+            repo: localStorage.getItem('github_repo') || 'pingyinxulian'
         };
-        
-        // 从GitHub仓库加载全局配置
-        async function loadGlobalGitHubConfig() {
-            try {
-                // 尝试从GitHub仓库的配置文件中读取全局配置
-                const response = await fetch(
-                    `https://api.github.com/repos/${githubConfig.username}/${githubConfig.repo}/contents/config/global-config.json`
-                );
-                
-                if (response.ok) {
-                    const fileData = await response.json();
-                    const configContent = JSON.parse(atob(fileData.content));
-                    
-                    // 更新全局配置
-                    githubConfig.token = configContent.token || '';
-                    githubConfig.username = configContent.username || 'Jiaming-Yi';
-                    githubConfig.repo = configContent.repo || 'pingyinxulian';
-                    
-                    console.log('✅ 已加载全局GitHub配置');
-                    return true;
-                } else if (response.status === 404) {
-                    console.log('ℹ️ 全局配置文件不存在，使用本地配置');
-                } else {
-                    console.log('⚠️ 加载全局配置失败，状态码:', response.status);
-                }
-            } catch (error) {
-                console.log('⚠️ 加载全局配置出错:', error.message);
-            }
-            
-            // 如果加载失败，尝试从本地存储加载
-            const localToken = localStorage.getItem('github_token');
-            if (localToken) {
-                githubConfig.token = localToken;
-                githubConfig.username = localStorage.getItem('github_username') || 'Jiaming-Yi';
-                githubConfig.repo = localStorage.getItem('github_repo') || 'pingyinxulian';
-                console.log('✅ 已加载本地GitHub配置');
-                return true;
-            }
-            
-            console.log('ℹ️ 未找到任何GitHub配置，使用默认配置');
-            return false;
-        }
-        
-        // 重新加载全局配置（带用户反馈）
-        async function reloadGlobalConfig() {
-            const button = event.target;
-            const originalText = button.innerHTML;
-            button.disabled = true;
-            button.innerHTML = '🔄 加载中...';
-            
-            try {
-                const loaded = await loadGlobalGitHubConfig();
-                if (loaded) {
-                    showSyncStatus('success', '✅ 配置重新加载成功');
-                    loadGitHubConfig(); // 更新界面显示
-                } else {
-                    showSyncStatus('warning', '⚠️ 未找到云端配置，使用本地配置');
-                    loadGitHubConfig(); // 更新界面显示
-                }
-            } catch (error) {
-                showSyncStatus('error', '❌ 重新加载配置失败: ' + error.message);
-            } finally {
-                button.disabled = false;
-                button.innerHTML = originalText;
-            }
-        }
-        
-        // 保存全局配置到GitHub仓库
-        async function saveGlobalGitHubConfig() {
-            if (!githubConfig.token) {
-                alert('❌ 请先输入GitHub Token');
-                return false;
-            }
-            
-            try {
-                const configData = {
-                    token: githubConfig.token,
-                    username: githubConfig.username,
-                    repo: githubConfig.repo,
-                    updatedAt: new Date().toISOString()
-                };
-                
-                const uploadData = {
-                    message: 'Update global GitHub configuration',
-                    content: btoa(JSON.stringify(configData, null, 2)),
-                    branch: 'main'
-                };
-                
-                const response = await fetch(
-                    `https://api.github.com/repos/${githubConfig.username}/${githubConfig.repo}/contents/config/global-config.json`,
-                    {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `Bearer ${githubConfig.token}`,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/vnd.github.v3+json'
-                        },
-                        body: JSON.stringify(uploadData)
-                    }
-                );
-                
-                if (response.ok) {
-                    console.log('✅ 全局配置已保存到GitHub');
-                    return true;
-                } else {
-                    console.error('❌ 保存全局配置失败');
-                    return false;
-                }
-            } catch (error) {
-                console.error('❌ 保存全局配置出错:', error);
-                return false;
-            }
-        }
         
         // 用户信息同步到GitHub
         async function syncUsersToGitHub() {
@@ -4986,7 +4814,7 @@
         }
 
         // 保存GitHub配置
-        async function saveGitHubConfig() {
+        function saveGitHubConfig() {
             githubConfig.token = document.getElementById('githubToken').value.trim();
             githubConfig.username = document.getElementById('githubUsername').value.trim();
             githubConfig.repo = document.getElementById('githubRepo').value.trim();
@@ -4996,18 +4824,11 @@
                 return;
             }
             
-            // 保存到本地存储（作为备份）
             localStorage.setItem('github_token', githubConfig.token);
             localStorage.setItem('github_username', githubConfig.username);
             localStorage.setItem('github_repo', githubConfig.repo);
             
-            // 尝试保存到GitHub仓库作为全局配置
-            const saved = await saveGlobalGitHubConfig();
-            if (saved) {
-                showSyncStatus('success', '✅ GitHub配置已保存并同步到云端\n其他用户无需重复配置');
-            } else {
-                showSyncStatus('success', '✅ GitHub配置已保存到本地\n（云端同步失败，但本地可用）');
-            }
+            showSyncStatus('success', '✅ GitHub配置已保存');
         }
         
         // 手动同步账户信息

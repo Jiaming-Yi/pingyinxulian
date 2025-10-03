@@ -1954,7 +1954,7 @@
     <div class="screen active" id="trainingScreen">
         <div id="selectionView">
             <h1 class="title">🎓 桐桐拼音训练系统</h1>
-            <p class="subtitle">选择训练模式，系统将自动生成一页训练表单（8行×4列=32个）</p>
+            <p class="subtitle">选择训练模式，系统将自动生成一页训练表单（7行×4列=28个）</p>
             
             <!-- 批量打印选择器 -->
             <div class="batch-print-selector">
@@ -2075,7 +2075,7 @@
                     <li>✓ 整体认读音节（含声调）：64个（16个 × 4声调）</li>
                     <li>✓ 千字文四字句：250句（完整千字文，共1000字）</li>
                     <li>✓ 基础训练项总计：183个</li>
-                    <li>✓ 每页显示：32个训练项（8行×4列）</li>
+                    <li>✓ 每页显示：28个训练项（7行×4列）</li>
                 </ul>
             </div>
         </div>
@@ -2299,7 +2299,7 @@
             <p style="color: #7f8c8d; margin-bottom: 15px;">
                 千字文是中国古代经典蒙学教材，由南北朝梁武帝时周兴嗣编纂，全文由250句四字韵文组成，共1000个不重复的汉字。
                 每句四个汉字配对应的四个拼音，既可以训练拼音，又能学习汉字和传统文化。
-                本训练库按四字句为单位进行训练，每次随机抽取8句（32个字）。
+                本训练库按四字句为单位进行训练，每次随机抽取7句（28个字）。
             </p>
             <div class="pinyin-showcase" id="qianziwenShowcase"></div>
         </div>
@@ -3101,7 +3101,7 @@
         
         let currentTraining = null;
         let inputResults = {};
-        const itemsPerPage = 32; // 8行×4列
+        const itemsPerPage = 28; // 7行×4列
         
         // 切换屏幕
         function switchScreen(screen) {
@@ -3573,8 +3573,8 @@
                     typeName = '整体认读音节训练';
                     break;
                 case 'qianziwen':
-                    // 千字文是四字句对象，随机选取8句（8句×4字=32个训练项）
-                    items = shuffleArray([...pinyinDatabase.qianziwen]).slice(0, 8);
+                    // 千字文是四字句对象，随机选取7句（7句×4字=28个训练项）
+                    items = shuffleArray([...pinyinDatabase.qianziwen]).slice(0, 7);
                     typeName = '千字文训练';
                     break;
                 case 'random':

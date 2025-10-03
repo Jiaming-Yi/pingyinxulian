@@ -770,6 +770,8 @@
             page-break-after: always;
             margin: 0;
             padding: 0;
+            height: 0;
+            overflow: hidden;
         }
         
         /* 拼音库打印专用样式 */
@@ -782,6 +784,7 @@
             body {
                 background: white !important;
                 padding: 0;
+                margin: 0;
             }
             
             .nav-tabs, .action-buttons, .batch-print-selector {
@@ -794,6 +797,11 @@
                 padding: 10mm;
                 max-width: 100%;
                 background: white !important;
+            }
+            
+            /* 防止空白页 */
+            .training-container {
+                page-break-inside: auto;
             }
             
             .training-grid {
@@ -815,6 +823,8 @@
                 margin: 0;
                 padding: 0;
                 border: none;
+                overflow: hidden;
+                visibility: hidden;
             }
             
             .training-header {
@@ -822,7 +832,8 @@
             }
             
             .training-grid {
-                page-break-inside: avoid;
+                page-break-inside: auto;
+                break-inside: auto;
             }
             
             /* 拼音库打印样式 */
@@ -4536,7 +4547,7 @@
                     container.appendChild(sheetDiv);
                     
                     // 添加分页符（除了最后一页）
-                    if (sheetIndex < totalSheets) {
+                    if (sheetIndex < totalSheets - 1) {
                         const divider = document.createElement('div');
                         divider.className = 'page-divider';
                         container.appendChild(divider);

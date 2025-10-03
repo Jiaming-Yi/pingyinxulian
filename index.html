@@ -2630,6 +2630,27 @@
         // 自动同步账户（后台静默进行）
         async function autoSyncUsers() {
             try {
+                console.log('🔄 开始自动同步账户...');
+                console.log('GitHub配置状态:', {
+                    token: githubConfig.token ? '已配置' : '未配置',
+                    username: githubConfig.username,
+                    repo: githubConfig.repo
+                });
+                
+                // 如果没有token，尝试从本地存储加载
+                if (!githubConfig.token) {
+                    const localToken = localStorage.getItem('github_token');
+                    if (localToken) {
+                        githubConfig.token = localToken;
+                        githubConfig.username = localStorage.getItem('github_username') || 'Jiaming-Yi';
+                        githubConfig.repo = localStorage.getItem('github_repo') || 'pingyinxulian';
+                        console.log('✅ 已从本地存储加载GitHub配置');
+                    } else {
+                        console.log('⚠️ 未找到GitHub Token，跳过自动同步');
+                        return;
+                    }
+                }
+                
                 // 尝试从GitHub同步用户数据
                 const success = await syncUsersFromGitHub();
                 if (success) {

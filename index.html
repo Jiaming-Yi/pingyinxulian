@@ -869,6 +869,19 @@
                 border-color: #000 !important;
             }
             
+            /* 防止知识库内容跨页 */
+            #libraryScreen {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            
+            .library-section {
+                page-break-inside: avoid;
+                break-inside: avoid;
+                orphans: 3;
+                widows: 3;
+            }
+            
             .page-divider {
                 page-break-after: always;
                 height: 0;
@@ -894,6 +907,7 @@
             /* 拼音库打印样式 */
             .library-section {
                 page-break-inside: avoid;
+                break-inside: avoid;
                 margin-bottom: 15mm;
             }
             
@@ -903,18 +917,24 @@
                 font-size: 18pt;
                 margin-bottom: 8mm;
                 padding-bottom: 3mm;
+                page-break-after: avoid;
+                break-after: avoid;
             }
             
             .library-section h3 {
                 color: #333 !important;
                 font-size: 14pt;
                 margin: 5mm 0 3mm;
+                page-break-after: avoid;
+                break-after: avoid;
             }
             
             .pinyin-showcase {
                 grid-template-columns: repeat(8, 1fr);
                 gap: 3mm;
                 margin-bottom: 5mm;
+                page-break-inside: avoid;
+                break-inside: avoid;
             }
             
             .showcase-item {
@@ -932,6 +952,8 @@
                 justify-content: center;
                 box-shadow: none !important;
                 position: relative;
+                page-break-inside: avoid;
+                break-inside: avoid;
             }
             
             .showcase-item .pinyin-text {

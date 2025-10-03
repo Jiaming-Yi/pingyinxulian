@@ -799,22 +799,36 @@
                 background: white !important;
             }
             
-            /* 防止空白页 */
+            /* 防止空白页和强制单页 */
             .training-container {
-                page-break-inside: auto;
+                page-break-inside: avoid;
+                break-inside: avoid;
             }
             
             .training-grid {
-                gap: 8px;
+                gap: 6px;
+                page-break-inside: avoid;
+                break-inside: avoid;
             }
             
             .training-item {
-                padding: 8px;
-                min-height: 70px;
+                padding: 6px;
+                min-height: 60px;
+                font-size: 14px;
             }
             
             .pinyin {
-                font-size: 20px;
+                font-size: 18px;
+            }
+            
+            .training-header h2 {
+                font-size: 24px;
+                margin-bottom: 8px;
+            }
+            
+            .training-info {
+                font-size: 14px;
+                margin-bottom: 8px;
             }
             
             .page-divider {
@@ -829,11 +843,14 @@
             
             .training-header {
                 page-break-after: avoid;
+                page-break-inside: avoid;
+                break-inside: avoid;
             }
             
-            .training-grid {
-                page-break-inside: auto;
-                break-inside: auto;
+            /* 确保整个训练表单不被分割 */
+            #trainingView, #singleSheetContainer {
+                page-break-inside: avoid;
+                break-inside: avoid;
             }
             
             /* 拼音库打印样式 */

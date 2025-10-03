@@ -506,10 +506,6 @@
             background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         }
         
-        .showcase-item.qianziwen {
-            background: linear-gradient(135deg, #fbc531 0%, #e55039 100%);
-        }
-        
         .library-stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -1981,12 +1977,6 @@
                         <div class="option-desc">64个（含声调）</div>
                     </div>
                     
-                    <div class="batch-option" onclick="toggleBatchOption('qianziwen', this)">
-                        <input type="checkbox" id="batch-qianziwen" onclick="event.stopPropagation(); toggleBatchOption('qianziwen', this.parentElement)">
-                        <div class="option-title">📖 千字文训练</div>
-                        <div class="option-desc">250句（汉字+拼音）</div>
-                    </div>
-                    
                     <div class="batch-option" onclick="toggleBatchOption('random', this)">
                         <input type="checkbox" id="batch-random" onclick="event.stopPropagation(); toggleBatchOption('random', this.parentElement)">
                         <div class="option-title">🎲 随机混合</div>
@@ -2043,11 +2033,6 @@
                     <span style="font-size: 16px; opacity: 0.9;">64个（16×4声调）</span>
                 </button>
                 
-                <button class="mode-btn" onclick="startTraining('qianziwen')" style="background: linear-gradient(135deg, #fbc531 0%, #e55039 100%);">
-                    📖 千字文训练<br>
-                    <span style="font-size: 16px; opacity: 0.9;">250句（汉字+拼音）</span>
-                </button>
-                
                 <button class="mode-btn random" onclick="startTraining('random')">
                     🎲 随机训练<br>
                     <span style="font-size: 16px; opacity: 0.9;">混合所有内容</span>
@@ -2062,8 +2047,7 @@
                     <li>✓ 复韵母（含声调）：36个（9个 × 4声调）</li>
                     <li>✓ 鼻韵母（含声调）：36个（9个 × 4声调）</li>
                     <li>✓ 整体认读音节（含声调）：64个（16个 × 4声调）</li>
-                    <li>✓ 千字文四字句：250句（完整千字文，共1000字）</li>
-                    <li>✓ 基础训练项总计：183个</li>
+                    <li>✓ 总计：183个训练项</li>
                     <li>✓ 每页显示：32个训练项（8行×4列）</li>
                 </ul>
             </div>
@@ -2139,8 +2123,6 @@
             <h3 style="color: #2c3e50; margin: 20px 0;">识别结果（请核对并修正）</h3>
             <div id="ocrResultGrid"></div>
             <div class="action-buttons">
-                <button class="action-btn" onclick="markAllOCRResults(true)" style="background: #27ae60;">✓ 全部标记为正确</button>
-                <button class="action-btn" onclick="markAllOCRResults(false)" style="background: #e74c3c;">✗ 全部标记为错误</button>
                 <button class="action-btn success" onclick="saveOCRResults()">💾 确认并保存</button>
                 <button class="action-btn warning" onclick="resetOCR()">🔄 重新上传</button>
             </div>
@@ -2149,27 +2131,12 @@
         <div class="stats" style="margin-top: 30px;">
             <h3>💡 使用提示</h3>
             <ul>
-                <li>📸 <strong>拍照技巧：</strong>确保照片清晰，光线充足，避免阴影和反光</li>
-                <li>📐 <strong>角度要求：</strong>尽量保持表单平整，正面拍摄，避免倾斜或变形</li>
-                <li>🆔 <strong>训练编号：</strong>确保训练表单顶部的ID（T开头的数字）清晰可见</li>
-                <li>✓ <strong>勾选标记：</strong>勾选的✓和✗要清楚，不要模糊</li>
-                <li>🔍 <strong>识别范围：</strong>系统会自动识别训练ID、类型、拼音项和勾选状态</li>
-                <li>✏️ <strong>人工确认：</strong>识别后请仔细核对每个项目，特别是标记为🔴的低置信度项</li>
-                <li>💾 <strong>保存前检查：</strong>确认所有训练项都已正确标记后再保存</li>
-                <li>🔄 <strong>重新识别：</strong>如果识别结果不理想，可以点击"重新上传"按钮重拍照片</li>
+                <li>1. 确保照片清晰，光线充足</li>
+                <li>2. 尽量保持表单平整，避免倾斜</li>
+                <li>3. 训练表单ID要清晰可见</li>
+                <li>4. 识别后请仔细核对结果</li>
+                <li>5. OCR识别可能不完全准确，建议人工复核</li>
             </ul>
-            
-            <div style="background: #d5f4e6; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #27ae60;">
-                <p style="color: #155724; margin: 0; line-height: 1.8;">
-                    <strong>✨ 智能识别功能：</strong><br>
-                    • 自动提取训练编号（T后面的数字）<br>
-                    • 智能识别训练类型（声母、韵母、千字文等）<br>
-                    • 批量识别所有拼音项<br>
-                    • 自动检测勾选标记（✓正确 / ✗错误）<br>
-                    • 图像自动增强处理，提高识别准确率<br>
-                    • 置信度评分，帮助您快速定位需要确认的项目
-                </p>
-            </div>
         </div>
     </div>
 
@@ -2282,23 +2249,12 @@
             <div class="pinyin-showcase" id="zhengtiShowcase"></div>
         </div>
         
-        <!-- 千字文四字句库 -->
-        <div class="library-section">
-            <h2>📖 千字文四字句库（250句，共1000字）</h2>
-            <p style="color: #7f8c8d; margin-bottom: 15px;">
-                千字文是中国古代经典蒙学教材，由南北朝梁武帝时周兴嗣编纂，全文由250句四字韵文组成，共1000个不重复的汉字。
-                每句四个汉字配对应的四个拼音，既可以训练拼音，又能学习汉字和传统文化。
-                本训练库按四字句为单位进行训练，每次随机抽取8句（32个字）。
-            </p>
-            <div class="pinyin-showcase" id="qianziwenShowcase"></div>
-        </div>
-        
         <!-- 统计汇总 -->
         <div class="library-stats">
             <div class="library-stat-card">
-                <h4>📊 基础拼音库</h4>
+                <h4>📊 拼音库总览</h4>
                 <div class="count">183</div>
-                <p style="color: #7f8c8d; margin-top: 10px;">个基础训练项</p>
+                <p style="color: #7f8c8d; margin-top: 10px;">个训练项</p>
             </div>
             <div class="library-stat-card">
                 <h4>🎯 训练组合</h4>
@@ -2308,7 +2264,6 @@
                     <li>✓ 复韵母：36个</li>
                     <li>✓ 鼻韵母：36个</li>
                     <li>✓ 整体认读：64个</li>
-                    <li>✓ 千字文：250句（1000字）</li>
                 </ul>
             </div>
         </div>
@@ -2490,7 +2445,6 @@
                     <option value="复韵母">复韵母</option>
                     <option value="鼻韵母">鼻韵母</option>
                     <option value="整体认读">整体认读</option>
-                    <option value="千字文">千字文</option>
                 </select>
                 <select id="elemSort" onchange="renderElementTable()">
                     <option value="tries_desc">按尝试数(多→少)</option>
@@ -2824,260 +2778,6 @@
                 'zī', 'zí', 'zǐ', 'zì', 'cī', 'cí', 'cǐ', 'cì', 'sī', 'sí', 'sǐ', 'sì', 'yī', 'yí', 'yǐ', 'yì',
                 'wū', 'wú', 'wǔ', 'wù', 'yū', 'yú', 'yǔ', 'yù', 'yē', 'yé', 'yě', 'yè', 'yuē', 'yué', 'yuě', 'yuè',
                 'yuān', 'yuán', 'yuǎn', 'yuàn', 'yīn', 'yín', 'yǐn', 'yìn', 'yūn', 'yún', 'yǔn', 'yùn', 'yīng', 'yíng', 'yǐng', 'yìng'
-            ],
-            
-            // 千字文四字句库（250句，每句4个汉字+4个拼音）
-            qianziwen: [
-                { hanzi: '天地玄黄', pinyin: ['Tiān', 'dì', 'xuán', 'huáng'] },
-                { hanzi: '宇宙洪荒', pinyin: ['Yǔ', 'zhòu', 'hóng', 'huāng'] },
-                { hanzi: '日月盈昃', pinyin: ['Rì', 'yuè', 'yíng', 'xǔ'] },
-                { hanzi: '辰宿列张', pinyin: ['Chén', 'xiù', 'liè', 'zhāng'] },
-                { hanzi: '寒来暑往', pinyin: ['Hán', 'lái', 'shǔ', 'wǎng'] },
-                { hanzi: '秋收冬藏', pinyin: ['Qiū', 'shōu', 'dōng', 'cáng'] },
-                { hanzi: '闰余成岁', pinyin: ['Rùn', 'yú', 'chéng', 'suì'] },
-                { hanzi: '律吕调阳', pinyin: ['Lǜ', 'lǚ', 'tiáo', 'yáng'] },
-                { hanzi: '云腾致雨', pinyin: ['Yún', 'téng', 'zhì', 'yǔ'] },
-                { hanzi: '露结为霜', pinyin: ['Lù', 'jié', 'wéi', 'shuāng'] },
-                { hanzi: '金生丽水', pinyin: ['Jīn', 'shēng', 'lí', 'shuǐ'] },
-                { hanzi: '玉出昆冈', pinyin: ['Yù', 'chū', 'kūn', 'gāng'] },
-                { hanzi: '剑号巨阙', pinyin: ['Jiàn', 'hào', 'jù', 'quē'] },
-                { hanzi: '珠称夜光', pinyin: ['Zhū', 'chēng', 'yè', 'guāng'] },
-                { hanzi: '果珍李柰', pinyin: ['Guǒ', 'zhēn', 'lǐ', 'nài'] },
-                { hanzi: '菜重芥姜', pinyin: ['Cài', 'zhòng', 'jiè', 'jiāng'] },
-                { hanzi: '海咸河淡', pinyin: ['Hǎi', 'xián', 'hé', 'dàn'] },
-                { hanzi: '鳞潜羽翔', pinyin: ['Lín', 'qián', 'yǔ', 'xiáng'] },
-                { hanzi: '龙师火帝', pinyin: ['Lóng', 'shī', 'huǒ', 'dì'] },
-                { hanzi: '鸟官人皇', pinyin: ['Niǎo', 'guān', 'rén', 'huáng'] },
-                { hanzi: '始制文字', pinyin: ['Shǐ', 'zhì', 'wén', 'zì'] },
-                { hanzi: '乃服衣裳', pinyin: ['Nǎi', 'fú', 'yī', 'shāng'] },
-                { hanzi: '推位让国', pinyin: ['Tuī', 'wèi', 'ràng', 'guó'] },
-                { hanzi: '有虞陶唐', pinyin: ['Yǒu', 'yú', 'táo', 'táng'] },
-                { hanzi: '吊民伐罪', pinyin: ['Diào', 'mín', 'fá', 'zuì'] },
-                { hanzi: '周发殷汤', pinyin: ['Zhōu', 'fā', 'yīn', 'tāng'] },
-                { hanzi: '坐朝问道', pinyin: ['Zuò', 'cháo', 'wèn', 'dào'] },
-                { hanzi: '垂拱平章', pinyin: ['Chuí', 'gǒng', 'píng', 'zhāng'] },
-                { hanzi: '爱育黎首', pinyin: ['Ài', 'yù', 'lí', 'shǒu'] },
-                { hanzi: '臣伏戎羌', pinyin: ['Chén', 'fú', 'róng', 'qiāng'] },
-                { hanzi: '遐迩一体', pinyin: ['Xiá', 'ěr', 'yī', 'tǐ'] },
-                { hanzi: '率宾归王', pinyin: ['Shuài', 'bīn', 'guī', 'wáng'] },
-                { hanzi: '鸣凤在竹', pinyin: ['Míng', 'fèng', 'zài', 'zhú'] },
-                { hanzi: '白驹食场', pinyin: ['Bái', 'jū', 'shí', 'chǎng'] },
-                { hanzi: '化被草木', pinyin: ['Huà', 'bèi', 'cǎo', 'mù'] },
-                { hanzi: '赖及万方', pinyin: ['Lài', 'jí', 'wàn', 'fāng'] },
-                { hanzi: '盖此身发', pinyin: ['Gài', 'cǐ', 'shēn', 'fà'] },
-                { hanzi: '四大五常', pinyin: ['Sì', 'fù', 'wǔ', 'cháng'] },
-                { hanzi: '恭惟鞠养', pinyin: ['Gōng', 'wéi', 'jū', 'yǎng'] },
-                { hanzi: '岂敢毁伤', pinyin: ['Qǐ', 'gǎn', 'huǐ', 'shāng'] },
-                { hanzi: '女慕贞洁', pinyin: ['Nǚ', 'mù', 'zhēn', 'jié'] },
-                { hanzi: '男效才良', pinyin: ['Nán', 'xiào', 'cái', 'liáng'] },
-                { hanzi: '知过必改', pinyin: ['Zhī', 'guò', 'bì', 'gǎi'] },
-                { hanzi: '得能莫忘', pinyin: ['Dé', 'néng', 'mò', 'wàng'] },
-                { hanzi: '罔谈彼短', pinyin: ['Wǎng', 'tán', 'bǐ', 'duǎn'] },
-                { hanzi: '靡恃己长', pinyin: ['Mǐ', 'shì', 'jǐ', 'cháng'] },
-                { hanzi: '信使可覆', pinyin: ['Xìn', 'shǐ', 'kě', 'fù'] },
-                { hanzi: '器欲难量', pinyin: ['Qì', 'yù', 'nán', 'liáng'] },
-                { hanzi: '墨悲丝染', pinyin: ['Mò', 'bēi', 'sī', 'rǎn'] },
-                { hanzi: '诗赞羔羊', pinyin: ['Shī', 'zàn', 'gāo', 'yáng'] },
-                { hanzi: '景行维贤', pinyin: ['Jǐng', 'xíng', 'wéi', 'xián'] },
-                { hanzi: '克念作圣', pinyin: ['Kè', 'niàn', 'zuò', 'shèng'] },
-                { hanzi: '德建名立', pinyin: ['Dé', 'jiàn', 'míng', 'lì'] },
-                { hanzi: '形端表正', pinyin: ['Xíng', 'duān', 'biǎo', 'zhèng'] },
-                { hanzi: '空谷传声', pinyin: ['Kōng', 'gǔ', 'chuán', 'shēng'] },
-                { hanzi: '虚堂习听', pinyin: ['Xū', 'táng', 'xí', 'tīng'] },
-                { hanzi: '祸因恶积', pinyin: ['Huò', 'yīn', 'è', 'jī'] },
-                { hanzi: '福缘善庆', pinyin: ['Fú', 'yuán', 'shàn', 'qìng'] },
-                { hanzi: '尺璧非宝', pinyin: ['Chǐ', 'bì', 'fēi', 'bǎo'] },
-                { hanzi: '寸阴是竞', pinyin: ['Cùn', 'yīn', 'shì', 'jìng'] },
-                { hanzi: '资父事君', pinyin: ['Zī', 'fù', 'shì', 'jūn'] },
-                { hanzi: '曰严与敬', pinyin: ['Yuē', 'yán', 'yǔ', 'jìng'] },
-                { hanzi: '孝当竭力', pinyin: ['Xiào', 'dāng', 'jié', 'lì'] },
-                { hanzi: '忠则尽命', pinyin: ['Zhōng', 'zé', 'jìn', 'mìng'] },
-                { hanzi: '临深履薄', pinyin: ['Lín', 'shēn', 'lǚ', 'bó'] },
-                { hanzi: '夙兴温凊', pinyin: ['Sù', 'xīng', 'wēn', 'qìng'] },
-                { hanzi: '似兰斯馨', pinyin: ['Sì', 'lán', 'sī', 'xīn'] },
-                { hanzi: '如松之盛', pinyin: ['Rú', 'sǎng', 'zhī', 'xīng'] },
-                { hanzi: '川流不息', pinyin: ['Chuān', 'liú', 'bù', 'xī'] },
-                { hanzi: '渊澄取映', pinyin: ['Yuān', 'chéng', 'qǔ', 'yìng'] },
-                { hanzi: '容止若思', pinyin: ['Róng', 'zhǐ', 'ruò', 'sī'] },
-                { hanzi: '言辞安定', pinyin: ['Yán', 'cí', 'ān', 'dìng'] },
-                { hanzi: '笃初诚美', pinyin: ['Dǔ', 'chū', 'chéng', 'měi'] },
-                { hanzi: '慎终宜令', pinyin: ['Shèn', 'zhōng', 'yí', 'lìng'] },
-                { hanzi: '荣业所基', pinyin: ['Róng', 'yè', 'suǒ', 'jī'] },
-                { hanzi: '籍甚无竟', pinyin: ['Jí', 'shèn', 'wú', 'jìng'] },
-                { hanzi: '学优登仕', pinyin: ['Xué', 'yōu', 'dēng', 'shì'] },
-                { hanzi: '摄职从政', pinyin: ['Shè', 'zhí', 'cóng', 'zhèng'] },
-                { hanzi: '存以甘棠', pinyin: ['Cún', 'yǐ', 'gān', 'táng'] },
-                { hanzi: '去而益咏', pinyin: ['Qù', 'ér', 'yì', 'yǒng'] },
-                { hanzi: '乐殊贵贱', pinyin: ['Lè', 'shū', 'guì', 'jiàn'] },
-                { hanzi: '礼别尊卑', pinyin: ['Lǐ', 'bié', 'zūn', 'bēi'] },
-                { hanzi: '上和下睦', pinyin: ['Shàng', 'hé', 'xià', 'mù'] },
-                { hanzi: '夫唱妇随', pinyin: ['Fū', 'chàng', 'fù', 'suí'] },
-                { hanzi: '外受傅训', pinyin: ['Wài', 'shòu', 'fù', 'xùn'] },
-                { hanzi: '入奉母仪', pinyin: ['Rù', 'fèng', 'mǔ', 'yí'] },
-                { hanzi: '诸姑伯叔', pinyin: ['Zhū', 'gū', 'bó', 'shū'] },
-                { hanzi: '犹子比儿', pinyin: ['Yóu', 'zǐ', 'bǐ', 'ér'] },
-                { hanzi: '孔怀兄弟', pinyin: ['Kǒng', 'huái', 'xiōng', 'dì'] },
-                { hanzi: '同气连枝', pinyin: ['Tóng', 'qì', 'lián', 'zhī'] },
-                { hanzi: '交友投分', pinyin: ['Jiāo', 'yǒu', 'tóu', 'fèn'] },
-                { hanzi: '切磨箴规', pinyin: ['Qiē', 'mó', 'zhēn', 'guī'] },
-                { hanzi: '仁慈隐恻', pinyin: ['Rén', 'cí', 'yǐn', 'cè'] },
-                { hanzi: '造次弗离', pinyin: ['Zào', 'cì', 'fú', 'lí'] },
-                { hanzi: '节义廉退', pinyin: ['Jié', 'yì', 'lián', 'tuì'] },
-                { hanzi: '颠沛匪亏', pinyin: ['Diān', 'pèi', 'fěi', 'kuī'] },
-                { hanzi: '性静情逸', pinyin: ['Xìng', 'jìng', 'qíng', 'yì'] },
-                { hanzi: '心动神疲', pinyin: ['Xīn', 'dòng', 'shén', 'pí'] },
-                { hanzi: '守真志满', pinyin: ['Shǒu', 'zhēn', 'zhì', 'mǎn'] },
-                { hanzi: '逐物意移', pinyin: ['Zhú', 'wù', 'yì', 'yí'] },
-                { hanzi: '坚持雅操', pinyin: ['Jiān', 'chí', 'yǎ', 'cāo'] },
-                { hanzi: '好爵自縻', pinyin: ['Hǎo', 'jué', 'zì', 'mí'] },
-                { hanzi: '都邑华夏', pinyin: ['Dū', 'yì', 'huá', 'xià'] },
-                { hanzi: '东西二京', pinyin: ['Dōng', 'xī', 'èr', 'jīng'] },
-                { hanzi: '背邙面洛', pinyin: ['Bèi', 'máng', 'miàn', 'luò'] },
-                { hanzi: '浮渭据泾', pinyin: ['Fú', 'wèi', 'jù', 'jīng'] },
-                { hanzi: '宫殿盘郁', pinyin: ['Gōng', 'diàn', 'pán', 'yù'] },
-                { hanzi: '楼观飞惊', pinyin: ['Lóu', 'guān', 'fēi', 'jīng'] },
-                { hanzi: '图写禽兽', pinyin: ['Tú', 'xiě', 'qín', 'shòu'] },
-                { hanzi: '画彩仙灵', pinyin: ['Huà', 'cǎi', 'xiān', 'líng'] },
-                { hanzi: '丙舍旁启', pinyin: ['Bǐng', 'shè', 'páng', 'qǐ'] },
-                { hanzi: '甲帐对楹', pinyin: ['Jiǎ', 'zhàng', 'duì', 'yíng'] },
-                { hanzi: '肆筵设席', pinyin: ['Sì', 'yán', 'shè', 'xí'] },
-                { hanzi: '鼓瑟吹笙', pinyin: ['Gǔ', 'sè', 'chuī', 'shēng'] },
-                { hanzi: '升阶纳陛', pinyin: ['Shēng', 'jiē', 'nà', 'bì'] },
-                { hanzi: '弁转疑星', pinyin: ['Biàn', 'zhuàn', 'yí', 'xīng'] },
-                { hanzi: '右通广内', pinyin: ['Yòu', 'tōng', 'guǎng', 'nèi'] },
-                { hanzi: '左达承明', pinyin: ['Zuǒ', 'dá', 'chéng', 'míng'] },
-                { hanzi: '既集坟典', pinyin: ['Jì', 'jí', 'fén', 'diǎn'] },
-                { hanzi: '亦聚群英', pinyin: ['Yì', 'jù', 'qún', 'yīng'] },
-                { hanzi: '杜稿钟隶', pinyin: ['Dù', 'gǎo', 'zhōng', 'lì'] },
-                { hanzi: '漆书壁经', pinyin: ['Qī', 'shū', 'bì', 'jīng'] },
-                { hanzi: '府罗将相', pinyin: ['Fǔ', 'luó', 'xiàng', 'lù'] },
-                { hanzi: '路侠槐卿', pinyin: ['Lù', 'xiá', 'huái', 'qīng'] },
-                { hanzi: '户封八县', pinyin: ['Hù', 'fēng', 'bā', 'xiàn'] },
-                { hanzi: '家给千兵', pinyin: ['Jiā', 'jǐ', 'qiān', 'bīng'] },
-                { hanzi: '高冠陪辇', pinyin: ['Gāo', 'guān', 'péi', 'niǎn'] },
-                { hanzi: '驱毂振缨', pinyin: ['Qū', 'gǔ', 'zhèn', 'yīng'] },
-                { hanzi: '世禄侈富', pinyin: ['Shì', 'lù', 'chǐ', 'fù'] },
-                { hanzi: '车驾肥轻', pinyin: ['Chē', 'jià', 'féi', 'qīng'] },
-                { hanzi: '策功茂实', pinyin: ['Cè', 'gōng', 'mào', 'shí'] },
-                { hanzi: '勒碑刻铭', pinyin: ['Lè', 'bēi', 'kè', 'míng'] },
-                { hanzi: '盘溪伊尹', pinyin: ['Pán', 'xī', 'yī', 'yǐn'] },
-                { hanzi: '佐时阿衡', pinyin: ['Zuǒ', 'shí', 'ā', 'héng'] },
-                { hanzi: '奄宅曲阜', pinyin: ['Yǎn', 'zhái', 'qū', 'fǔ'] },
-                { hanzi: '微旦孰营', pinyin: ['Wēi', 'dàn', 'shú', 'yíng'] },
-                { hanzi: '桓公匡合', pinyin: ['Huán', 'gōng', 'kuāng', 'hé'] },
-                { hanzi: '济弱扶倾', pinyin: ['Jì', 'ruò', 'fú', 'qīng'] },
-                { hanzi: '绮回汉惠', pinyin: ['Qǐ', 'huí', 'hàn', 'huì'] },
-                { hanzi: '说感武丁', pinyin: ['Yuè', 'gǎn', 'wǔ', 'dīng'] },
-                { hanzi: '俊乂密勿', pinyin: ['Jùn', 'yì', 'mì', 'wù'] },
-                { hanzi: '多士实宁', pinyin: ['Duō', 'shì', 'shí', 'níng'] },
-                { hanzi: '晋楚更霸', pinyin: ['Jìn', 'chǔ', 'gēng', 'bà'] },
-                { hanzi: '赵魏困横', pinyin: ['Zhào', 'wèi', 'kùn', 'héng'] },
-                { hanzi: '假途灭虢', pinyin: ['Jiǎ', 'tú', 'miè', 'guó'] },
-                { hanzi: '践土会盟', pinyin: ['Jiàn', 'tǔ', 'huì', 'méng'] },
-                { hanzi: '何遵约法', pinyin: ['Hé', 'zūn', 'yuē', 'fǎ'] },
-                { hanzi: '韩弊烦刑', pinyin: ['Hán', 'bì', 'fán', 'xíng'] },
-                { hanzi: '起翦颇牧', pinyin: ['Qǐ', 'jiǎn', 'pō', 'mù'] },
-                { hanzi: '用军最精', pinyin: ['Yòng', 'jūn', 'zuì', 'jīng'] },
-                { hanzi: '宣威沙漠', pinyin: ['Xuān', 'wēi', 'shā', 'mò'] },
-                { hanzi: '驰誉丹青', pinyin: ['Chí', 'yù', 'dān', 'qīng'] },
-                { hanzi: '九州禹迹', pinyin: ['Jǐu', 'zhōu', 'yǔ', 'jì'] },
-                { hanzi: '百郡秦并', pinyin: ['Bǎi', 'jùn', 'qín', 'bīng'] },
-                { hanzi: '岳宗泰岱', pinyin: ['Yuè', 'zōng', 'tài', 'dài'] },
-                { hanzi: '禅主云亭', pinyin: ['Shàn', 'zhǔ', 'yún', 'tíng'] },
-                { hanzi: '雁门紫塞', pinyin: ['Yàn', 'mén', 'zǐ', 'sài'] },
-                { hanzi: '鸡田赤城', pinyin: ['Jī', 'tián', 'chì', 'chéng'] },
-                { hanzi: '昆池碣石', pinyin: ['Kūn', 'chí', 'jié', 'shí'] },
-                { hanzi: '钜野洞庭', pinyin: ['Jù', 'yě', 'dòng', 'tíng'] },
-                { hanzi: '旷远绵邈', pinyin: ['Kuàng', 'yuǎn', 'mián', 'miǎo'] },
-                { hanzi: '岩岫杳冥', pinyin: ['Yán', 'xiù', 'yǎo', 'míng'] },
-                { hanzi: '治本于农', pinyin: ['Zhì', 'běn', 'yú', 'nóng'] },
-                { hanzi: '务兹稼穑', pinyin: ['Wù', 'zī', 'jià', 'sè'] },
-                { hanzi: '俶载南亩', pinyin: ['Chù', 'zǎi', 'nán', 'mǔ'] },
-                { hanzi: '我艺黍稷', pinyin: ['Wǒ', 'yì', 'shǔ', 'jì'] },
-                { hanzi: '税熟贡新', pinyin: ['Shuì', 'shú', 'gòng', 'xīn'] },
-                { hanzi: '劝赏黜陟', pinyin: ['Quàn', 'shǎng', 'chù', 'zhì'] },
-                { hanzi: '孟轲敦素', pinyin: ['Mèng', 'kē', 'dūn', 'sù'] },
-                { hanzi: '史鱼秉直', pinyin: ['Shǐ', 'yú', 'bǐng', 'zhí'] },
-                { hanzi: '庶几中庸', pinyin: ['Shù', 'jī', 'zhōng', 'yōng'] },
-                { hanzi: '劳谦谨敕', pinyin: ['Láo', 'qiān', 'jǐn', 'chì'] },
-                { hanzi: '聆音察理', pinyin: ['Líng', 'yīn', 'chá', 'lǐ'] },
-                { hanzi: '鉴貌辨色', pinyin: ['Jiàn', 'mào', 'biàn', 'sè'] },
-                { hanzi: '贻厥嘉猷', pinyin: ['Yí', 'jué', 'jiā', 'yóu'] },
-                { hanzi: '勉其祗植', pinyin: ['Miǎn', 'qí', 'zhī', 'zhí'] },
-                { hanzi: '省躬讥诫', pinyin: ['Xǐng', 'gōng', 'jī', 'jiè'] },
-                { hanzi: '宠增抗极', pinyin: ['Chǒng', 'zēng', 'kàng', 'jí'] },
-                { hanzi: '殆辱近耻', pinyin: ['Dài', 'rǔ', 'jìn', 'chǐ'] },
-                { hanzi: '林皋幸即', pinyin: ['Lín', 'gāo', 'xìng', 'jí'] },
-                { hanzi: '两疏见机', pinyin: ['Liǎng', 'shū', 'jiàn', 'jī'] },
-                { hanzi: '解组谁逼', pinyin: ['Jiě', 'zǔ', 'shuí', 'bī'] },
-                { hanzi: '索居闲处', pinyin: ['Suǒ', 'jū', 'xián', 'chǔ'] },
-                { hanzi: '沉默寂寥', pinyin: ['Chén', 'mò', 'jì', 'liáo'] },
-                { hanzi: '求古寻论', pinyin: ['Qiú', 'gǔ', 'xún', 'lùn'] },
-                { hanzi: '散虑逍遥', pinyin: ['Sàn', 'lǜ', 'xiāo', 'yáo'] },
-                { hanzi: '欣奏累遣', pinyin: ['Xīn', 'zòu', 'lèi', 'qiǎn'] },
-                { hanzi: '戚谢欢招', pinyin: ['Qī', 'xiè', 'huān', 'zhāo'] },
-                { hanzi: '渠荷的历', pinyin: ['Qú', 'hé', 'dì', 'lì'] },
-                { hanzi: '园莽抽条', pinyin: ['Yuán', 'mǎng', 'chōu', 'tiáo'] },
-                { hanzi: '枇杷晚翠', pinyin: ['Pí', 'pá', 'wǎn', 'cuì'] },
-                { hanzi: '梧桐早凋', pinyin: ['Wú', 'tóng', 'zǎo', 'diāo'] },
-                { hanzi: '陈根委翳', pinyin: ['Chén', 'gēn', 'wěi', 'yì'] },
-                { hanzi: '落叶飘摇', pinyin: ['Luò', 'yè', 'piāo', 'yáo'] },
-                { hanzi: '游鹍独运', pinyin: ['Yóu', 'kūn', 'dú', 'yùn'] },
-                { hanzi: '凌摩绛霄', pinyin: ['Líng', 'mó', 'jiàng', 'xiāo'] },
-                { hanzi: '耽读玩市', pinyin: ['Dān', 'dú', 'wán', 'shì'] },
-                { hanzi: '寓目囊箱', pinyin: ['Yù', 'mù', 'náng', 'xiāng'] },
-                { hanzi: '易輶攸畏', pinyin: ['Yì', 'yóu', 'yōu', 'wèi'] },
-                { hanzi: '属耳垣墙', pinyin: ['Zhǔ', 'ěr', 'yuán', 'qiáng'] },
-                { hanzi: '具膳餐饭', pinyin: ['Jù', 'shàn', 'cān', 'fàn'] },
-                { hanzi: '适口充肠', pinyin: ['Shì', 'kǒu', 'chōng', 'cháng'] },
-                { hanzi: '饱饫烹宰', pinyin: ['Bǎo', 'yù', 'pēng', 'zǎi'] },
-                { hanzi: '饥厌糟糠', pinyin: ['Jī', 'yàn', 'zāo', 'kāng'] },
-                { hanzi: '亲戚故旧', pinyin: ['Qīn', 'qī', 'gù', 'jiù'] },
-                { hanzi: '老少异粮', pinyin: ['Lǎo', 'shào', 'yì', 'liáng'] },
-                { hanzi: '妾御绩纺', pinyin: ['Qiè', 'yù', 'jì', 'fǎng'] },
-                { hanzi: '侍巾帷房', pinyin: ['Shì', 'jīn', 'wéi', 'fáng'] },
-                { hanzi: '纨扇圆洁', pinyin: ['Wán', 'shàn', 'yuán', 'jié'] },
-                { hanzi: '银烛炜煌', pinyin: ['Yín', 'zhú', 'wěi', 'huáng'] },
-                { hanzi: '昼眠夕寐', pinyin: ['Zhòu', 'mián', 'xī', 'mèi'] },
-                { hanzi: '蓝笋象床', pinyin: ['Lán', 'sǔn', 'xiàng', 'chuáng'] },
-                { hanzi: '弦歌酒宴', pinyin: ['Xián', 'gē', 'jiǔ', 'yàn'] },
-                { hanzi: '接杯举觞', pinyin: ['Jiē', 'bēi', 'jǔ', 'shāng'] },
-                { hanzi: '矫手顿足', pinyin: ['Jiǎo', 'shǒu', 'dùn', 'zú'] },
-                { hanzi: '悦豫且康', pinyin: ['Yuè', 'yù', 'qiě', 'kāng'] },
-                { hanzi: '嫡后嗣续', pinyin: ['Dí', 'hòu', 'sì', 'xù'] },
-                { hanzi: '祭祀烝尝', pinyin: ['Jì', 'sì', 'zhēng', 'cháng'] },
-                { hanzi: '稽颡再拜', pinyin: ['Qǐ', 'sǎng', 'zài', 'bài'] },
-                { hanzi: '悚惧恐惶', pinyin: ['Sǒng', 'jù', 'kǒng', 'huáng'] },
-                { hanzi: '笺牒简要', pinyin: ['Jiān', 'dié', 'jiǎn', 'yào'] },
-                { hanzi: '顾答审详', pinyin: ['Gù', 'dá', 'shěn', 'xiáng'] },
-                { hanzi: '骸垢想浴', pinyin: ['Hái', 'gòu', 'xiǎng', 'yù'] },
-                { hanzi: '执热愿凉', pinyin: ['Zhí', 'rè', 'yuàn', 'liáng'] },
-                { hanzi: '驴骡犊特', pinyin: ['Lǘ', 'luó', 'dú', 'tè'] },
-                { hanzi: '骇跃超骧', pinyin: ['Hài', 'yuè', 'chāo', 'xiāng'] },
-                { hanzi: '诛斩贼盗', pinyin: ['Zhū', 'zhǎn', 'zéi', 'dào'] },
-                { hanzi: '捕获叛亡', pinyin: ['Bǔ', 'huò', 'pàn', 'wáng'] },
-                { hanzi: '布射辽丸', pinyin: ['Bù', 'shè', 'liáo', 'wán'] },
-                { hanzi: '嵇琴阮啸', pinyin: ['Jī', 'qín', 'ruǎn', 'xiào'] },
-                { hanzi: '恬笔伦纸', pinyin: ['Tián', 'bǐ', 'lún', 'zhǐ'] },
-                { hanzi: '钧巧任钓', pinyin: ['Jūn', 'qiǎo', 'rèn', 'diào'] },
-                { hanzi: '释纷利俗', pinyin: ['Shì', 'fēn', 'lì', 'sú'] },
-                { hanzi: '并皆佳妙', pinyin: ['Bìng', 'jiē', 'jiā', 'miào'] },
-                { hanzi: '毛施淑姿', pinyin: ['Máo', 'shī', 'shū', 'zī'] },
-                { hanzi: '工颦妍笑', pinyin: ['Gōng', 'pín', 'yán', 'xiào'] },
-                { hanzi: '年矢每催', pinyin: ['Nián', 'shǐ', 'měi', 'cuī'] },
-                { hanzi: '曦晖朗曜', pinyin: ['Xī', 'huī', 'lǎng', 'yào'] },
-                { hanzi: '璇玑悬斡', pinyin: ['Xuán', 'jī', 'xuán', 'wò'] },
-                { hanzi: '晦魄环照', pinyin: ['Huì', 'pò', 'huán', 'zhào'] },
-                { hanzi: '指薪修祜', pinyin: ['Zhǐ', 'xīn', 'xiū', 'hù'] },
-                { hanzi: '永绥吉劭', pinyin: ['Yǒng', 'suí', 'jí', 'shào'] },
-                { hanzi: '矩步引领', pinyin: ['Jǔ', 'bù', 'yǐn', 'lǐng'] },
-                { hanzi: '俯仰廊庙', pinyin: ['Fǔ', 'yǎng', 'láng', 'miào'] },
-                { hanzi: '束带矜庄', pinyin: ['Shù', 'dài', 'jīn', 'zhuāng'] },
-                { hanzi: '徘徊瞻眺', pinyin: ['Pái', 'huái', 'zhān', 'tiào'] },
-                { hanzi: '孤陋寡闻', pinyin: ['Gū', 'lòu', 'guǎ', 'wén'] },
-                { hanzi: '愚蒙等诮', pinyin: ['Yú', 'méng', 'děng', 'qiào'] },
-                { hanzi: '谓语助者', pinyin: ['Wèi', 'yǔ', 'zhù', 'zhě'] },
-                { hanzi: '焉哉乎也', pinyin: ['Yān', 'zāi', 'hū', 'yě'] }
             ]
         };
         
@@ -3195,20 +2895,6 @@
             pinyinDatabase.zhengtiWithTones.forEach(item => {
                 const div = createPinyinItem(item, 'zhengti');
                 zhengtiContainer.appendChild(div);
-            });
-            
-            // 显示千字文音节库 - 每个四字句显示为一个条目
-            const qianziwenContainer = document.getElementById('qianziwenShowcase');
-            qianziwenContainer.innerHTML = '';
-            pinyinDatabase.qianziwen.forEach(sentence => {
-                const div = document.createElement('div');
-                div.className = 'showcase-item qianziwen';
-                div.style.cssText = 'padding: 15px; min-height: 100px; display: flex; flex-direction: column; justify-content: center; grid-column: span 2;';
-                div.innerHTML = `
-                    <div style="font-size: 24px; font-weight: bold; margin-bottom: 8px; text-align: center;">${sentence.hanzi}</div>
-                    <div style="font-size: 16px; text-align: center; opacity: 0.95;">${sentence.pinyin.join(' ')}</div>
-                `;
-                qianziwenContainer.appendChild(div);
             });
         }
         
@@ -3561,21 +3247,13 @@
                     items = [...pinyinDatabase.zhengtiWithTones];
                     typeName = '整体认读音节训练';
                     break;
-                case 'qianziwen':
-                    // 千字文是四字句对象，随机选取8句（8句×4字=32个训练项）
-                    items = shuffleArray([...pinyinDatabase.qianziwen]).slice(0, 8);
-                    typeName = '千字文训练';
-                    break;
                 case 'random':
                     items = [...pinyinDatabase.shengmu, ...pinyinDatabase.yunmuWithTones, ...pinyinDatabase.zhengtiWithTones];
                     typeName = '随机混合训练';
                     break;
             }
             
-            // 千字文已在case中处理，其他类型需要打乱并截取
-            if (mode !== 'qianziwen') {
-                items = shuffleArray(items).slice(0, itemsPerPage);
-            }
+            items = shuffleArray(items).slice(0, itemsPerPage);
             
             currentTraining = {
                 id: 'T' + Date.now(),
@@ -3597,49 +3275,22 @@
             const grid = document.getElementById('trainingGrid');
             grid.innerHTML = '';
             
-            // 千字文需要特殊处理：每个item是一个四字句对象
-            if (currentTraining.mode === 'qianziwen') {
-                currentTraining.items.forEach(sentence => {
-                    // 每个汉字占一个格子
-                    for (let i = 0; i < 4; i++) {
-                        const div = document.createElement('div');
-                        div.className = 'training-item';
-                        div.innerHTML = `
-                            <div class="pinyin" style="display: flex; flex-direction: column; gap: 5px;">
-                                <span style="font-size: 28px; color: #e74c3c;">${sentence.hanzi[i]}</span>
-                                <span style="font-size: 20px;">${sentence.pinyin[i]}</span>
-                            </div>
-                            <div class="checkboxes">
-                                <label class="checkbox-item correct">
-                                    <input type="checkbox"> ✓
-                                </label>
-                                <label class="checkbox-item wrong">
-                                    <input type="checkbox"> ✗
-                                </label>
-                            </div>
-                        `;
-                        grid.appendChild(div);
-                    }
-                });
-            } else {
-                // 其他类型：普通拼音训练
-                currentTraining.items.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'training-item';
-                    div.innerHTML = `
-                        <div class="pinyin">${item}</div>
-                        <div class="checkboxes">
-                            <label class="checkbox-item correct">
-                                <input type="checkbox"> ✓
-                            </label>
-                            <label class="checkbox-item wrong">
-                                <input type="checkbox"> ✗
-                            </label>
-                        </div>
-                    `;
-                    grid.appendChild(div);
-                });
-            }
+            currentTraining.items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'training-item';
+                div.innerHTML = `
+                    <div class="pinyin">${item}</div>
+                    <div class="checkboxes">
+                        <label class="checkbox-item correct">
+                            <input type="checkbox"> ✓
+                        </label>
+                        <label class="checkbox-item wrong">
+                            <input type="checkbox"> ✗
+                        </label>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
         }
         
         // 前往录入界面
@@ -3846,67 +3497,9 @@
                 img.style.display = 'block';
                 
                 document.getElementById('uploadArea').style.display = 'none';
-                
-                // 对图像进行预处理以提高OCR准确率
-                enhanceImageForOCR(e.target.result).then(enhancedImage => {
-                    performOCR(enhancedImage);
-                }).catch(error => {
-                    console.error('图像增强失败，使用原始图像', error);
-                    performOCR(e.target.result);
-                });
+                performOCR(e.target.result);
             };
             reader.readAsDataURL(file);
-        }
-        
-        // 图像增强处理（提高OCR识别率）
-        function enhanceImageForOCR(imageDataUrl) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => {
-                    try {
-                        // 创建canvas进行图像处理
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        
-                        // 设置更大的尺寸以提高识别率
-                        const scale = Math.min(2, 2000 / Math.max(img.width, img.height));
-                        canvas.width = img.width * scale;
-                        canvas.height = img.height * scale;
-                        
-                        // 绘制图像
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        
-                        // 获取图像数据
-                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                        const data = imageData.data;
-                        
-                        // 转换为灰度并增强对比度
-                        for (let i = 0; i < data.length; i += 4) {
-                            // 转换为灰度
-                            const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-                            
-                            // 增强对比度（简单的阈值处理）
-                            const threshold = 128;
-                            const enhanced = gray > threshold ? 255 : gray < threshold * 0.5 ? 0 : gray;
-                            
-                            data[i] = enhanced;     // R
-                            data[i + 1] = enhanced; // G
-                            data[i + 2] = enhanced; // B
-                            // Alpha通道保持不变
-                        }
-                        
-                        // 将处理后的数据放回canvas
-                        ctx.putImageData(imageData, 0, 0);
-                        
-                        // 转换为DataURL
-                        resolve(canvas.toDataURL('image/png'));
-                    } catch (error) {
-                        reject(error);
-                    }
-                };
-                img.onerror = reject;
-                img.src = imageDataUrl;
-            });
         }
         
         // 执行OCR识别
@@ -3926,20 +3519,14 @@
                     }
                 });
                 
-                document.getElementById('ocrStatus').textContent = '加载OCR引擎...';
                 await worker.loadLanguage('chi_sim');
                 await worker.initialize('chi_sim');
-                
-                document.getElementById('ocrStatus').textContent = '正在识别文字...';
                 const { data: { text } } = await worker.recognize(imageData);
                 await worker.terminate();
                 
-                document.getElementById('ocrStatus').textContent = '正在智能解析结果...';
-                
-                // 智能解析训练表单
+                // 模拟结果（实际需要更复杂的解析逻辑）
                 setTimeout(() => {
-                    const parsedResults = parseTrainingForm(text);
-                    showOCRResults(text, parsedResults);
+                    showOCRResults(text);
                 }, 500);
                 
             } catch (error) {
@@ -3948,367 +3535,27 @@
             }
         }
         
-        // 智能解析训练表单
-        function parseTrainingForm(text) {
-            const results = {
-                trainingId: null,
-                typeName: null,
-                items: [],
-                rawText: text
-            };
-            
-            // 1. 提取训练ID（格式：T + 数字）
-            const idMatch = text.match(/[T|t][\s]*(\d{10,15})/);
-            if (idMatch) {
-                results.trainingId = 'T' + idMatch[1];
-            }
-            
-            // 2. 识别训练类型
-            const typePatterns = [
-                { pattern: /声母训练/, name: '声母训练', mode: 'shengmu' },
-                { pattern: /单韵母训练/, name: '单韵母训练（带声调）', mode: 'danyunmu' },
-                { pattern: /复韵母训练/, name: '复韵母训练（带声调）', mode: 'shuangyunmu' },
-                { pattern: /鼻韵母训练/, name: '鼻韵母训练（带声调）', mode: 'biyunmu' },
-                { pattern: /整体认读/, name: '整体认读音节训练', mode: 'zhengti' },
-                { pattern: /千字文训练/, name: '千字文训练', mode: 'qianziwen' },
-                { pattern: /随机.*训练/, name: '随机混合训练', mode: 'random' }
-            ];
-            
-            for (const tp of typePatterns) {
-                if (tp.pattern.test(text)) {
-                    results.typeName = tp.name;
-                    results.mode = tp.mode;
-                    break;
-                }
-            }
-            
-            // 3. 提取拼音项和勾选状态
-            // 创建所有可能的拼音列表
-            const allPinyins = [
-                ...pinyinDatabase.shengmu,
-                ...pinyinDatabase.danyunmu,
-                ...pinyinDatabase.shuangyunmu,
-                ...pinyinDatabase.biyunmu,
-                ...pinyinDatabase.zhengtiWithTones
-            ];
-            
-            // 清理文本，移除多余空格和换行
-            const cleanText = text.replace(/\s+/g, ' ');
-            
-            // 查找文本中出现的拼音
-            const foundPinyins = [];
-            for (const pinyin of allPinyins) {
-                if (cleanText.includes(pinyin)) {
-                    // 尝试检测勾选状态
-                    const pinyinIndex = cleanText.indexOf(pinyin);
-                    const contextBefore = cleanText.substring(Math.max(0, pinyinIndex - 20), pinyinIndex);
-                    const contextAfter = cleanText.substring(pinyinIndex + pinyin.length, Math.min(cleanText.length, pinyinIndex + pinyin.length + 20));
-                    
-                    let result = null;
-                    // 检测正确标记
-                    if (/[✓√✔☑]/u.test(contextAfter) || /[✓√✔☑]/u.test(contextBefore)) {
-                        result = true;
-                    }
-                    // 检测错误标记
-                    else if (/[✗✘×X]/u.test(contextAfter) || /[✗✘×X]/u.test(contextBefore)) {
-                        result = false;
-                    }
-                    
-                    foundPinyins.push({
-                        pinyin: pinyin,
-                        result: result,
-                        confidence: result !== null ? 'high' : 'low'
-                    });
-                }
-            }
-            
-            // 对千字文特殊处理：尝试识别汉字
-            if (results.mode === 'qianziwen') {
-                // 提取四字句
-                const hanziPattern = /[\u4e00-\u9fa5]{4}/g;
-                const hanziMatches = text.match(hanziPattern);
-                if (hanziMatches) {
-                    hanziMatches.forEach(hanzi => {
-                        // 在千字文库中查找匹配
-                        const match = pinyinDatabase.qianziwen.find(item => item.hanzi === hanzi);
-                        if (match) {
-                            // 为每个汉字创建训练项
-                            for (let i = 0; i < 4; i++) {
-                                foundPinyins.push({
-                                    pinyin: match.pinyin[i],
-                                    hanzi: match.hanzi[i],
-                                    result: null,
-                                    confidence: 'medium'
-                                });
-                            }
-                        }
-                    });
-                }
-            }
-            
-            // 如果没有识别到足够的拼音，使用训练ID匹配已有记录
-            if (foundPinyins.length < 10 && results.trainingId) {
-                const userKey = getUserDataKey('pinyinTrainingDB');
-                const database = JSON.parse(localStorage.getItem(userKey) || '[]');
-                const existingRecord = database.find(r => r.id === results.trainingId);
-                
-                if (existingRecord && existingRecord.items) {
-                    // 使用已有的训练项
-                    foundPinyins.length = 0; // 清空
-                    existingRecord.items.forEach(item => {
-                        foundPinyins.push({
-                            pinyin: typeof item === 'string' ? item : (item.pinyin ? item.pinyin.join(',') : ''),
-                            hanzi: item.hanzi || '',
-                            result: null,
-                            confidence: 'high',
-                            fromDatabase: true
-                        });
-                    });
-                    results.typeName = existingRecord.typeName;
-                    results.mode = existingRecord.mode;
-                }
-            }
-            
-            results.items = foundPinyins;
-            
-            return results;
-        }
-        
-        // 存储当前OCR识别结果
-        let currentOCRResults = null;
-        
         // 显示OCR结果
-        function showOCRResults(text, parsedResults) {
-            currentOCRResults = parsedResults;
+        function showOCRResults(text) {
             document.getElementById('ocrProgress').classList.remove('show');
             document.getElementById('ocrResults').style.display = 'block';
             
-            let html = '';
-            
-            // 显示识别摘要
-            html += `<div style="background: #ecf0f1; padding: 20px; border-radius: 10px; margin-bottom: 20px;">`;
-            html += `<h3 style="color: #2c3e50; margin-bottom: 15px;">📋 识别摘要</h3>`;
-            
-            if (parsedResults.trainingId) {
-                html += `<div style="margin: 10px 0;">
-                    <strong>训练编号：</strong>
-                    <span style="color: #3498db; font-weight: bold;">${parsedResults.trainingId}</span>
-                </div>`;
-            } else {
-                html += `<div style="margin: 10px 0;">
-                    <strong>训练编号：</strong>
-                    <span style="color: #e74c3c;">未识别到</span>
-                    <input type="text" id="manualTrainingId" placeholder="请手动输入训练编号" style="margin-left: 10px; padding: 5px; border: 2px solid #ddd; border-radius: 5px;">
-                </div>`;
-            }
-            
-            if (parsedResults.typeName) {
-                html += `<div style="margin: 10px 0;">
-                    <strong>训练类型：</strong>
-                    <span style="color: #27ae60;">${parsedResults.typeName}</span>
-                </div>`;
-            } else {
-                html += `<div style="margin: 10px 0;">
-                    <strong>训练类型：</strong>
-                    <span style="color: #e74c3c;">未识别到</span>
-                </div>`;
-            }
-            
-            html += `<div style="margin: 10px 0;">
-                <strong>识别到的训练项：</strong>
-                <span style="color: #2c3e50; font-weight: bold;">${parsedResults.items.length} 个</span>
-            </div>`;
-            
-            const withResults = parsedResults.items.filter(item => item.result !== null).length;
-            html += `<div style="margin: 10px 0;">
-                <strong>识别到勾选状态：</strong>
-                <span style="color: ${withResults > 0 ? '#27ae60' : '#e67e22'}; font-weight: bold;">${withResults} 个</span>
-                ${withResults === 0 ? '<span style="color: #7f8c8d; font-size: 13px;">（需要手动选择）</span>' : ''}
-            </div>`;
-            
-            html += `</div>`;
-            
-            // 显示识别结果网格
-            if (parsedResults.items.length > 0) {
-                html += `<h3 style="color: #2c3e50; margin: 20px 0 10px;">✏️ 请确认并修正识别结果：</h3>`;
-                html += `<div class="input-grid">`;
-                
-                parsedResults.items.forEach((item, index) => {
-                    const displayText = item.hanzi ? `${item.hanzi} (${item.pinyin})` : item.pinyin;
-                    const resultClass = item.result === true ? 'correct' : (item.result === false ? 'wrong' : '');
-                    const statusText = item.result === true ? '✓ 正确' : (item.result === false ? '✗ 错误' : '未选择');
-                    const confidenceBadge = item.confidence === 'high' ? '🟢' : (item.confidence === 'medium' ? '🟡' : '🔴');
-                    
-                    html += `
-                        <div class="input-item ${resultClass}" data-index="${index}">
-                            <div class="pinyin" style="font-size: 24px;">${displayText}</div>
-                            <div class="input-status" style="font-size: 12px;">
-                                ${confidenceBadge} ${statusText}
-                            </div>
-                            <div class="mark-buttons">
-                                <button type="button" class="mark-btn correct" onclick="markOCRResult(${index}, true)">✓ 正确</button>
-                                <button type="button" class="mark-btn wrong" onclick="markOCRResult(${index}, false)">✗ 错误</button>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                html += `</div>`;
-                
-                // 添加说明
-                html += `<div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #ffc107;">
-                    <p style="color: #856404; margin: 0; line-height: 1.6;">
-                        <strong>💡 提示：</strong><br>
-                        🟢 高置信度识别 | 🟡 中等置信度识别 | 🔴 低置信度识别（需要确认）<br>
-                        请仔细核对每个训练项的识别结果，特别是标记为🔴的项目。
-                    </p>
-                </div>`;
-            } else {
-                html += `<div style="padding: 40px; text-align: center; background: #fadbd8; border-radius: 10px; margin: 20px 0;">
-                    <h3 style="color: #e74c3c; margin-bottom: 15px;">❌ 未能识别到训练项</h3>
-                    <p style="color: #c0392b;">可能原因：</p>
-                    <ul style="text-align: left; max-width: 400px; margin: 15px auto; color: #7f8c8d;">
-                        <li>照片不够清晰</li>
-                        <li>表单角度倾斜</li>
-                        <li>光线不足</li>
-                        <li>字体太小或模糊</li>
-                    </ul>
-                    <p style="margin-top: 20px; color: #2c3e50;">
-                        <strong>建议：</strong>重新拍照或使用"📝 录入结果"功能手动录入
-                    </p>
-                </div>`;
-            }
-            
-            // 显示原始OCR文本（可折叠）
-            html += `<details style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                <summary style="cursor: pointer; font-weight: bold; color: #2c3e50;">🔍 查看原始OCR文本</summary>
-                <pre style="background: #fff; padding: 15px; border-radius: 5px; margin-top: 10px; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; font-size: 12px; line-height: 1.5;">${text}</pre>
-            </details>`;
-            
-            document.getElementById('ocrResultGrid').innerHTML = html;
-        }
-        
-        // 标记OCR识别结果
-        function markOCRResult(index, isCorrect) {
-            if (!currentOCRResults || !currentOCRResults.items[index]) return;
-            
-            currentOCRResults.items[index].result = isCorrect;
-            
-            // 更新界面显示
-            const item = document.querySelector(`.input-item[data-index="${index}"]`);
-            if (item) {
-                item.classList.remove('correct', 'wrong');
-                item.classList.add(isCorrect ? 'correct' : 'wrong');
-                const statusElement = item.querySelector('.input-status');
-                if (statusElement) {
-                    // 保留置信度标记
-                    const confidenceBadge = statusElement.textContent.match(/[🟢🟡🔴]/)?.[0] || '';
-                    statusElement.innerHTML = confidenceBadge + ' ' + (isCorrect ? '✓ 正确' : '✗ 错误');
-                }
-            }
-        }
-        
-        // 批量标记所有OCR结果
-        function markAllOCRResults(isCorrect) {
-            if (!currentOCRResults || !currentOCRResults.items.length) return;
-            
-            const action = isCorrect ? '正确' : '错误';
-            if (!confirm(`确定要将所有 ${currentOCRResults.items.length} 个训练项标记为"${action}"吗？\n\n标记后仍可以单独修改每个项目。`)) {
-                return;
-            }
-            
-            // 批量标记所有项
-            currentOCRResults.items.forEach((item, index) => {
-                markOCRResult(index, isCorrect);
-            });
-            
-            // 显示提示
-            const tip = document.createElement('div');
-            tip.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(46, 204, 113, 0.95); color: white; padding: 20px 40px; border-radius: 10px; font-size: 18px; font-weight: bold; z-index: 9999; box-shadow: 0 4px 20px rgba(0,0,0,0.3);';
-            tip.textContent = `✅ 已将所有项目标记为"${action}"`;
-            document.body.appendChild(tip);
-            
-            setTimeout(() => {
-                tip.style.transition = 'opacity 0.3s';
-                tip.style.opacity = '0';
-                setTimeout(() => tip.remove(), 300);
-            }, 1500);
+            // 这里需要实现复杂的解析逻辑
+            // 暂时提示用户使用手动录入
+            document.getElementById('ocrResultGrid').innerHTML = `
+                <div style="padding: 40px; text-align: center; color: #7f8c8d;">
+                    <h3 style="color: #e67e22; margin-bottom: 20px;">⚠️ OCR功能正在完善中</h3>
+                    <p>由于训练表单格式的复杂性，OCR识别准确率可能不高。</p>
+                    <p style="margin-top: 15px; color: #2c3e50; font-weight: bold;">建议使用"📝 录入结果"功能进行手动录入，准确率更高！</p>
+                    <p style="margin-top: 20px; font-size: 14px;">识别到的文本（供参考）：</p>
+                    <pre style="background: #ecf0f1; padding: 15px; border-radius: 5px; margin-top: 10px; text-align: left; max-height: 200px; overflow-y: auto;">${text}</pre>
+                </div>
+            `;
         }
         
         // 保存OCR结果
         function saveOCRResults() {
-            if (!currentOCRResults) {
-                alert('没有可保存的识别结果');
-                return;
-            }
-            
-            // 检查训练ID
-            let trainingId = currentOCRResults.trainingId;
-            if (!trainingId) {
-                const manualInput = document.getElementById('manualTrainingId');
-                if (manualInput) {
-                    trainingId = manualInput.value.trim();
-                }
-            }
-            
-            if (!trainingId) {
-                alert('❌ 缺少训练编号\n\n请输入训练编号后再保存。');
-                return;
-            }
-            
-            // 检查是否所有项都已标记
-            const unmarkedCount = currentOCRResults.items.filter(item => item.result === null).length;
-            if (unmarkedCount > 0) {
-                if (!confirm(`还有 ${unmarkedCount} 个训练项未标记结果，确定要保存吗？\n\n未标记的项目将被标记为"跳过"。`)) {
-                    return;
-                }
-            }
-            
-            // 构建保存记录
-            const results = currentOCRResults.items.map(item => ({
-                pinyin: item.hanzi ? `${item.hanzi} (${item.pinyin})` : item.pinyin,
-                result: item.result
-            }));
-            
-            const record = {
-                id: trainingId,
-                mode: currentOCRResults.mode || 'unknown',
-                typeName: currentOCRResults.typeName || '未知类型',
-                items: currentOCRResults.items.map(item => 
-                    item.hanzi ? { hanzi: item.hanzi, pinyin: [item.pinyin] } : item.pinyin
-                ),
-                date: new Date().toISOString(),
-                results: results,
-                completedDate: new Date().toISOString(),
-                source: 'OCR识别'
-            };
-            
-            // 保存到数据库
-            saveToDatabase(record);
-            
-            // 更新驾驶舱（如果打开）
-            if (isDashboardActive()) refreshDashboard();
-            
-            // 显示成功消息
-            const correctCount = results.filter(r => r.result === true).length;
-            const wrongCount = results.filter(r => r.result === false).length;
-            const total = correctCount + wrongCount;
-            const rate = total > 0 ? Math.round(correctCount / total * 100) : 0;
-            
-            alert(`✅ 保存成功！\n\n训练编号：${trainingId}\n训练项数：${currentOCRResults.items.length}\n正确：${correctCount}\n错误：${wrongCount}\n正确率：${rate}%`);
-            
-            // 询问是否同步到GitHub
-            if (githubConfig.token) {
-                if (confirm('是否立即同步到GitHub？')) {
-                    syncToGitHub().then(() => { 
-                        if (isDashboardActive()) refreshDashboard(); 
-                    });
-                }
-            }
-            
-            // 切换到历史记录页面
-            resetOCR();
-            switchScreen('history');
+            alert('OCR功能正在完善中，请使用手动录入功能');
         }
         
         // 重置OCR
@@ -4384,7 +3631,6 @@
                 'shuangyunmu': '复韵母训练',
                 'biyunmu': '鼻韵母训练',
                 'zhengti': '整体认读训练',
-                'qianziwen': '千字文训练',
                 'random': '随机混合训练'
             };
             
@@ -4429,7 +3675,6 @@
                 'shuangyunmu': '复韵母训练（带声调）',
                 'biyunmu': '鼻韵母训练（带声调）',
                 'zhengti': '整体认读音节训练',
-                'qianziwen': '千字文训练',
                 'random': '随机混合训练'
             };
             
@@ -4458,65 +3703,18 @@
                         case 'zhengti':
                             items = [...pinyinDatabase.zhengtiWithTones];
                             break;
-                        case 'qianziwen':
-                            // 千字文：随机选8句四字句
-                            items = shuffleArray([...pinyinDatabase.qianziwen]).slice(0, 8);
-                            break;
                         case 'random':
                             items = [...pinyinDatabase.shengmu, ...pinyinDatabase.yunmuWithTones, ...pinyinDatabase.zhengtiWithTones];
                             break;
                     }
                     
-                    // 千字文已在case中处理，其他类型需要打乱并截取
-                    if (mode !== 'qianziwen') {
-                        items = shuffleArray(items).slice(0, itemsPerPage);
-                    }
+                    // 随机打乱并取32个
+                    items = shuffleArray(items).slice(0, itemsPerPage);
                     
                     // 创建表单
                     const trainingId = 'T' + Date.now() + '-' + sheetIndex;
                     const sheetDiv = document.createElement('div');
                     sheetDiv.className = 'training-sheet';
-                    
-                    // 生成训练项HTML
-                    let trainingItemsHTML = '';
-                    if (mode === 'qianziwen') {
-                        // 千字文：每个sentence是四字句对象，展开为4个训练项
-                        items.forEach(sentence => {
-                            for (let i = 0; i < 4; i++) {
-                                trainingItemsHTML += `
-                                    <div class="training-item">
-                                        <div class="pinyin" style="display: flex; flex-direction: column; gap: 5px;">
-                                            <span style="font-size: 28px; color: #e74c3c;">${sentence.hanzi[i]}</span>
-                                            <span style="font-size: 20px;">${sentence.pinyin[i]}</span>
-                                        </div>
-                                        <div class="checkboxes">
-                                            <label class="checkbox-item correct">
-                                                <input type="checkbox"> ✓
-                                            </label>
-                                            <label class="checkbox-item wrong">
-                                                <input type="checkbox"> ✗
-                                            </label>
-                                        </div>
-                                    </div>
-                                `;
-                            }
-                        });
-                    } else {
-                        // 普通拼音训练
-                        trainingItemsHTML = items.map(item => `
-                            <div class="training-item">
-                                <div class="pinyin">${item}</div>
-                                <div class="checkboxes">
-                                    <label class="checkbox-item correct">
-                                        <input type="checkbox"> ✓
-                                    </label>
-                                    <label class="checkbox-item wrong">
-                                        <input type="checkbox"> ✗
-                                    </label>
-                                </div>
-                            </div>
-                        `).join('');
-                    }
                     
                     sheetDiv.innerHTML = `
                         <div class="training-header">
@@ -4529,7 +3727,19 @@
                         </div>
                         
                         <div class="training-grid">
-                            ${trainingItemsHTML}
+                            ${items.map(item => `
+                                <div class="training-item">
+                                    <div class="pinyin">${item}</div>
+                                    <div class="checkboxes">
+                                        <label class="checkbox-item correct">
+                                            <input type="checkbox"> ✓
+                                        </label>
+                                        <label class="checkbox-item wrong">
+                                            <input type="checkbox"> ✗
+                                        </label>
+                                    </div>
+                                </div>
+                            `).join('')}
                         </div>
                     `;
                     
@@ -5059,7 +4269,6 @@
                 { key:'shuangyunmu', label:'复韵母' },
                 { key:'biyunmu', label:'鼻韵母' },
                 { key:'zhengti', label:'整体认读' },
-                { key:'qianziwen', label:'千字文' },
                 { key:'random', label:'随机' }
             ];
             const typeAgg = new Map(typeKeys.map(t=>[t.key,{ label:t.label, items:0, correct:0 }]));
@@ -5170,7 +4379,6 @@
             if (pinyinDatabase && Array.isArray(pinyinDatabase.shuangyunmu) && pinyinDatabase.shuangyunmu.includes(p)) return '复韵母';
             if (pinyinDatabase && Array.isArray(pinyinDatabase.biyunmu) && pinyinDatabase.biyunmu.includes(p)) return '鼻韵母';
             if (pinyinDatabase && Array.isArray(pinyinDatabase.zhengtiWithTones) && pinyinDatabase.zhengtiWithTones.includes(p)) return '整体认读';
-            if (pinyinDatabase && Array.isArray(pinyinDatabase.qianziwen) && pinyinDatabase.qianziwen.includes(p)) return '千字文';
             return '';
         }
         function buildElementStatsCache(db){

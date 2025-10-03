@@ -2392,13 +2392,26 @@
                 <div class="current-user-info">
                     <div>
                         <div class="user-name" id="currentUserDisplay">未登录</div>
-                        <div style="color: #7f8c8d; font-size: 13px; margin-top: 5px;">用户名：<span id="currentUsernameDisplay">-</span></div>
+                        <div style="color: #7f8c8d; font-size: 13px; margin-top: 5px;">
+                            用户名：<span id="currentUsernameDisplay">-</span>
+                            <span id="userRoleDisplay" style="margin-left: 10px; padding: 2px 8px; background: #f39c12; color: white; border-radius: 12px; font-size: 11px; display: none;"></span>
+                        </div>
                     </div>
                     <button class="logout-btn" onclick="handleLogout()">退出登录</button>
                 </div>
                 <p style="color: #7f8c8d; font-size: 13px; line-height: 1.6;">
                     您的所有训练数据和设置都与当前账户关联。切换账户后，将看到该账户的独立数据。
                 </p>
+                <div id="adminInfo" style="background: #fff3cd; padding: 10px; border-radius: 6px; margin-top: 10px; border-left: 4px solid #ffc107; display: none;">
+                    <p style="color: #856404; margin: 0; font-size: 12px;">
+                        🔧 <strong>管理员权限：</strong>可以配置GitHub同步功能，管理全局设置。
+                    </p>
+                </div>
+                <div id="userInfo" style="background: #d1ecf1; padding: 10px; border-radius: 6px; margin-top: 10px; border-left: 4px solid #17a2b8; display: none;">
+                    <p style="color: #0c5460; margin: 0; font-size: 12px;">
+                        👤 <strong>普通用户：</strong>专注于训练功能，无需配置复杂的同步设置。
+                    </p>
+                </div>
             </div>
             <!-- GitHub同步设置 -->
             <div class="setting-card">
@@ -2732,6 +2745,7 @@
                 username: username,
                 displayName: displayName,
                 password: password, // 实际应用中应该加密
+                role: 'user', // 默认角色为普通用户
                 createdAt: new Date().toISOString(),
                 lastLoginAt: new Date().toISOString()
             };
@@ -2750,7 +2764,8 @@
                 }
             });
             
-            alert(`✅ 注册成功！欢迎，${displayName}！\n\n💡 提示：在"设置"中配置GitHub Token后，可以在多个设备上使用同一账户。`);
+            const roleText = users[username].role === 'admin' ? '（管理员）' : '（普通用户）';
+            alert(`✅ 注册成功！欢迎，${displayName}！${roleText}\n\n💡 提示：管理员可以在"设置"中配置GitHub同步功能。`);
             
             hideLoginOverlay();
             updateUserDisplay();
@@ -2782,7 +2797,8 @@
             currentUser = users[username];
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             
-            alert(`✅ 登录成功！欢迎回来，${currentUser.displayName}！`);
+            const roleText = currentUser.role === 'admin' ? '（管理员）' : '（普通用户）';
+            alert(`✅ 登录成功！欢迎回来，${currentUser.displayName}！${roleText}`);
             
             hideLoginOverlay();
             updateUserDisplay();
@@ -2807,7 +2823,48 @@
             if (currentUser) {
                 document.getElementById('currentUserDisplay').textContent = currentUser.displayName;
                 document.getElementById('currentUsernameDisplay').textContent = currentUser.username;
+                
+                // 显示用户角色
+                const roleDisplay = document.getElementById('userRoleDisplay');
+                const adminInfo = document.getElementById('adminInfo');
+                const userInfo = document.getElementById('userInfo');
+                
+                if (currentUser.role === 'admin') {
+                    roleDisplay.textContent = '管理员';
+                    roleDisplay.style.background = '#e74c3c';
+                    roleDisplay.style.display = 'inline-block';
+                    adminInfo.style.display = 'block';
+                    userInfo.style.display = 'none';
+                } else {
+                    roleDisplay.textContent = '普通用户';
+                    roleDisplay.style.background = '#3498db';
+                    roleDisplay.style.display = 'inline-block';
+                    adminInfo.style.display = 'none';
+                    userInfo.style.display = 'block';
+                }
+                
+                // 根据用户角色显示/隐藏GitHub配置界面
+                updateGitHubConfigVisibility();
+            } else {
+                document.getElementById('userRoleDisplay').style.display = 'none';
+                document.getElementById('adminInfo').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'none';
             }
+        }
+        
+        // 根据用户角色更新GitHub配置界面可见性
+        function updateGitHubConfigVisibility() {
+            const githubConfigCards = document.querySelectorAll('.setting-card');
+            githubConfigCards.forEach(card => {
+                const title = card.querySelector('h3');
+                if (title && title.textContent.includes('GitHub数据同步')) {
+                    if (currentUser && currentUser.role === 'admin') {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
         }
         
         // 获取用户专属的数据键名
@@ -2853,8 +2910,26 @@
             pinyinDatabase.zhengtiWithTones = pinyinDatabase.zhengtiWithTones.map(p => p.toLowerCase());
         }
         
+        // 创建默认管理员用户
+        function createDefaultAdmin() {
+            const adminUsername = 'admin';
+            if (!users[adminUsername]) {
+                users[adminUsername] = {
+                    username: adminUsername,
+                    displayName: '系统管理员',
+                    password: 'admin123', // 实际应用中应该使用更安全的密码
+                    role: 'admin',
+                    createdAt: new Date().toISOString(),
+                    lastLoginAt: new Date().toISOString()
+                };
+                localStorage.setItem('users', JSON.stringify(users));
+                console.log('✅ 已创建默认管理员账户: admin/admin123');
+            }
+        }
+        
         // 页面加载时初始化用户系统
         window.addEventListener('DOMContentLoaded', function() {
+            createDefaultAdmin(); // 创建默认管理员
             initUserSystem();
             convertPinyinToLowercase();
             // 异步加载全局GitHub配置，不阻塞页面初始化

@@ -2835,9 +2835,21 @@
             localStorage.setItem(userKey, JSON.stringify(database));
         }
         
+        // 将所有拼音转换为小写
+        function convertPinyinToLowercase() {
+            // 转换千字文中的拼音
+            pinyinDatabase.qianziwen.forEach(item => {
+                item.pinyin = item.pinyin.map(p => p.toLowerCase());
+            });
+            
+            // 转换整体认读音节中的拼音
+            pinyinDatabase.zhengtiWithTones = pinyinDatabase.zhengtiWithTones.map(p => p.toLowerCase());
+        }
+        
         // 页面加载时初始化用户系统
         window.addEventListener('DOMContentLoaded', function() {
             initUserSystem();
+            convertPinyinToLowercase();
         });
         
         // ========== 原有代码开始 ==========
@@ -2894,46 +2906,46 @@
             
             // 千字文四字句库（250句，每句4个汉字+4个拼音）
             qianziwen: [
-                { hanzi: '天地玄黄', pinyin: ['Tiān', 'dì', 'xuán', 'huáng'] },
-                { hanzi: '宇宙洪荒', pinyin: ['Yǔ', 'zhòu', 'hóng', 'huāng'] },
-                { hanzi: '日月盈昃', pinyin: ['Rì', 'yuè', 'yíng', 'xǔ'] },
-                { hanzi: '辰宿列张', pinyin: ['Chén', 'xiù', 'liè', 'zhāng'] },
-                { hanzi: '寒来暑往', pinyin: ['Hán', 'lái', 'shǔ', 'wǎng'] },
-                { hanzi: '秋收冬藏', pinyin: ['Qiū', 'shōu', 'dōng', 'cáng'] },
-                { hanzi: '闰余成岁', pinyin: ['Rùn', 'yú', 'chéng', 'suì'] },
-                { hanzi: '律吕调阳', pinyin: ['Lǜ', 'lǚ', 'tiáo', 'yáng'] },
-                { hanzi: '云腾致雨', pinyin: ['Yún', 'téng', 'zhì', 'yǔ'] },
-                { hanzi: '露结为霜', pinyin: ['Lù', 'jié', 'wéi', 'shuāng'] },
-                { hanzi: '金生丽水', pinyin: ['Jīn', 'shēng', 'lí', 'shuǐ'] },
-                { hanzi: '玉出昆冈', pinyin: ['Yù', 'chū', 'kūn', 'gāng'] },
-                { hanzi: '剑号巨阙', pinyin: ['Jiàn', 'hào', 'jù', 'quē'] },
-                { hanzi: '珠称夜光', pinyin: ['Zhū', 'chēng', 'yè', 'guāng'] },
-                { hanzi: '果珍李柰', pinyin: ['Guǒ', 'zhēn', 'lǐ', 'nài'] },
-                { hanzi: '菜重芥姜', pinyin: ['Cài', 'zhòng', 'jiè', 'jiāng'] },
-                { hanzi: '海咸河淡', pinyin: ['Hǎi', 'xián', 'hé', 'dàn'] },
-                { hanzi: '鳞潜羽翔', pinyin: ['Lín', 'qián', 'yǔ', 'xiáng'] },
-                { hanzi: '龙师火帝', pinyin: ['Lóng', 'shī', 'huǒ', 'dì'] },
-                { hanzi: '鸟官人皇', pinyin: ['Niǎo', 'guān', 'rén', 'huáng'] },
-                { hanzi: '始制文字', pinyin: ['Shǐ', 'zhì', 'wén', 'zì'] },
-                { hanzi: '乃服衣裳', pinyin: ['Nǎi', 'fú', 'yī', 'shāng'] },
-                { hanzi: '推位让国', pinyin: ['Tuī', 'wèi', 'ràng', 'guó'] },
-                { hanzi: '有虞陶唐', pinyin: ['Yǒu', 'yú', 'táo', 'táng'] },
-                { hanzi: '吊民伐罪', pinyin: ['Diào', 'mín', 'fá', 'zuì'] },
-                { hanzi: '周发殷汤', pinyin: ['Zhōu', 'fā', 'yīn', 'tāng'] },
-                { hanzi: '坐朝问道', pinyin: ['Zuò', 'cháo', 'wèn', 'dào'] },
-                { hanzi: '垂拱平章', pinyin: ['Chuí', 'gǒng', 'píng', 'zhāng'] },
-                { hanzi: '爱育黎首', pinyin: ['Ài', 'yù', 'lí', 'shǒu'] },
-                { hanzi: '臣伏戎羌', pinyin: ['Chén', 'fú', 'róng', 'qiāng'] },
-                { hanzi: '遐迩一体', pinyin: ['Xiá', 'ěr', 'yī', 'tǐ'] },
-                { hanzi: '率宾归王', pinyin: ['Shuài', 'bīn', 'guī', 'wáng'] },
-                { hanzi: '鸣凤在竹', pinyin: ['Míng', 'fèng', 'zài', 'zhú'] },
-                { hanzi: '白驹食场', pinyin: ['Bái', 'jū', 'shí', 'chǎng'] },
-                { hanzi: '化被草木', pinyin: ['Huà', 'bèi', 'cǎo', 'mù'] },
-                { hanzi: '赖及万方', pinyin: ['Lài', 'jí', 'wàn', 'fāng'] },
-                { hanzi: '盖此身发', pinyin: ['Gài', 'cǐ', 'shēn', 'fà'] },
-                { hanzi: '四大五常', pinyin: ['Sì', 'fù', 'wǔ', 'cháng'] },
-                { hanzi: '恭惟鞠养', pinyin: ['Gōng', 'wéi', 'jū', 'yǎng'] },
-                { hanzi: '岂敢毁伤', pinyin: ['Qǐ', 'gǎn', 'huǐ', 'shāng'] },
+                { hanzi: '天地玄黄', pinyin: ['tiān', 'dì', 'xuán', 'huáng'] },
+                { hanzi: '宇宙洪荒', pinyin: ['yǔ', 'zhòu', 'hóng', 'huāng'] },
+                { hanzi: '日月盈昃', pinyin: ['rì', 'yuè', 'yíng', 'xǔ'] },
+                { hanzi: '辰宿列张', pinyin: ['chén', 'xiù', 'liè', 'zhāng'] },
+                { hanzi: '寒来暑往', pinyin: ['hán', 'lái', 'shǔ', 'wǎng'] },
+                { hanzi: '秋收冬藏', pinyin: ['qiū', 'shōu', 'dōng', 'cáng'] },
+                { hanzi: '闰余成岁', pinyin: ['rùn', 'yú', 'chéng', 'suì'] },
+                { hanzi: '律吕调阳', pinyin: ['lǜ', 'lǚ', 'tiáo', 'yáng'] },
+                { hanzi: '云腾致雨', pinyin: ['yún', 'téng', 'zhì', 'yǔ'] },
+                { hanzi: '露结为霜', pinyin: ['lù', 'jié', 'wéi', 'shuāng'] },
+                { hanzi: '金生丽水', pinyin: ['jīn', 'shēng', 'lí', 'shuǐ'] },
+                { hanzi: '玉出昆冈', pinyin: ['yù', 'chū', 'kūn', 'gāng'] },
+                { hanzi: '剑号巨阙', pinyin: ['jiàn', 'hào', 'jù', 'quē'] },
+                { hanzi: '珠称夜光', pinyin: ['zhū', 'chēng', 'yè', 'guāng'] },
+                { hanzi: '果珍李柰', pinyin: ['guǒ', 'zhēn', 'lǐ', 'nài'] },
+                { hanzi: '菜重芥姜', pinyin: ['cài', 'zhòng', 'jiè', 'jiāng'] },
+                { hanzi: '海咸河淡', pinyin: ['hǎi', 'xián', 'hé', 'dàn'] },
+                { hanzi: '鳞潜羽翔', pinyin: ['lín', 'qián', 'yǔ', 'xiáng'] },
+                { hanzi: '龙师火帝', pinyin: ['lóng', 'shī', 'huǒ', 'dì'] },
+                { hanzi: '鸟官人皇', pinyin: ['niǎo', 'guān', 'rén', 'huáng'] },
+                { hanzi: '始制文字', pinyin: ['shǐ', 'zhì', 'wén', 'zì'] },
+                { hanzi: '乃服衣裳', pinyin: ['nǎi', 'fú', 'yī', 'shāng'] },
+                { hanzi: '推位让国', pinyin: ['tuī', 'wèi', 'ràng', 'guó'] },
+                { hanzi: '有虞陶唐', pinyin: ['yǒu', 'yú', 'táo', 'táng'] },
+                { hanzi: '吊民伐罪', pinyin: ['diào', 'mín', 'fá', 'zuì'] },
+                { hanzi: '周发殷汤', pinyin: ['zhōu', 'fā', 'yīn', 'tāng'] },
+                { hanzi: '坐朝问道', pinyin: ['zuò', 'cháo', 'wèn', 'dào'] },
+                { hanzi: '垂拱平章', pinyin: ['chuí', 'gǒng', 'píng', 'zhāng'] },
+                { hanzi: '爱育黎首', pinyin: ['ài', 'yù', 'lí', 'shǒu'] },
+                { hanzi: '臣伏戎羌', pinyin: ['chén', 'fú', 'róng', 'qiāng'] },
+                { hanzi: '遐迩一体', pinyin: ['xiá', 'ěr', 'yī', 'tǐ'] },
+                { hanzi: '率宾归王', pinyin: ['shuài', 'bīn', 'guī', 'wáng'] },
+                { hanzi: '鸣凤在竹', pinyin: ['míng', 'fèng', 'zài', 'zhú'] },
+                { hanzi: '白驹食场', pinyin: ['bái', 'jū', 'shí', 'chǎng'] },
+                { hanzi: '化被草木', pinyin: ['huà', 'bèi', 'cǎo', 'mù'] },
+                { hanzi: '赖及万方', pinyin: ['lài', 'jí', 'wàn', 'fāng'] },
+                { hanzi: '盖此身发', pinyin: ['gài', 'cǐ', 'shēn', 'fà'] },
+                { hanzi: '四大五常', pinyin: ['sì', 'fù', 'wǔ', 'cháng'] },
+                { hanzi: '恭惟鞠养', pinyin: ['gōng', 'wéi', 'jū', 'yǎng'] },
+                { hanzi: '岂敢毁伤', pinyin: ['qǐ', 'gǎn', 'huǐ', 'shāng'] },
                 { hanzi: '女慕贞洁', pinyin: ['Nǚ', 'mù', 'zhēn', 'jié'] },
                 { hanzi: '男效才良', pinyin: ['Nán', 'xiào', 'cái', 'liáng'] },
                 { hanzi: '知过必改', pinyin: ['Zhī', 'guò', 'bì', 'gǎi'] },
